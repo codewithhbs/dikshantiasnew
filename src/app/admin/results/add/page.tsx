@@ -12,7 +12,8 @@ export default function AddResultPage() {
 
   // 📌 Basic Info
   const [name, setName] = useState("");
-  const [rank, setRank] = useState<number | "">("");
+  const [rank, setRank] = useState("");
+
   const [service, setService] = useState("");
   const [year, setYear] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -102,7 +103,7 @@ export default function AddResultPage() {
               <input
                 type="text"
                 value={rank}
-                onChange={(e) => setRank(Number(e.target.value))}
+                onChange={(e) => setRank(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
                 required
               />
