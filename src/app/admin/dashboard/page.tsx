@@ -101,14 +101,14 @@ export default function Dashboard() {
               <Globe size={18} />
               VISIT OUR ENGLISH WEBSITE
             </a>
-           <a
-  href="https://app.download.link"
-  target="_blank"
-  className="bg-gradient-to-tr from-[#ED2988] to-[#9C1F64] hover:from-[#d61f76] hover:to-[#7d1750] text-white font-semibold px-5 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
->
-  <Download size={18} />
-  DOWNLOAD DIKSHANT LEARNING APP
-</a>
+            <a
+              href="https://app.download.link"
+              target="_blank"
+              className="bg-gradient-to-tr from-[#ED2988] to-[#9C1F64] hover:from-[#d61f76] hover:to-[#7d1750] text-white font-semibold px-5 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Download size={18} />
+              DOWNLOAD DIKSHANT LEARNING APP
+            </a>
 
           </div>
         </div>
