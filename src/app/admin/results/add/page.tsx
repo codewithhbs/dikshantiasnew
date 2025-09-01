@@ -100,7 +100,7 @@ export default function AddResultPage() {
             <div>
               <label className="block font-medium text-gray-700 mb-1">Rank</label>
               <input
-                type="number"
+                type="text"
                 value={rank}
                 onChange={(e) => setRank(Number(e.target.value))}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
