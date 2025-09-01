@@ -29,7 +29,7 @@ const Testimonials = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await fetch('/api/admin/testimonials', { cache: 'no-store' });k
+        const res = await fetch('/api/admin/testimonials', { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch testimonials');
         const data = await res.json();
         setTestimonials(data);
