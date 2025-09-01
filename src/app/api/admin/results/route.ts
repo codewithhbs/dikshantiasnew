@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
     const name = formData.get("name") as string;
-    const rank = Number(formData.get("rank"));
+    const rank = formData.get("rank") as string;
     const service = formData.get("service") as string;
     const year = formData.get("year") as string;
 
