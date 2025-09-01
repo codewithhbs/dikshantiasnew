@@ -30,13 +30,7 @@ export async function POST(req: Request) {
 
     const imageFile = formData.get("image") as File;
 
-    if (!name || !rank || !service || !year) {
-      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
-    }
-
-    if (!imageFile) {
-      return NextResponse.json({ error: "Image is required" }, { status: 400 });
-    }
+   
 
     // Convert file to Buffer
     const buffer = Buffer.from(await imageFile.arrayBuffer());
