@@ -196,11 +196,19 @@ export default function CoursePage() {
                             className="pl-7 pr-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-[#e94e4e] focus:outline-none shadow-sm transition"
                         >
                             <option value="">All Languages</option>
-                            {Array.from(new Set(courses.map((c) => c.languages))).map((lang, index) => (
-                                <option key={index} value={lang}>{lang}</option>
+                            {Array.from(
+                                new Set(
+                                    courses
+                                        .flatMap((c) => c.languages.split(",").map((lang) => lang.trim()))
+                                )
+                            ).map((lang, index) => (
+                                <option key={index} value={lang}>
+                                    {lang}
+                                </option>
                             ))}
                         </select>
                     </div>
+
 
                     {/* Course Mode Filter */}
                     <div className="relative">
