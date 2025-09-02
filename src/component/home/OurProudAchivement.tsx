@@ -16,29 +16,48 @@ interface Topper {
   }
 }
 
+interface SectionContent {
+  description: string
+  buttonText: string
+  buttonLink: string
+}
+
 export default function OurProudAchivement() {
+  const [section, setSection] = useState<SectionContent | null>(null)
   const [toppers, setToppers] = useState<Topper[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [itemsPerView, setItemsPerView] = useState(4)
 
-// Fetch toppers from API
-useEffect(() => {
-  const fetchResults = async () => {
-    try {
-      const res = await fetch("/api/admin/results")
-      const data = await res.json()
-
-      const activeResults = data.filter((item) => item.active === true)
-
-      setToppers(activeResults)
-    } catch (error) {
-      console.error("Error fetching results:", error)
+  // ✅ Fetch section content
+  useEffect(() => {
+    const fetchSection = async () => {
+      try {
+        const res = await fetch("/api/admin/result-section")
+        const data = await res.json()
+        setSection(data)
+      } catch (err) {
+        console.error("Error fetching section:", err)
+      }
     }
-  }
-  fetchResults()
-}, [])
+    fetchSection()
+  }, [])
 
-  // Responsive items per view
+  // ✅ Fetch toppers
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const res = await fetch("/api/admin/results")
+        const data = await res.json()
+        const activeResults = data.filter((item: Topper & { active: boolean }) => item.active === true)
+        setToppers(activeResults)
+      } catch (error) {
+        console.error("Error fetching results:", error)
+      }
+    }
+    fetchResults()
+  }, [])
+
+  // ✅ Responsive items per view
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
@@ -57,7 +76,7 @@ useEffect(() => {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  // Adjust index when items change
+  // ✅ Adjust index when items change
   useEffect(() => {
     const maxIndex = Math.max(0, toppers.length - itemsPerView)
     if (currentIndex > maxIndex) {
@@ -75,7 +94,7 @@ useEffect(() => {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1))
   }
 
-  // Autoplay
+  // ✅ Autoplay
   useEffect(() => {
     if (toppers.length === 0) return
     const interval = setInterval(() => {
@@ -92,16 +111,13 @@ useEffect(() => {
             Our Results
           </h2>
 
-          {/* ✅ Static text */}
-          <p className="text-blue-950 mb-4 md:mb-10">
-            For the last 21 years, Dikshant IAS has been shaping the success stories of aspirants. With
-            consistent and remarkable results, we have established ourselves as one of the most trusted
-            institutes for UPSC examinations.
-            <br />
-            Every year, a large number of our students secure top ranks in Civil Services. This consistent
-            success is the outcome of our experienced faculty, quality study material, and student-focused
-            approach. The results stand as a testimony to our commitment to excellence.
-          </p>
+          {/* ✅ Dynamic description */}
+          {section?.description && (
+            <p
+              className="text-blue-950 mb-4 md:mb-10"
+              dangerouslySetInnerHTML={{ __html: section.description }}
+            />
+          )}
 
           <div className="relative">
             {toppers.length > itemsPerView && (
@@ -162,10 +178,13 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* ✅ Static button */}
+          {/* ✅ Dynamic button */}
           <div className="flex justify-center mt-8">
-            <Link href="#" className="px-4 py-2 bg-[#a50309] text-white rounded-md">
-              View All Results
+            <Link
+              href={section?.buttonLink || "#"}
+              className="px-4 py-2 bg-[#a50309] text-white rounded-md"
+            >
+              {section?.buttonText || "View All Results"}
             </Link>
           </div>
         </div>
