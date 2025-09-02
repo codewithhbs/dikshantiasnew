@@ -181,7 +181,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     if (!courseId) {
-      toast.error("Course ID missing ❌");
+      toast.error("Course ID missing");
       setSubmitting(false);
       return;
     }
@@ -238,13 +238,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     if (!res.ok) throw new Error("Failed to update course");
 
-    // ✅ Show success toast once, before redirect
     toast.success("Course updated successfully");
     router.push("/admin/courses");
 
   } catch (err) {
     console.error(err);
-    toast.error("Failed to update course ❌");
+    toast.error("Failed to update course");
   } finally {
     setSubmitting(false);
   }

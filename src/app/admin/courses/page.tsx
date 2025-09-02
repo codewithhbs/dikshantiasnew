@@ -91,7 +91,6 @@ export default function CoursePage() {
         setConfirmOpen(true);
     };
 
-
     const handleToggleActive = (id: string, currentStatus: boolean) => {
         setConfirmTitle(currentStatus ? "Deactivate this course?" : "Activate this course?");
         setConfirmMessage(
@@ -107,20 +106,18 @@ export default function CoursePage() {
                     headers: { "Content-Type": "application/json" },
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
+                if (!res.ok) throw new Error("Failed to update course");
 
-                    // ✅ Use returned course object
-                    setCourses((prev) =>
-                        prev.map((course) =>
-                            course._id === id ? { ...course, active: data.course.active } : course
-                        )
-                    );
+                const data = await res.json();
 
-                    toast.success(`Course has been ${!currentStatus ? "activated" : "deactivated"}`);
-                } else {
-                    toast.error("Something went wrong.");
-                }
+                // ✅ correctly update the course list
+                setCourses((prev) =>
+                    prev.map((course) =>
+                        course._id === id ? { ...course, active: data.course.active } : course
+                    )
+                );
+
+                toast.success(`Course has been ${!currentStatus ? "activated" : "deactivated"}`);
             } catch (err) {
                 toast.error("Failed to update course.");
             } finally {
@@ -130,6 +127,7 @@ export default function CoursePage() {
 
         setConfirmOpen(true);
     };
+
 
 
     const filteredCourses = courses.filter((course) => {
@@ -316,6 +314,7 @@ export default function CoursePage() {
                                                 </div>
                                             </label>
                                         </td>
+
                                         <td className="py-3 px-5 text-center">
                                             <div className="flex justify-center gap-2">
                                                 <button

@@ -162,11 +162,11 @@ export default function AddCoursePage() {
 
             if (!res.ok) throw new Error("Failed to create course");
 
-            toast.success("Course added successfully 🎉");
+            toast.success("Course added successfully");
             router.push("/admin/courses");
         } catch (err) {
             console.error("Error submitting course:", err);
-            toast.error("Failed to add course ❌");
+            toast.error("Failed to add course");
         } finally {
             setSubmitting(false);
         }
