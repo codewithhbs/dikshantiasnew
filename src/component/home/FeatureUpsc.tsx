@@ -4,131 +4,59 @@ import { ChevronLeft, ChevronRight, Clock, Users, CheckCircle } from 'lucide-rea
 import Image from 'next/image';
 
 interface Program {
-  id: number;
-  badge: string;
-  badgeColor: string;
+  _id: string;
+  badge?: string;
+  badgeColor?: string;
   title: string;
   description: string;
   originalPrice: number;
   currentPrice: number;
-  rating: number;
-  duration: string;
-  students: string;
+  rating?: number;
+  duration: string; // from API
+  students?: string; // optional
+  lectures?: number; // fallback if students not present
   features: string[];
-  moreFeatures: number;
+  moreFeatures?: number;
   image: string;
-  backcolor: string;
-}
-
-interface ProgramCardProps {
-  program: Program;
+  backcolor?: string;
 }
 
 const FeatureUpsc: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [slidesToShow, setSlidesToShow] = useState<number>(1);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const sliderRef = useRef<HTMLDivElement>(null);
 
-  const programs: Program[] = [
-    {
-      id: 1,
-      badge: 'Most Popular',
-      badgeColor: 'bg-green-500',
-      title: 'Prelims Foundation',
-      description: 'Complete preparation for UPSC Preliminary Examination',
-      originalPrice: 65000,
-      currentPrice: 48000,
-      rating: 4.9,
-      duration: '12 Months',
-      students: '3,500+',
-      features: ['Complete NCERT Foundation', 'Daily Current Affairs', '25+ Mock Tests'],
-      moreFeatures: 2,
-      image: '/img/Prelims-Foundation-Course.webp',
-      backcolor: 'purple-200',
-    },
-    {
-      id: 2,
-      badge: 'High Success Rate',
-      badgeColor: 'bg-blue-500',
-      title: 'Mains Intensive Course',
-      description: 'Comprehensive mains preparation with answer writing mastery',
-      originalPrice: 70000,
-      currentPrice: 58000,
-      rating: 4.8,
-      duration: '10 Months',
-      students: '2,200+',
-      features: ['Essay Writing Masterclass', 'GS Paper-wise Coverage', 'Weekly Answer Tests'],
-      moreFeatures: 2,
-      image: '/img/Mains-Intensive-Course.webp',
-      backcolor: 'purple-200',
-    },
-    {
-      id: 3,
-      badge: 'Best Value',
-      badgeColor: 'bg-red-600',
-      title: 'Complete UPSC Course',
-      description: 'End-to-end preparation from Prelims to Interview',
-      originalPrice: 125000,
-      currentPrice: 89000,
-      rating: 4.9,
-      duration: '18 Months',
-      students: '4,100+',
-      features: ['Prelims + Mains + Interview', 'Optional Subject Coaching', 'Unlimited Mock Tests'],
-      moreFeatures: 2,
-      image: '/img/Complete-UPSC-Course.webp',
-      backcolor: 'purple-200',
-    },
-    {
-      id: 4,
-      badge: 'Expert Faculty',
-      badgeColor: 'bg-purple-500',
-      title: 'Sociology Optional',
-      description: 'Specialized coaching for Sociology optional subject',
-      originalPrice: 52000,
-      currentPrice: 38000,
-      rating: 4.7,
-      duration: '8 Months',
-      students: '1,800+',
-      features: ['Subject Expert Faculty', 'Previous Year Analysis', 'Weekly Tests'],
-      moreFeatures: 2,
-      image: '/img/Sociology-Optional.webp',
-      backcolor: 'purple-200',
-    },
-    {
-      id: 5,
-      badge: 'New Launch',
-      badgeColor: 'bg-orange-500',
-      title: 'Essay Writing Masterclass',
-      description: 'Focused training on essay writing techniques',
-      originalPrice: 35000,
-      currentPrice: 25000,
-      rating: 4.6,
-      duration: '6 Months',
-      students: '1,200+',
-      features: ['Expert Essay Review', 'Weekly Practice Tests', 'Personalized Feedback'],
-      moreFeatures: 2,
-      image: '/img/Essay-Writing-Masterclass.webp',
-      backcolor: 'purple-200',
-    },
-    {
-      id: 6,
-      badge: 'Limited Seats',
-      badgeColor: 'bg-indigo-500',
-      title: 'Interview Guidance',
-      description: 'Comprehensive interview preparation with mock sessions',
-      originalPrice: 45000,
-      currentPrice: 32000,
-      rating: 4.8,
-      duration: '4 Months',
-      students: '800+',
-      features: ['Mock Interview Sessions', 'Personality Development', 'Current Affairs Focus'],
-      moreFeatures: 2,
-      image: '/img/Interview-Guidance-Program.webp',
-      backcolor: 'purple-200',
-    },
-  ];
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/api/admin/courses');
+        const data = await res.json();
+        const formatted = data.map((course: any) => ({
+          _id: course._id,
+          badge: course.badge || '',
+          badgeColor: course.badgeColor || 'bg-gray-500',
+          title: course.title,
+          description: course.shortContent || '',
+          originalPrice: course.originalPrice,
+          currentPrice: course.price,
+          duration: course.duration ? `${course.duration} Hours` : 'N/A',
+          students: course.students || `${course.lectures || 0} Lectures`,
+          features: course.features || [],
+          moreFeatures: course.features?.length > 2 ? course.features.length - 2 : 0,
+          image: course.image?.url || '/img/default-course.webp',
+          backcolor: 'purple-200',
+        }));
+        setPrograms(formatted);
+      } catch (err) {
+        console.error('Failed to fetch programs:', err);
+      }
+    };
+    fetchPrograms();
+  }, []);
 
-  // Update slide count based on screen width
+  // Update slidesToShow based on screen width
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -144,11 +72,8 @@ const FeatureUpsc: React.FC = () => {
 
   const maxSlides = Math.max(0, programs.length - slidesToShow);
 
-  // Update current slide if out of bounds
   useEffect(() => {
-    if (currentSlide > maxSlides) {
-      setCurrentSlide(maxSlides);
-    }
+    if (currentSlide > maxSlides) setCurrentSlide(maxSlides);
   }, [slidesToShow, programs.length, currentSlide, maxSlides]);
 
   const nextSlide = useCallback(() => {
@@ -159,16 +84,11 @@ const FeatureUpsc: React.FC = () => {
     setCurrentSlide((prev) => (prev <= 0 ? maxSlides : prev - 1));
   };
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(Math.min(index, maxSlides));
-  };
+  const goToSlide = (index: number) => setCurrentSlide(Math.min(index, maxSlides));
 
   // Autoplay
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 3000);
-
+    const interval = setInterval(() => nextSlide(), 3000);
     return () => clearInterval(interval);
   }, [nextSlide]);
 
@@ -193,7 +113,7 @@ const FeatureUpsc: React.FC = () => {
             >
               {programs.map((program) => (
                 <div
-                  key={program.id}
+                  key={program._id}
                   className="flex-shrink-0 md:px-3 px-0"
                   style={{ width: `${100 / slidesToShow}%` }}
                 >
@@ -228,8 +148,9 @@ const FeatureUpsc: React.FC = () => {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-7 h-2 md:w-7 md:h-3 rounded-full ${currentSlide === index ? 'bg-[#f43144]' : 'bg-gray-300'
-                    }`}
+                  className={`w-7 h-2 md:w-7 md:h-3 rounded-full ${
+                    currentSlide === index ? 'bg-[#f43144]' : 'bg-gray-300'
+                  }`}
                 />
               ))}
             </div>
@@ -241,13 +162,19 @@ const FeatureUpsc: React.FC = () => {
 };
 
 // Program Card Component
+interface ProgramCardProps {
+  program: Program;
+}
+
 const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
   return (
     <div className="rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow bg-white h-full relative">
       {/* Badge */}
-      <div className={`absolute top-4 left-4 ${program.badgeColor} text-white px-3 py-1 rounded-full text-sm font-medium z-10`}>
-        {program.badge}
-      </div>
+      {program.badge && (
+        <div className={`absolute top-4 left-4 ${program.badgeColor} text-white px-3 py-1 rounded-full text-sm font-medium z-10`}>
+          {program.badge}
+        </div>
+      )}
 
       {/* Price */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow p-2 z-10 text-sm">
@@ -286,15 +213,16 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
           ))}
           {program.features.length > 2 && (
             <div className="text-[#f43144] text-sm font-medium">
-              +{program.features.length - 2 + program.moreFeatures} more features
+              +{program.features.length - 2 + (program.moreFeatures || 0)} more features
             </div>
           )}
         </div>
 
         {/* Buttons */}
-
         <div className="mt-auto flex gap-2.5 items-center">
-          <button className="bg-blue-950 hover:bg-[#d12a3a] text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">View Details</button>
+          <button className="bg-blue-950 hover:bg-[#d12a3a] text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
+            View Details
+          </button>
           <button className="bg-[#f43144] hover:bg-blue-950 text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
             Enroll Now
           </button>
