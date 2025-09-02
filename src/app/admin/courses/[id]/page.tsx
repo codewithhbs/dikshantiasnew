@@ -4,20 +4,39 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import AdminLayout from "@/component/admin/AdminLayout";
 import ImageUpload from "@/component/admin/ImageUpload";
-import { CheckCircle, Play } from "lucide-react";
+import { CheckCircle, Play, Palette } from "lucide-react";
 import toast from "react-hot-toast";
 import RichTextEditor from "@/component/admin/RichTextEditor";
+
+
+const tailwindColors = [
+    "bg-red-500",
+    "bg-green-500",
+    "bg-blue-500",
+    "bg-indigo-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-yellow-500",
+    "bg-gray-500",
+    "bg-orange-500",
+    "bg-teal-500",
+    "bg-cyan-500",
+    "bg-rose-500",
+];
 
 export default function CourseFormPage() {
     const params = useParams();
     const router = useRouter();
     const courseId = params?.id as string | undefined;
 
+
+    const [showColorDropdown, setShowColorDropdown] = useState(false);
+
     // 📌 Basic Info
     const [title, setTitle] = useState("");
     const [slug, setSlug] = useState("");
     const [isSlugEdited, setIsSlugEdited] = useState(false);
-    
+
     const [shortContent, setShortContent] = useState("");
     const [content, setContent] = useState("");
     const [active, setActive] = useState(true);
@@ -38,6 +57,13 @@ export default function CourseFormPage() {
     const [secondInstallment, setSecondInstallment] = useState<string | "">("");
     const [thirdInstallment, setThirdInstallment] = useState<string | "">("");
     const [fourthInstallment, setFourthInstallment] = useState<string | "">("");
+
+    // Badge & Features
+    const [badge, setBadge] = useState<string>("Limited Seats");
+    const [badgeColor, setBadgeColor] = useState<string>("bg-indigo-500");
+    const [featureInput, setFeatureInput] = useState<string>("");
+    const [features, setFeatures] = useState<string[]>([]);
+
 
     // 📌 Media
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -76,12 +102,17 @@ export default function CourseFormPage() {
                 if (!res.ok) throw new Error("Failed to fetch course");
                 const data = await res.json();
 
-                // ✅ Pre-fill states
+                //Pre-fill states
                 setTitle(data.title);
                 setSlug(data.slug);
                 setShortContent(data.shortContent || "");
                 setContent(data.content || "");
                 setActive(data.active);
+
+                // Badge & Features
+                setBadge(data.badge || "Limited Seats");
+                setBadgeColor(data.badgeColor || "bg-indigo-500");
+                setFeatures(data.features || []);
 
                 setCourseMode(data.courseMode || "");
                 setLectures(data.lectures ?? "");
@@ -125,28 +156,28 @@ export default function CourseFormPage() {
     }, [courseId]);
 
     // 🔹 Auto slug from title
-useEffect(() => {
-  if (!isSlugEdited) {
-    if (title) {
-      setSlug(
-        title
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-      );
-    } else {
-      setSlug(""); // clear slug if title is empty
-    }
-  }
-}, [title]);
+    useEffect(() => {
+        if (!isSlugEdited) {
+            if (title) {
+                setSlug(
+                    title
+                        .toLowerCase()
+                        .trim()
+                        .replace(/[^a-z0-9\s-]/g, "")
+                        .replace(/\s+/g, "-")
+                        .replace(/-+/g, "-")
+                );
+            } else {
+                setSlug(""); // clear slug if title is empty
+            }
+        }
+    }, [title]);
 
-// Handle manual slug change
-const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setSlug(e.target.value);
-  setIsSlugEdited(true); // mark as manually edited
-};
+    // Handle manual slug change
+    const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSlug(e.target.value);
+        setIsSlugEdited(true); // mark as manually edited
+    };
 
 
     // 🔹 Helpers for videos
@@ -174,86 +205,93 @@ const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     };
 
 
-// 🔹 Handle Update Only
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setSubmitting(true);
+    // 🔹 Handle Update Only
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubmitting(true);
 
-  try {
-    if (!courseId) {
-      toast.error("Course ID missing");
-      setSubmitting(false);
-      return;
-    }
+        try {
+            if (!courseId) {
+                toast.error("Course ID missing");
+                setSubmitting(false);
+                return;
+            }
 
-    const formData = new FormData();
+            const formData = new FormData();
 
-    formData.append("title", title);
-    formData.append("slug", slug);
-    formData.append("shortContent", shortContent);
-    formData.append("content", content);
-    formData.append("active", JSON.stringify(active));
-    formData.append("courseMode", courseMode);
+            formData.append("title", title);
+            formData.append("slug", slug);
+            formData.append("shortContent", shortContent);
+            formData.append("content", content);
+            formData.append("active", JSON.stringify(active));
+            formData.append("courseMode", courseMode);
 
-    if (lectures !== "") formData.append("lectures", String(lectures));
-    if (duration) formData.append("duration", duration);
-    if (languages) formData.append("languages", languages);
-    if (displayOrder !== "") formData.append("displayOrder", String(displayOrder));
-
-    if (originalPrice !== "") formData.append("originalPrice", String(originalPrice));
-    if (price !== "") formData.append("price", String(price));
-    if (totalFee !== "") formData.append("totalFee", String(totalFee));
-    if (oneTimeFee !== "") formData.append("oneTimeFee", String(oneTimeFee));
-    if (firstInstallment !== "") formData.append("firstInstallment", String(firstInstallment));
-    if (secondInstallment !== "") formData.append("secondInstallment", String(secondInstallment));
-    if (thirdInstallment !== "") formData.append("thirdInstallment", String(thirdInstallment));
-    if (fourthInstallment !== "") formData.append("fourthInstallment", String(fourthInstallment));
-
-    if (imageFile) {
-      formData.append("image", imageFile);
-      if (imageAlt) formData.append("imageAlt", imageAlt);
-    }
-
-    if (demoVideo) formData.append("demoVideo", demoVideo);
-    if (videos.length > 0) {
-      formData.append("videos", JSON.stringify(videos));
-    }
-
-    if (metaTitle) formData.append("metaTitle", metaTitle);
-    if (metaDescription) formData.append("metaDescription", metaDescription);
-    if (metaKeywords.length > 0) {
-      formData.append("metaKeywords", JSON.stringify(metaKeywords));
-    }
-    if (canonicalUrl) formData.append("canonicalUrl", canonicalUrl);
-    if (ogTitle) formData.append("ogTitle", ogTitle);
-    if (ogDescription) formData.append("ogDescription", ogDescription);
-    formData.append("index", JSON.stringify(index));
-    formData.append("follow", JSON.stringify(follow));
-
-    // ✅ Always update (PUT)
-    const res = await fetch(`/api/admin/courses/${courseId}`, {
-      method: "PUT",
-      body: formData,
-    });
-
-    if (!res.ok) throw new Error("Failed to update course");
-
-    toast.success("Course updated successfully");
-    router.push("/admin/courses");
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to update course");
-  } finally {
-    setSubmitting(false);
-  }
-};
+            if (lectures !== "") formData.append("lectures", String(lectures));
+            if (duration) formData.append("duration", duration);
+            if (languages) formData.append("languages", languages);
+            if (displayOrder !== "") formData.append("displayOrder", String(displayOrder));
 
 
 
+            if (originalPrice !== "") formData.append("originalPrice", String(originalPrice));
+            if (price !== "") formData.append("price", String(price));
+            if (totalFee !== "") formData.append("totalFee", String(totalFee));
+            if (oneTimeFee !== "") formData.append("oneTimeFee", String(oneTimeFee));
+            if (firstInstallment !== "") formData.append("firstInstallment", String(firstInstallment));
+            if (secondInstallment !== "") formData.append("secondInstallment", String(secondInstallment));
+            if (thirdInstallment !== "") formData.append("thirdInstallment", String(thirdInstallment));
+            if (fourthInstallment !== "") formData.append("fourthInstallment", String(fourthInstallment));
 
-     // Loading UI
-   if (loading) {
+            if (badge) formData.append("badge", badge);
+            if (badgeColor) formData.append("badgeColor", badgeColor);
+            if (features.length > 0) formData.append("features", JSON.stringify(features));
+
+
+            if (imageFile) {
+                formData.append("image", imageFile);
+                if (imageAlt) formData.append("imageAlt", imageAlt);
+            }
+
+            if (demoVideo) formData.append("demoVideo", demoVideo);
+            if (videos.length > 0) {
+                formData.append("videos", JSON.stringify(videos));
+            }
+
+            if (metaTitle) formData.append("metaTitle", metaTitle);
+            if (metaDescription) formData.append("metaDescription", metaDescription);
+            if (metaKeywords.length > 0) {
+                formData.append("metaKeywords", JSON.stringify(metaKeywords));
+            }
+            if (canonicalUrl) formData.append("canonicalUrl", canonicalUrl);
+            if (ogTitle) formData.append("ogTitle", ogTitle);
+            if (ogDescription) formData.append("ogDescription", ogDescription);
+            formData.append("index", JSON.stringify(index));
+            formData.append("follow", JSON.stringify(follow));
+
+            // ✅ Always update (PUT)
+            const res = await fetch(`/api/admin/courses/${courseId}`, {
+                method: "PUT",
+                body: formData,
+            });
+
+            if (!res.ok) throw new Error("Failed to update course");
+
+            toast.success("Course updated successfully");
+            router.push("/admin/courses");
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to update course");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+
+
+
+    // Loading UI
+    if (loading) {
         return (
             <div className="flex items-center justify-center h-screen bg-gray-100">
                 <div className="flex flex-col items-center">
@@ -268,7 +306,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         );
     }
 
-     if (submitting) {
+    if (submitting) {
         return (
             <div className="flex items-center justify-center h-screen bg-gray-100">
                 <div className="flex flex-col items-center">
@@ -317,7 +355,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 onChange={handleSlugChange}
                                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
                                 required
-                                />
+                            />
 
                         </div>
 
@@ -410,6 +448,118 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </div>
 
                 </div>
+
+
+                {/* Badge & Features */}
+                <div className="mt-6">
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300 pb-2">
+                        Badge & Features
+                    </h2>
+
+                    {/* Badge */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <label className="block font-medium text-gray-700 mb-1">Badge Text</label>
+                            <input
+                                type="text"
+                                value={badge}
+                                onChange={(e) => setBadge(e.target.value)}
+                                placeholder="Enter badge text"
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                            />
+                        </div>
+
+                        <div className="relative">
+                            <label className="block font-medium text-gray-700 mb-1">
+                                Badge Color (Tailwind class)
+                            </label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={badgeColor}
+                                    onChange={(e) => setBadgeColor(e.target.value)}
+                                    placeholder="e.g., bg-indigo-500"
+                                    className="flex-1 border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowColorDropdown(!showColorDropdown)}
+                                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
+                                >
+                                    <Palette size={20} />
+                                </button>
+                            </div>
+
+                            {showColorDropdown && (
+                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                    {tailwindColors.map((color) => (
+                                        <div
+                                            key={color}
+                                            onClick={() => {
+                                                setBadgeColor(color);
+                                                setShowColorDropdown(false);
+                                            }}
+                                            className="cursor-pointer px-4 py-2 flex items-center gap-2 hover:bg-gray-100"
+                                        >
+                                            <span className={`w-6 h-6 rounded-full ${color}`}></span>
+                                            <span className="text-gray-700">{color}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
+
+                    {/* Features */}
+                    <div>
+                        <label className="block font-medium text-gray-700 mb-2">Add Features</label>
+
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                            <input
+                                type="text"
+                                value={featureInput}
+                                onChange={(e) => setFeatureInput(e.target.value)}
+                                placeholder="Enter feature"
+                                className="flex-1 min-w-[180px] border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (featureInput.trim()) {
+                                        setFeatures([...features, featureInput.trim()]);
+                                        setFeatureInput("");
+                                    }
+                                }}
+                                className="flex items-center gap-2 px-4 py-3 bg-[#e94e4e] text-white rounded-lg shadow-md hover:bg-red-600 transition"
+                            >
+                                <CheckCircle size={18} className="text-white" /> Add
+                            </button>
+                        </div>
+
+                        {/* Features list */}
+                        <div className="flex flex-wrap gap-2">
+                            {features.map((f, idx) => (
+                                <span
+                                    key={idx}
+                                    className="bg-lime-100 px-3 py-1.5 rounded flex items-center gap-2 text-sm border border-gray-300"
+                                >
+                                    {f}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFeatures(features.filter((_, i) => i !== idx))}
+                                        className="text-red-500 font-bold hover:text-red-700 transition"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+
+                    </div>
+                </div>
+
+
                 {/* Image Upload */}
                 <div>
                     <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300-b pb-2">
@@ -422,10 +572,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 isLoading={false}
                                 initialImage={imageUrl}
                             />
-                               <span className="text-gray-400 text-xs mt-1 block">
-                            Recommended size: <strong>500px × 300px</strong></span>
+                            <span className="text-gray-400 text-xs mt-1 block">
+                                Recommended size: <strong>500px × 300px</strong></span>
 
-                            </div>
+                        </div>
 
 
                         <div>

@@ -23,12 +23,17 @@ export interface ICourse extends Document {
   secondInstallment?: number;
   thirdInstallment?: number;
   fourthInstallment?: number;
+   
+
+  badge?: string;
+  badgeColor?: string;
+  features?: string[];
 
   // Images
   image?: {
-    url: string;        // ✅ secure_url
-    public_url: string; // ✅ plain http url
-    public_id: string;  // ✅ Cloudinary public_id
+    url: string;
+    public_url: string;
+    public_id: string;
     alt: string;
   };
 
@@ -72,6 +77,10 @@ const CourseSchema: Schema = new Schema(
     secondInstallment: { type: Number },
     thirdInstallment: { type: Number },
     fourthInstallment: { type: Number },
+
+    badge: { type: String, default: 'Limited Seats' },
+    badgeColor: { type: String, default: 'bg-indigo-500' },
+    features: { type: [String], default: [] },     
 
     image: {
       url: { type: String },

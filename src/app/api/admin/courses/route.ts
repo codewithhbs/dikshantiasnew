@@ -42,10 +42,9 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
 
-    // ✅ Required fields
     const title = formData.get("title") as string;
 
-    // ✅ Slug (generate if missing)
+    //Slug (generate if missing)
     const rawSlug = formData.get("slug") as string | null;
     const slug =
       rawSlug && rawSlug.trim().length > 0
@@ -58,7 +57,7 @@ export async function POST(req: Request) {
       ? JSON.parse(formData.get("active") as string)
       : true;
 
-    // ✅ Basic Info
+    // Basic Info
     const courseMode = formData.get("courseMode") as "online" | "offline";
     const lectures = parseInt(formData.get("lectures") as string, 10);
     const duration = formData.get("duration") as string;
@@ -67,7 +66,7 @@ export async function POST(req: Request) {
       ? parseInt(formData.get("displayOrder") as string, 10)
       : 0;
 
-    // ✅ Pricing
+    // Pricing
     const originalPrice = formData.get("originalPrice")
       ? parseFloat(formData.get("originalPrice") as string)
       : undefined;
@@ -93,26 +92,33 @@ export async function POST(req: Request) {
       ? parseFloat(formData.get("fourthInstallment") as string)
       : undefined;
 
-    // ✅ Handle image
+    //Handle image
     let imageData: ICourse["image"] | undefined;
     const imageFile = formData.get("image") as File | null;
     if (imageFile) {
       const uploadedImage = await uploadImageToCloudinary(imageFile);
       imageData = {
-        url: uploadedImage.secure_url,       // ✅ main URL
-        public_url: uploadedImage.url,       // ✅ non-https URL
-        public_id: uploadedImage.public_id,  // ✅ Cloudinary public_id
+        url: uploadedImage.secure_url,
+        public_url: uploadedImage.url,
+        public_id: uploadedImage.public_id,
         alt: (formData.get("imageAlt") as string) || "",
       };
     }
 
-    // ✅ Videos
+    // Videos
     const demoVideo = formData.get("demoVideo") as string | undefined;
     const videos = formData.get("videos")
       ? JSON.parse(formData.get("videos") as string)
       : [];
 
-    // ✅ SEO fields
+       //Badge & Features
+    const badge = (formData.get("badge") as string) || undefined;
+    const badgeColor = (formData.get("badgeColor") as string) || undefined;
+    const features = formData.get("features")
+      ? JSON.parse(formData.get("features") as string)
+      : [];
+
+    //SEO fields
     const metaTitle = (formData.get("metaTitle") as string) || "";
     const metaDescription = (formData.get("metaDescription") as string) || "";
     const metaKeywords = formData.get("metaKeywords")
@@ -128,7 +134,7 @@ export async function POST(req: Request) {
       ? JSON.parse(formData.get("follow") as string)
       : true;
 
-    // ✅ Create and save course
+    // Create and save course
     const newCourse = await Course.create({
       title,
       slug,
@@ -159,6 +165,9 @@ export async function POST(req: Request) {
       ogDescription,
       index,
       follow,
+      badge,
+      badgeColor,
+      features, 
     });
 
     return NextResponse.json(newCourse, { status: 201 });

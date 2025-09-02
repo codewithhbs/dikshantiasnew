@@ -94,6 +94,14 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     const fourthInstallment = formData.get("fourthInstallment")
       ? parseFloat(formData.get("fourthInstallment") as string)
       : undefined;
+
+      const badge = (formData.get("badge") as string) || undefined;
+      const badgeColor = (formData.get("badgeColor") as string) || undefined;
+      const features = formData.get("features")
+        ? JSON.parse(formData.get("features") as string)
+        : undefined;
+
+
     let imageData: ICourse["image"] | undefined;
     const imageFile = formData.get("image") as File | null;
     if (imageFile) {
@@ -157,6 +165,9 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
         ogDescription,
         index,
         follow,
+          ...(badge && { badge }),
+          ...(badgeColor && { badgeColor }),
+          ...(features && { features }),
       },
       { new: true }
     );

@@ -62,6 +62,24 @@ const Header: React.FC = () => {
                             <Link href='/about-us' className="text-gray-900 hover:text-red-500 font-medium py-2">About Us</Link>
                             <Link href='/scholarship-programme' className="text-gray-900 hover:text-red-500 font-medium py-2">Scholarship Programme</Link>
 
+                             {/* Courses Dropdown */}
+                            <div
+                                className="relative group"
+                                onMouseEnter={() => handleMouseEnter('courses')}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <button className="flex items-center space-x-1 text-gray-900 hover:text-red-500 font-medium py-2">
+                                    <span>Courses</span>
+                                    <ChevronDown className="w-4 h-4" />
+                                </button>
+                                {openDropdown === 'courses' && (
+                                    <div className="absolute top-full left-0 w-56 bg-white shadow-lg rounded-md py-2 z-50">
+                                        <Link href="/online-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Online Mode</Link>
+                                        <Link href="#" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Offline Mode</Link>
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Current Affairs Dropdown */}
                             <div
                                 className="relative group"
@@ -129,9 +147,30 @@ const Header: React.FC = () => {
 
                         {/* Mobile Navigation */}
                         <nav>
-                            <Link href='/about-us' className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">About Dikshant IAS</Link>
-                            <Link href='/scholarship-programme' className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">Scholarship Programme</Link>
+                            <div className="border-b border-gray-200">
+                                <a href="/about-us" className="block py-1 text-gray-900 hover:text-red-500 font-medium">About Dikshant IAS</a>
+                            </div>
+                            <div className="border-b border-gray-200">
+                                <a href="/about-upsc" className="block py-1 text-gray-900 hover:text-red-500 font-medium">About UPSC</a>
+                            </div>
 
+                            {/* Courses Dropdown */}
+                            <div className="border-b border-gray-200">
+                                <button
+                                    className="flex items-center justify-between w-full text-left py-2 text-gray-900 hover:text-red-500 font-medium"
+                                    onClick={() => handleMobileDropdownToggle('courses')}
+                                >
+                                    <span>Courses</span>
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openMobileDropdown === 'courses' ? 'rotate-180' : ''}`} />
+                                </button>
+                                <div className={`overflow-hidden transition-all duration-300 ${openMobileDropdown === 'courses' ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                    <div className="ml-4 space-y-2 pt-2">
+                                        <Link href="/online-course" className="block py-1 text-gray-700 hover:text-red-500">Online Mode</Link>
+                                        <Link href="#" className="block border-b border-gray-200 py-1 text-gray-700 hover:text-red-500">Offline Mode</Link>
+
+                                    </div>
+                                </div>
+                            </div>
                             {/* Current Affairs Mobile Dropdown */}
                             <div className="border-b border-gray-200">
                                 <button
@@ -155,7 +194,9 @@ const Header: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-
+                            <div className="border-b border-gray-200">
+                                <a href="/scholarship-programme" className="block py-2 text-gray-900 hover:text-red-500 font-medium">Scholarship Programme</a>
+                            </div>
                             <Link href="/blogs" className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">Blog</Link>
                         </nav>
 
