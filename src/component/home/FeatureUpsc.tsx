@@ -31,9 +31,9 @@ const FeatureUpsc: React.FC = () => {
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/admin/courses');
+        const res = await fetch('/api/admin/courses');
         const data = await res.json();
-        const formatted = data.map((course: any) => ({
+        const formatted = data.map((course) => ({
           _id: course._id,
           badge: course.badge || '',
           badgeColor: course.badgeColor || 'bg-gray-500',
