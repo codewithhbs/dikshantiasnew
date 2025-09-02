@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import AdminLayout from "@/component/admin/AdminLayout";
-import { Globe, Mail, CheckCircle, Trophy } from "lucide-react";
+import { Globe, Mail, CheckCircle } from "lucide-react";
 import ImageUpload from "@/component/admin/ImageUpload";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -24,59 +24,12 @@ interface IWebSettings {
     telegram: string;
 }
 
-interface IResultSection {
-    _id: string
-    description: string
-    buttonText: string
-    buttonLink: string
-}
-
-
 export default function PagesPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("web");
     const [settings, setSettings] = useState<IWebSettings | null>(null);
     const [formData, setFormData] = useState<Partial<IWebSettings>>({});
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [resultSection, setResultSection] = useState<IResultSection | null>(null)
-    const [resultForm, setResultForm] = useState<Partial<IResultSection>>({})
-
-
-    useEffect(() => {
-        fetch("/api/admin/result-section")
-            .then((res) => res.json())
-            .then((data) => {
-                if (data) {
-                    setResultSection(data)
-                    setResultForm(data)
-                }
-            })
-            .catch((err) => console.error("Error fetching result section:", err))
-    }, [])
-
-    const handleResultChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setResultForm({ ...resultForm, [e.target.name]: e.target.value })
-    }
-
-
-    const handleResultSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        try {
-            const res = await fetch("/api/admin/result-section", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(resultForm),
-            })
-
-            if (!res.ok) throw new Error("Failed to update result section")
-
-            toast.success("Result section updated successfully")
-        } catch (err) {
-            console.error(err)
-            toast.error("Failed to update result section")
-        }
-    }
-
 
     // Fetch settings from API
     useEffect(() => {
@@ -153,7 +106,6 @@ export default function PagesPage() {
                         {[
                             { name: "Web Setting", key: "web", icon: <Globe size={18} /> },
                             { name: "SMTP Setting", key: "smtp", icon: <Mail size={18} /> },
-                            { name: "Result Setting", key: "result", icon: <Trophy size={18} /> },
                         ].map((item) => (
                             <li key={item.key}>
                                 <button
@@ -327,70 +279,6 @@ export default function PagesPage() {
                             </div>
                         </form>
                     )}
-
-                    {activeTab === "result" && resultSection && (
-                        <form
-                            onSubmit={handleResultSubmit}
-                            className="space-y-5 bg-white p-6 rounded-2xl shadow-md border border-gray-100"
-                        >
-                            <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300 pb-2">
-                                Result Section
-                            </h2>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-2">Description</label>
-                                <textarea
-                                    name="description"
-                                    value={resultForm.description || ""}
-                                    onChange={handleResultChange}
-                                    className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
-                                    rows={4}
-                                ></textarea>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-2">Button Text</label>
-                                    <input
-                                        type="text"
-                                        name="buttonText"
-                                        value={resultForm.buttonText || ""}
-                                        onChange={handleResultChange}
-                                        className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-2">Button Link</label>
-                                    <input
-                                        type="text"
-                                        name="buttonLink"
-                                        value={resultForm.buttonLink || ""}
-                                        onChange={handleResultChange}
-                                        className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex justify-end gap-4 mt-6">
-                                <button
-                                    type="button"
-                                    className="flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-200 transition"
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#E94E4E] text-white rounded-xl shadow-md hover:bg-red-600 transition"
-                                >
-                                    <CheckCircle size={18} className="text-white" />
-                                    Update
-                                </button>
-                            </div>
-                        </form>
-                    )}
-
                 </div>
             </div>
         </AdminLayout>
