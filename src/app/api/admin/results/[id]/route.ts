@@ -33,7 +33,7 @@ export async function PUT(
     const formData = await request.formData();
     const id = context.params.id;
     const name = formData.get("name") as string;
-    const rank = Number(formData.get("rank"));
+     const rank = formData.get("rank") as string;
     const service = formData.get("service") as string;
     const year = formData.get("year") as string;
     const imageFile = formData.get("image") as File | null;

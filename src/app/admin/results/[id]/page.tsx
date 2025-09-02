@@ -149,11 +149,11 @@ export default function ResultFormPage() {
             <div>
               <label className="block font-medium text-gray-700 mb-1">Rank</label>
               <input
-                type="number"
+                type="text"
                 value={rank}
                 onChange={(e) => setRank(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                required
+                
               />
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function ResultFormPage() {
                 value={service}
                 onChange={(e) => setService(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                required
+                
               />
             </div>
 
@@ -177,7 +177,7 @@ export default function ResultFormPage() {
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                required
+                
               />
             </div>
           </div>
