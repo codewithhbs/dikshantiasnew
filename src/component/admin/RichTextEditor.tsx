@@ -23,10 +23,22 @@ export default function RichTextEditor({
           onChange(newContent);
         }}
         config={{
-          height: 300,
+          height: 400,
           readonly: false,
           toolbarAdaptive: false,
           toolbarSticky: false,
+          uploader: {
+            insertImageAsBase64URI: true,
+          },
+          buttons: [
+            "source", "|",
+            "bold", "italic", "underline", "strikethrough", "|",
+            "ul", "ol", "outdent", "indent", "|",
+            "font", "fontsize", "brush", "paragraph", "|",
+            "image", "table", "link", "|",
+            "align", "undo", "redo", "hr", "eraser", "copyformat", "|",
+            "fullsize"
+          ],
         }}
       />
     </div>
