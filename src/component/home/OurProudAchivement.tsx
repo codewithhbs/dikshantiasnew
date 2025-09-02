@@ -3,71 +3,42 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import Link from "next/link"
 
 interface Topper {
-  id: number
+  _id: string
   name: string
   service: string
   year: string
-  rank: number
-  image: string
+  rank: string
+  image: {
+    url: string
+  }
 }
 
-const toppers: Topper[] = [
-  {
-    id: 1,
-    name: "Gamini Singla",
-    service: "CSE Result",
-    year: "2021",
-    rank: 3,
-    image: "/img/result/gamini-result.jpg",
-  },
-  {
-    id: 2,
-    name: "Aishwarya Verma",
-    service: "CSE Result",
-    year: "2021",
-    rank: 4,
-    image: "/img/result/aishwarya-result.jpg",
-  },
-  {
-    id: 3,
-    name: "Yaksh Chaudhary",
-    service: "CSE Result",
-    year: "2021",
-    rank: 6,
-    image: "/img/result/yaksh-chaudhary.jpg",
-  },
-  {
-    id: 4,
-    name: "Preetam Verma",
-    service: "CSE Result",
-    year: "2021",
-    rank: 9,
-    image: "/img/result/pritum-result.jpg",
-  },
-  {
-    id: 5,
-    name: "Shruti Sharma",
-    service: "CSE Result",
-    year: "2021",
-    rank: 1,
-    image: "/img/result/shruti-sharma-result.jpg",
-  },
-  {
-    id: 6,
-    name: "Arjun Reddy",
-    service: "IFS",
-    year: "2023",
-    rank: 34,
-    image: "/img/result/gamini-result.jpg",
-  },
-]
-
 export default function OurProudAchivement() {
+  const [toppers, setToppers] = useState<Topper[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [itemsPerView, setItemsPerView] = useState(4)
 
+// Fetch toppers from API
+useEffect(() => {
+  const fetchResults = async () => {
+    try {
+      const res = await fetch("/api/admin/results")
+      const data = await res.json()
+
+      const activeResults = data.filter((item) => item.active === true)
+
+      setToppers(activeResults)
+    } catch (error) {
+      console.error("Error fetching results:", error)
+    }
+  }
+  fetchResults()
+}, [])
+
+  // Responsive items per view
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
@@ -86,13 +57,13 @@ export default function OurProudAchivement() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  // Reset current index when items per view changes
+  // Adjust index when items change
   useEffect(() => {
     const maxIndex = Math.max(0, toppers.length - itemsPerView)
     if (currentIndex > maxIndex) {
       setCurrentIndex(maxIndex)
     }
-  }, [itemsPerView, currentIndex])
+  }, [itemsPerView, toppers.length, currentIndex])
 
   const maxIndex = Math.max(0, toppers.length - itemsPerView)
 
@@ -104,26 +75,33 @@ export default function OurProudAchivement() {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1))
   }
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(Math.min(index, maxIndex))
-  }
-
-  // Autoplay effect
+  // Autoplay
   useEffect(() => {
+    if (toppers.length === 0) return
     const interval = setInterval(() => {
       nextSlide()
-    }, 6000) // change interval time (ms) if needed
-
+    }, 6000)
     return () => clearInterval(interval)
-  }, [currentIndex, itemsPerView]) // Depends on these to keep logic updated
+  }, [toppers, currentIndex, itemsPerView])
 
   return (
     <div className="py-5 px-2 md:px-4 mb-4" style={{ backgroundColor: "#fff" }}>
       <div className="max-w-7xl md:mx-auto mt-7">
         <div className="bg-[#ecf4fc] backdrop-blur-sm rounded-3xl p-6 md:p-8 lg:p-12">
-          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[#040c33] mb-4 md:mb-12">
+          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[#040c33] mb-4 md:mb-4">
             Our Results
           </h2>
+
+          {/* ✅ Static text */}
+          <p className="text-blue-950 mb-4 md:mb-10">
+            For the last 21 years, Dikshant IAS has been shaping the success stories of aspirants. With
+            consistent and remarkable results, we have established ourselves as one of the most trusted
+            institutes for UPSC examinations.
+            <br />
+            Every year, a large number of our students secure top ranks in Civil Services. This consistent
+            success is the outcome of our experienced faculty, quality study material, and student-focused
+            approach. The results stand as a testimony to our commitment to excellence.
+          </p>
 
           <div className="relative">
             {toppers.length > itemsPerView && (
@@ -155,7 +133,7 @@ export default function OurProudAchivement() {
               >
                 {toppers.map((topper) => (
                   <div
-                    key={topper.id}
+                    key={topper._id}
                     className="flex-shrink-0 px-3"
                     style={{ width: `${100 / itemsPerView}%` }}
                   >
@@ -163,7 +141,7 @@ export default function OurProudAchivement() {
                       <div className="relative inline-block mb-4">
                         <div className="w-25 h-25 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden border-2 md:border-3 border-orange-400">
                           <Image
-                            src={topper.image || "/placeholder.svg"}
+                            src={topper.image?.url || "/placeholder.svg"}
                             alt={topper.name}
                             width={112}
                             height={112}
@@ -171,7 +149,7 @@ export default function OurProudAchivement() {
                           />
                         </div>
                         <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                          AIR {topper.rank}
+                          {topper.rank}
                         </div>
                       </div>
                       <h3 className="text-lg md:text-xl font-bold text-white mb-1">{topper.name}</h3>
@@ -184,21 +162,12 @@ export default function OurProudAchivement() {
             </div>
           </div>
 
-          {/* Dots Indicator */}
-          {toppers.length > itemsPerView && (
-            <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`w-6 h-2 md:w-7 md:h-3 rounded-full transition-all duration-200 ${
-                    index === currentIndex ? "bg-[#a50309]" : "bg-[#a50309]/30"
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
+          {/* ✅ Static button */}
+          <div className="flex justify-center mt-8">
+            <Link href="#" className="px-4 py-2 bg-[#a50309] text-white rounded-md">
+              View All Results
+            </Link>
+          </div>
         </div>
       </div>
     </div>

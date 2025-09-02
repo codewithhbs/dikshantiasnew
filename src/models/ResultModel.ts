@@ -5,6 +5,9 @@ export interface IResult extends Document {
   rank: string;
   service: string;
   year: string;
+  desc?: string;
+  btnName?: string;
+  btnLink?: string;   
  image: {
     url: string;
     public_url: string;
@@ -21,6 +24,9 @@ const ResultSchema: Schema = new Schema(
     rank: { type: String},
     service: { type: String},
     year: { type: String},
+    desc: { type: String },
+    btnName: { type: String },
+    btnLink: { type: String }, 
     image: {
       url: { type: String},
       public_url: { type: String},
