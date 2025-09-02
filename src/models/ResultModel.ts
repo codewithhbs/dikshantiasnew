@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IResult extends Document {
   name: string;
-  rank: number;
+  rank: string;
   service: string;
   year: string;
  image: {
@@ -18,13 +18,13 @@ export interface IResult extends Document {
 const ResultSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    rank: { type: Number, required: true },
-    service: { type: String, required: true },
-    year: { type: String, required: true },
+    rank: { type: String},
+    service: { type: String},
+    year: { type: String},
     image: {
-      url: { type: String, required: true },
-      public_url: { type: String, required: true },
-      public_id: { type: String, required: true },
+      url: { type: String},
+      public_url: { type: String},
+      public_id: { type: String},
     },
     active: { type: Boolean, default: true },
   },
@@ -34,4 +34,4 @@ const ResultSchema: Schema = new Schema(
 const ResultModel: Model<IResult> =
   mongoose.models.Result || mongoose.model<IResult>("Result", ResultSchema, "results");
 
-export default ResultModel;
+export default ResultModel; 

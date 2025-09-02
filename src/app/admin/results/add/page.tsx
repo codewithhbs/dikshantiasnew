@@ -105,7 +105,7 @@ export default function AddResultPage() {
                 value={rank}
                 onChange={(e) => setRank(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                required
+                
               />
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function AddResultPage() {
                 value={service}
                 onChange={(e) => setService(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                required
+                
               />
             </div>
 
@@ -129,7 +129,7 @@ export default function AddResultPage() {
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                required
+                
               />
             </div>
           </div>
