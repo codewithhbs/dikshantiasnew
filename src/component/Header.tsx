@@ -75,7 +75,7 @@ const Header: React.FC = () => {
                                 {openDropdown === 'courses' && (
                                     <div className="absolute top-full left-0 w-56 bg-white shadow-lg rounded-md py-2 z-50">
                                         <Link href="/online-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Online Mode</Link>
-                                        <Link href="#" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Offline Mode</Link>
+                                        <Link href="/offline-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Offline Mode</Link>
                                     </div>
                                 )}
                             </div>

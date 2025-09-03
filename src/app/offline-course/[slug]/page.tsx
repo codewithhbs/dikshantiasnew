@@ -513,4 +513,5 @@ const CoursePage = () => {
         </div>
     );
 };
+
 export default CoursePage;
