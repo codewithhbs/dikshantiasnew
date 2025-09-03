@@ -29,6 +29,7 @@ export async function GET(
   }
 }
 
+
 // Helper to upload image buffer to Cloudinary
 async function uploadImageToCloudinary(file: File) {
   const buffer = Buffer.from(await file.arrayBuffer());
