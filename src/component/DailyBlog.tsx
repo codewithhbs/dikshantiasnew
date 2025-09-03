@@ -1,78 +1,83 @@
 'use client';
 
-import { useState } from 'react';
-import { Calendar, Clock, ArrowRight, Bell, BookOpen, FileText, TrendingUp } from 'lucide-react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { ArrowRight, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
-
-interface QuickResource {
+interface Blog {
+  _id: string;
   title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  color: string;
+  slug: string;
+  createdAt: string;
 }
 
 const DailyBlog = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
 
-  const quickResources: QuickResource[] = [
-    {
-      title: 'Trending',
-      subtitle: 'Daily & Monthly Updates',
-      icon: <TrendingUp className="w-5 h-5" />,
-      color: 'text-blue-600'
-    },
-    // {
-    //   title: 'Mock Tests',
-    //   subtitle: 'Practice Test Series',
-    //   icon: <FileText className="w-5 h-5" />,
-    //   color: 'text-green-600'
-    // },
-    // {
-    //   title: 'Study Material',
-    //   subtitle: 'Notes & Resources',
-    //   icon: <BookOpen className="w-5 h-5" />,
-    //   color: 'text-purple-600'
-    // }
-  ];
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch("/api/admin/blogs", {
+          cache: "no-store",
+        });
+        const data = await res.json();
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Announcement':
-        return 'text-pink-600 bg-pink-50';
-      case 'Results':
-        return 'text-green-600 bg-green-50';
-      case 'Event':
-        return 'text-blue-600 bg-blue-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
-    }
-  };
+        // sort latest first and take only 4
+        const latest = data
+          .sort(
+            (a: Blog, b: Blog) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          .slice(0, 4);
+
+        setBlogs(latest);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   return (
     <section className="py-10 -mt-6 mb-6 md:mt-10 md:mb-10">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">        
-        {/* Section Header */}    
         <div className="grid lg:grid-cols-1">
           <div>
-            {/* Quick Resources */}
+            {/* Keep your same design */}
             <div className="bg-red-100 rounded-2xl p-6 shadow-md">
-              <h3 className="text-[18px] md:text-3xl font-bold text-[#00072c] mb-6">Daily Blog</h3>
-              
+              <h3 className="text-[18px] md:text-3xl font-bold text-[#00072c] mb-6">
+                Daily Blog
+              </h3>
+
               <div className="space-y-4">
-                {quickResources.map((resource, index) => (
-                  <div key={index} className="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors duration-300 cursor-pointer group">
-                    <div className={`${resource.color} mr-4 mt-1`}>
-                      {resource.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-[#00072c] group-hover:text-pink-600 transition-colors duration-300">
-                        {resource.title}
-                      </h4>
-                      <p className="text-sm text-[#081347] mt-1">{resource.subtitle}</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-red-600 group-hover:text-pink-600 group-hover:translate-x-1 transition-all duration-300" />
-                  </div>
-                ))}
+                {blogs.length > 0 ? (
+                  blogs.map((blog) => (
+                    <Link
+                      key={blog._id}
+                      href={`/blogs/${blog.slug}`}
+                      className="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors duration-300 cursor-pointer group"
+                    >
+                      {/* Keep Trending Icon to match your design */}
+                      <div className="text-red-600 mr-4 mt-1">
+                        <TrendingUp className="w-5 h-5" />
+                      </div>
+
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-[#00072c] group-hover:text-pink-600 transition-colors duration-300">
+                          {blog.title}
+                        </h4>
+                        <p className="text-sm text-[#081347] mt-1">
+                          Daily & Monthly Updates
+                        </p>
+                      </div>
+
+                      <ArrowRight className="w-4 h-4 text-red-600 group-hover:text-pink-600 group-hover:translate-x-1 transition-all duration-300" />
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No blogs available.</p>
+                )}
               </div>
             </div>
           </div>

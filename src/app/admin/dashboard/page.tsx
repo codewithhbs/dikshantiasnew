@@ -86,7 +86,7 @@ export default function Dashboard() {
           {/* Colorful Buttons */}
           <div className="mt-4 flex flex-col sm:flex-row gap-3">
             <a
-              href="https://hindi.website.url"
+              href="#"
               target="_blank"
               className="bg-gradient-to-tr from-red-400 to-orange-500 hover:from-red-500 hover:to-orange-600 text-white font-semibold px-5 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
@@ -94,7 +94,7 @@ export default function Dashboard() {
               हिंदी वेबसाइट पर जाए
             </a>
             <a
-              href="https://english.website.url"
+              href=""
               target="_blank"
               className="bg-gradient-to-tr from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-semibold px-5 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
@@ -102,7 +102,7 @@ export default function Dashboard() {
               VISIT OUR ENGLISH WEBSITE
             </a>
             <a
-              href="https://app.download.link"
+              href=""
               target="_blank"
               className="bg-gradient-to-tr from-[#ED2988] to-[#9C1F64] hover:from-[#d61f76] hover:to-[#7d1750] text-white font-semibold px-5 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >

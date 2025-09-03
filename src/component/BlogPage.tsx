@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 interface Blog {
   _id: string;
@@ -43,7 +45,50 @@ const BlogPage: React.FC = () => {
     fetchData();
   }, []);
 
-  if (loading) return <p className="text-center py-10">Loading...</p>;
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="bg-white rounded-xl shadow-md p-4 flex flex-col"
+          >
+            {/* Image placeholder */}
+            <Skeleton height={180} className="rounded-lg" />
+
+            {/* Category */}
+            <div className="mt-3 w-24">
+              <Skeleton height={20} />
+            </div>
+
+            {/* Title */}
+            <div className="mt-3">
+              <Skeleton width={`90%`} height={22} />
+            </div>
+
+            {/* Meta: author + date */}
+            <div className="flex items-center gap-3 mt-3">
+              <Skeleton width={60} height={18} />
+              <Skeleton width={80} height={18} />
+            </div>
+
+            {/* Short description */}
+            <div className="mt-3">
+              <Skeleton count={2} />
+            </div>
+
+            {/* Buttons / links */}
+            <div className="flex flex-col gap-2 mt-4">
+              <Skeleton height={36} borderRadius={8} />
+              <Skeleton height={20} width={`50%`} />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
 
   return (
     <div className="bg-white min-h-screen -mt-14 md:mt-3">
