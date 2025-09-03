@@ -339,7 +339,7 @@ const CoursePage = () => {
                                     </button>
                                 </div>
                                 <div className="p-6">
-                                    <div className="text-3xl font-bold text-[#040c33] mb-6">₹ {course.price}/ <del className='text-gray-400'>₹ {course.originalPrice}/</del></div>
+                                    <div className="text-2xl font-bold text-[#040c33] mb-6">₹ {course.price}/ <del className='text-gray-400'>₹ {course.originalPrice}/</del></div>
                                     {/* <button className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold mb-6 hover:bg-slate-700 transition-colors">
                                         Start Now
                                     </button> */}
