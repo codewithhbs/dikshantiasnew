@@ -1,12 +1,28 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 
 interface FormData {
     firstName: string;
     email: string;
+    phone?: string;
     message: string;
-    phone?:string;
+}
+
+interface SettingsData {
+    image: { url: string };
+    name: string;
+    phone: string;
+    whatsapp: string;
+    email: string;
+    address: string;
+    googleMap: string;
+    facebook: string;
+    instagram: string;
+    youtube: string;
+    linkedin: string;
+    twitter: string;
+    telegram: string;
 }
 
 const ContactUs: React.FC = () => {
@@ -15,10 +31,24 @@ const ContactUs: React.FC = () => {
         email: '',
         phone: '',
         message: ''
-        
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [settings, setSettings] = useState<SettingsData | null>(null);
+
+    // Fetch settings data dynamically
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch("/api/admin/settings");
+                const data = await res.json();
+                setSettings(data[0]); // because API returns an array
+            } catch (error) {
+                console.error("Error fetching settings:", error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -60,36 +90,55 @@ const ContactUs: React.FC = () => {
                         {/* Contact Address Section */}
                         <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300">
                             <h2 className="text-3xl font-bold text-slate-800 mb-6">Our contact address</h2>
-                           
 
                             <div className="space-y-4">
-                
                                 <div className="flex items-center space-x-4 group">
                                     <div className="bg-red-100 p-3 rounded-full group-hover:bg-red-200 transition-colors">
                                         <MapPin className="w-5 h-5 text-red-600" />
                                     </div>
-                                    <span className="text-slate-700 font-medium"><span className='font-bold'>Main Office: </span> Dikshant IAS - Best IAS Coaching in Delhi</span>
+                                    <span className="text-slate-700 font-medium">
+                                        <span className='font-bold'>Main Office: </span> {settings?.address}
+                                    </span>
                                 </div>
-                                
+
                                 <div className="flex items-center space-x-4 group">
                                     <div className="bg-red-100 p-3 rounded-full group-hover:bg-red-200 transition-colors">
                                         <Mail className="w-5 h-5 text-red-600" />
                                     </div>
-                                    <span className="text-slate-700 font-medium"><span className='font-bold'>Email us:</span> info@dikshantias.com</span>
+                                    <span className="text-slate-700 font-medium">
+                                        <span className='font-bold'>Email us:</span> {settings?.email}
+                                    </span>
                                 </div>
+
                                 <div className="flex items-center space-x-4 group">
                                     <div className="bg-red-100 p-3 rounded-full group-hover:bg-red-200 transition-colors">
                                         <Phone className="w-5 h-5 text-red-600" />
                                     </div>
-                                    <span className="text-slate-700 font-medium"><span className='font-bold'>Phone:</span> +(91) 7428092240</span>
+                                    <span className="text-slate-700 font-medium">
+                                        <span className='font-bold'>Phone:</span> {settings?.phone}
+                                    </span>
                                 </div>
-
-
-                                
                             </div>
                         </div>
 
                         {/* Find Our Location Section */}
+                        {/* <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300">
+                            <h2 className="text-3xl font-bold text-slate-800 mb-6">Find our location</h2>
+                            <div className="relative bg-slate-200 rounded-xl overflow-hidden h-64 group">
+                                {settings?.googleMap && (
+                                    <iframe
+                                        src={settings.googleMap}
+                                        width="600"
+                                        height="450"
+                                        style={{ border: 0 }}
+                                        allowFullScreen
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                )}
+                            </div>
+                        </div> */}
+
                         <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300">
                             <h2 className="text-3xl font-bold text-slate-800 mb-6">Find our location</h2>
 
@@ -105,110 +154,78 @@ const ContactUs: React.FC = () => {
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
                                 />
-                                {/* <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                                        <p className="text-slate-600 font-medium">New York University</p>
-                                        <p className="text-sm text-slate-500 mt-1">Interactive Map Loading...</p>
-                                    </div>
-                                </div> */}
 
-                                {/* Simulated map pin */}
-                                {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                    <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg animate-pulse"></div>
-                                </div> */}
-
-                                {/* View larger map link */}
-                                {/* <div className="absolute bottom-4 left-4">
-                                    <button className="bg-white/90 hover:bg-white px-3 py-1 rounded-md text-sm text-blue-600 font-medium shadow-md transition-all">
-                                        View larger map
-                                    </button>
-                                </div> */}
                             </div>
                         </div>
-                    </div>
+                        </div>
 
                     {/* Right Column - Contact Form */}
                     <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300">
                         <h2 className="text-3xl font-bold text-slate-800 mb-8">Do you have any questions?</h2>
-                         <p className="text-slate-600 mb-8 leading-relaxed -mt-5">
-                                Have a question or just want to say hi? We&apos;d love to hear from you.
-                            </p>
+                        <p className="text-slate-600 mb-8 leading-relaxed -mt-5">
+                            Have a question or just want to say hi? We&apos;d love to hear from you.
+                        </p>
 
-                        <div className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Name and Email Row */}
                             <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        placeholder="Your Name"
-                                        value={formData.firstName}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder-slate-400"
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        placeholder="Your Email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder-slate-400"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* phone */}
-                            <div>
                                 <input
-                                    type="tel"
-                                    name="phone"
-                                    placeholder="Your Phone"
-                                    value={formData.phone}
+                                    type="text"
+                                    name="firstName"
+                                    placeholder="Your Name"
+                                    value={formData.firstName}
                                     onChange={handleInputChange}
                                     required
-                                    className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder-slate-400"
+                                    className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:ring-2 focus:ring-red-500"
+                                />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Your Email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    required
+                                    className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:ring-2 focus:ring-red-500"
                                 />
                             </div>
 
-                            {/* Message */}
-                            <div>
-                                <textarea
-                                    name="message"
-                                    placeholder="Your Message"
-                                    rows={6}
-                                    value={formData.message}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder-slate-400 resize-none"
-                                />
-                            </div>
+                            <input
+                                type="tel"
+                                name="phone"
+                                placeholder="Your Phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:ring-2 focus:ring-red-500"
+                            />
 
-                            {/* Submit Button */}
+                            <textarea
+                                name="message"
+                                placeholder="Your Message"
+                                rows={6}
+                                value={formData.message}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg focus:ring-2 focus:ring-red-500 resize-none"
+                            />
+
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-4 px-6 rounded-lg transition-all flex items-center justify-center"
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        <span>Submitting...</span>
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                        Submitting...
                                     </>
                                 ) : (
                                     <>
-                                        <Send className="w-5 h-5" />
-                                        <span>Submit</span>
+                                        <Send className="w-5 h-5 mr-2" />
+                                        Submit
                                     </>
                                 )}
                             </button>
-                        </div>
-
-                        
+                        </form>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,9 @@
-import React from 'react';
-import { Facebook, Instagram, Youtube, Linkedin, Twitter, Send } from 'lucide-react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { Facebook, Instagram, Youtube, Linkedin, Twitter, Send, ChevronsRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface FooterLink {
   name: string;
@@ -12,7 +15,34 @@ interface FooterSection {
   links: FooterLink[];
 }
 
+interface Settings {
+  name: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  address: string;
+  googleMap: string;
+  facebook: string;
+  instagram: string;
+  youtube: string;
+  linkedin: string;
+  twitter: string;
+  telegram: string;
+  image: {
+    url: string;
+  };
+}
+
 const Footer: React.FC = () => {
+  const [settings, setSettings] = useState<Settings | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/settings')
+      .then(res => res.json())
+      .then(data => setSettings(data[0]))
+      .catch(err => console.error(err));
+  }, []);
+
   const footerSections: FooterSection[] = [
     {
       title: "QUICK LINKS",
@@ -25,32 +55,15 @@ const Footer: React.FC = () => {
         { name: "Gallery", href: "/gallery" }
       ]
     },
-    // {
-    //   title: "",
-    //   links: [
-    //     { name: "Mains 365", href: "/mains-365" },
-    //     { name: "Monthly CA", href: "/monthly-ca" },
-    //     { name: "Model Classes For Answer Writing", href: "/model-classes" },
-    //     { name: "Ethics Case Studies", href: "/ethics-case-studies" },
-    //     { name: "Samvidhan Test Series", href: "/samvidhan-test-series" },
-    //     { name: "Prelims Test Series", href: "/prelims-test-series" },
-    //     { name: "GS & Essay Test Series", href: "/gs-essay-test-series" },
-    //     { name: "Optional Test Series", href: "/optional-test-series" },
-
-    //     { name: "Interview", href: "/interview" },
-    //     { name: "Smart Content", href: "/smart-content" }
-    //   ]
-    // },
     {
       title: "COURSES",
       links: [
-        { name: "Online Courses", href: "/" },
-        { name: "Offline Course", href: "/" },
+        { name: "Online Courses", href: "/online-course" },
+        { name: "Offline Course", href: "/offline-course" },
         { name: "Mains Corner", href: "/mains-corner" },
         { name: "Mentorship Programme", href: "/" },
         { name: "Interview Guidancer", href: "/" },
         { name: "Essay Answer Writing", href: "/" },
-
       ]
     },
     {
@@ -74,36 +87,43 @@ const Footer: React.FC = () => {
     }
   ];
 
-  const socialMediaEnglish = [
-    { icon: Facebook, href: "https://facebook.com/dikshantias", label: "Facebook", backgroundColor: "bg-[#3b579d]" },
-    { icon: Instagram, href: "https://instagram.com/dikshantias", label: "Instagram", backgroundColor: "bg-[#a408f3]" },
-    { icon: Youtube, href: "https://youtube.com/dikshantias", label: "YouTube", backgroundColor: "bg-red-600" },
-    { icon: Linkedin, href: "https://linkedin.com/company/dikshantias", label: "LinkedIn", backgroundColor: "bg-[#0274b3]" },
-    { icon: Twitter, href: "https://twitter.com/dikshantias", label: "Twitter", backgroundColor: "bg-[#1d9bf0]" },
-    { icon: Send, href: "https://t.me/dikshantias", label: "Telegram", backgroundColor: "bg-[#29a9eb]" }
-  ];
+  const socialMedia = settings ? [
+    { icon: Facebook, href: settings.facebook, label: "Facebook", backgroundColor: "bg-[#3b579d]" },
+    { icon: Instagram, href: settings.instagram, label: "Instagram", backgroundColor: "bg-[#a408f3]" },
+    { icon: Youtube, href: settings.youtube, label: "YouTube", backgroundColor: "bg-red-600" },
+    { icon: Linkedin, href: settings.linkedin, label: "LinkedIn", backgroundColor: "bg-[#0274b3]" },
+    { icon: Twitter, href: settings.twitter, label: "Twitter", backgroundColor: "bg-[#1d9bf0]" },
+    { icon: Send, href: settings.telegram, label: "Telegram", backgroundColor: "bg-[#29a9eb]" }
+  ] : [];
+
+  if (!settings) return null; // Or a loader
 
   return (
-    <footer className="bg-gray-50 py-12 px-4 border-t border-gray-200">
+    <footer className="bg-[#ecf4fc] py-12 px-4 border-t border-gray-200">
       <div className="max-w-7xl mx-auto">
-        {/* Main Content */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Logo and Contact Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center mb-4">
               <div>
-                <div className="text-sm font-medium text-gray-900">
-                  <div className='logo w-[150px] md:w-[200px]'>
-                    <Image src={'/img/dikshant-logo.png'} alt="Logo" width={200} height={100} />
+                <div className='logo w-[150px] md:w-[200px]'>
+                  <Image src={settings.image.url} alt="Logo" width={200} height={100} />
+                  <div className="text-md font-medium text-blue-950 mt-2 text-center">
+                    Empowering minds for a brighter future.
                   </div>
                 </div>
-                <div className="text-md font-medium text-blue-950 mt-4">Empowering minds for a brighter future.</div>
               </div>
             </div>
             <div className="space-y-1 text-sm text-blue-950">
-              <div>Phone: +91 7428092240</div>
-              <div>WhatsApp : +91 9312511015</div>
-              <div>Email: info@dikshantias.com</div>
+              <div><span className='font-semibold'>Address:</span> {settings.address}</div>
+              <div><span className='font-semibold'>Phone:</span> {settings.phone}</div>
+              <div><span className='font-semibold'>WhatsApp:</span> {settings.whatsapp}</div>
+              <div><span className='font-semibold'>Email:</span> {settings.email}</div>
+              <div className='mt-5'>
+                <Link className="px-4 py-2 bg-[#a50309] text-white rounded-md" href={settings.googleMap} target='_blank'>
+                  Get Direction
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -111,16 +131,17 @@ const Footer: React.FC = () => {
           {footerSections.map((section, index) => (
             <div key={index} className="lg:col-span-1">
               {section.title && (
-                <h3 className="font-semibold text-[#040c33] mb-4 text-sm">
+                <h3 className="font-semibold text-[#a50309] mb-4 text-sm">
                   {section.title}
                 </h3>
               )}
               <ul className="space-y-2">
                 {section.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
+                  <li key={linkIndex} className='flex'>
+                    <ChevronsRight className='text-sm text-red-800' />
                     <a
                       href={link.href}
-                      className="text-sm text-blue-950 hover:text-[#f43144] transition-colors"
+                      className="text-sm text-blue-950 hover:text-[#990312] transition-colors"
                     >
                       {link.name}
                     </a>
@@ -134,11 +155,10 @@ const Footer: React.FC = () => {
         {/* Social Media and Download App */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-8">
-            {/* Social Media */}
             <div>
-              <h4 className="text-sm font-medium text-[#040c33] mb-3">Social Media</h4>
+              <h4 className="text-sm font-semibold text-[#8a0101] mb-3">SOCIAL MEDIA</h4>
               <div className="flex space-x-3">
-                {socialMediaEnglish.map((social, index) => (
+                {socialMedia.map((social, index) => (
                   <a
                     key={index}
                     href={social.href}
@@ -151,49 +171,22 @@ const Footer: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Hindi Social Media */}
-            {/* <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3">Hindi Social Media</h4>
-              <div className="flex space-x-3">
-                {socialMediaHindi.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"
-                    aria-label={social.label}
-                  >
-                    <social.icon size={16} />
-                  </a>
-                ))}
-              </div>
-            </div> */}
           </div>
 
           {/* Download App */}
-          <div className="text-right bg-red-500 rounded-sm">
-            <h4 className="text-sm font-medium text-gray-50 my-3 mx-1
-            ">Download App</h4>
-            {/* <div className="flex space-x-2">
-              <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-              <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-            </div> */}
+          <div className="text-right">
+            <Link href="#" className="bg-red-700 rounded-sm text-sm px-5 py-3 font-medium text-gray-50 my-3 mx-1">
+              Download App
+            </Link>
           </div>
         </div>
 
         {/* Copyright */}
         <div className="pt-6 border-t border-gray-200">
           <p className="text-xs text-blue-950">
-            Dikshant IAS © 2025. | All Rights Reserved. | Develop By Hover Business Services LLP
+            {settings.name} © 2025. | All Rights Reserved. | Develop By Hover Business Services LLP
           </p>
         </div>
-
-        {/* Chat Button */}
-        {/* <div className="fixed bottom-6 right-6">
-          <button className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors">
-            💬
-          </button>
-        </div> */}
       </div>
     </footer>
   );

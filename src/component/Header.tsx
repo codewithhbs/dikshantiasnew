@@ -12,11 +12,29 @@ interface CurrentAffair {
     active: boolean;
 }
 
+interface SettingsData {
+    image: { url: string };
+    name: string;
+    phone: string;
+    whatsapp: string;
+    email: string;
+    address: string;
+    googleMap: string;
+    facebook: string;
+    instagram: string;
+    youtube: string;
+    linkedin: string;
+    twitter: string;
+    telegram: string;
+}
+
 const Header: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
     const [currentAffairs, setCurrentAffairs] = useState<CurrentAffair[]>([]);
+    const [settings, setSettings] = useState<SettingsData | null>(null);
+
 
     // Fetch Current Affairs from API
     useEffect(() => {
@@ -30,6 +48,21 @@ const Header: React.FC = () => {
             }
         };
         fetchCurrentAffairs();
+    }, []);
+
+
+    // Fetch Settings
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/admin/settings');
+                const data = await res.json();
+                setSettings(data[0]);
+            } catch (error) {
+                console.error('Error fetching settings:', error);
+            }
+        };
+        fetchSettings();
     }, []);
 
     const toggleMobileMenu = () => {
@@ -53,7 +86,11 @@ const Header: React.FC = () => {
                         {/* Logo */}
                         <div className="logo w-[130px] md:w-[160px]">
                             <Link href='/'>
-                                <Image src={'/img/dikshant-logo.png'} alt="Logo" width={160} height={100} />
+                                {settings?.image?.url ? (
+                                    <Image src={settings.image.url} alt={settings.name} width={160} height={100} />
+                                ) : (
+                                    <Image src={'/img/dikshant-logo.png'} alt="Logo" width={160} height={100} />
+                                )}
                             </Link>
                         </div>
 
@@ -62,7 +99,7 @@ const Header: React.FC = () => {
                             <Link href='/about-us' className="text-gray-900 hover:text-red-500 font-medium py-2">About Us</Link>
                             <Link href='/scholarship-programme' className="text-gray-900 hover:text-red-500 font-medium py-2">Scholarship Programme</Link>
 
-                             {/* Courses Dropdown */}
+                            {/* Courses Dropdown */}
                             <div
                                 className="relative group"
                                 onMouseEnter={() => handleMouseEnter('courses')}
@@ -208,7 +245,7 @@ const Header: React.FC = () => {
                                 </div>
                                 <div className="text-sm">
                                     <div className="text-xs text-gray-500">Talk to our experts</div>
-                                    <div className="font-bold text-gray-900 text-lg">+91 7428092240</div>
+                                    <div className="font-bold text-gray-900 text-lg">{settings?.phone || '+91 7428092240'}</div>
                                 </div>
                             </div>
                             <button className="w-full flex items-center justify-center space-x-2 bg-red-500 text-white py-3 rounded hover:bg-red-600 animate-pulse">
