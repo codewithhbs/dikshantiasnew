@@ -27,6 +27,7 @@ export default function Sidebar() {
 
 const menus = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/announcement", label: "Announcement", icon: MessageSquare },
   {
     label: "Categories",
     icon: Layers,
