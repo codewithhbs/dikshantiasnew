@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
       title: "QUICK LINKS",
       links: [
         { name: "Home", href: "/" },
-        { name: "About", href: "/about" },
+        { name: "About", href: "/about-us" },
         { name: "Scholarship Programme", href: "/scholarship-programme" },
         { name: "Blog", href: "/blogs" },
         { name: "Contact Us", href: "/contact-us" },

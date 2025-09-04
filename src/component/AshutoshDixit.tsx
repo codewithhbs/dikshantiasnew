@@ -9,7 +9,7 @@ const AshutoshDixit = () => {
                 {/* Cover Banner */}
                 <div className="relative h-[150px] md:h-[400px] w-full">
                     <Image
-                        src="/img/ashutosh-profile-bg.webp"
+                        src="/img/online-course/online-course-hero.webp"
                         alt="Banner"
                         layout="fill"
                         objectFit="cover"
