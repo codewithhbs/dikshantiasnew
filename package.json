@@ -41,6 +41,7 @@
     "mongodb": "^6.18.0",
     "mongoose": "^8.17.2",
     "next": "15.4.3",
+    "nodemailer": "^7.0.6",
     "openai": "^5.15.0",
     "popper.js": "^1.16.1",
     "quill": "^2.0.3",

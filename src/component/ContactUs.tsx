@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import toast from "react-hot-toast";
+
 
 interface FormData {
     firstName: string;
@@ -35,6 +37,7 @@ const ContactUs: React.FC = () => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [settings, setSettings] = useState<SettingsData | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Fetch settings data dynamically
     useEffect(() => {
@@ -58,26 +61,38 @@ const ContactUs: React.FC = () => {
         }));
     };
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setSuccessMessage(null);
 
-        // Simulate form submission
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const res = await fetch("/api/admin/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
 
-        console.log('Form submitted:', formData);
-        alert('Thank you for your message! We\'ll get back to you soon.');
+            const data = await res.json();
 
-        // Reset form
-        setFormData({
-            firstName: '',
-            email: '',
-            phone: '',
-            message: ''
-        });
-
-        setIsSubmitting(false);
+            if (data.success) {
+                setSuccessMessage(data.message || "Thank you! Your message has been sent.");
+                setFormData({ firstName: "", email: "", phone: "", message: "" });
+                   // Hide the success message after 5 seconds
+                    setTimeout(() => setSuccessMessage(""), 5000);
+            } else {
+                setSuccessMessage(data.error || "Something went wrong. Please try again.");
+            }
+        } catch (err) {
+            console.error(err);
+            setSuccessMessage("Something went wrong. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-red-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -157,7 +172,7 @@ const ContactUs: React.FC = () => {
 
                             </div>
                         </div>
-                        </div>
+                    </div>
 
                     {/* Right Column - Contact Form */}
                     <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300">
@@ -226,7 +241,17 @@ const ContactUs: React.FC = () => {
                                 )}
                             </button>
                         </form>
-                    </div>
+
+                                 {/* Success Message */}
+                        {successMessage && (
+                            <div className="mt-4 p-4 bg-green-100 text-green-800 border border-green-200 rounded-lg">
+                                {successMessage}
+                            </div>
+                        )}
+                 
+
+
+                    </div>  
                 </div>
             </div>
         </div>
