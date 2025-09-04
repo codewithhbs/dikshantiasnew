@@ -16,8 +16,8 @@ const tabsData: TabData[] = [
     {
         id: 'journey',
         title: '20+ Years Journey of Excellence',
-        color: 'bg-red-400',
-        hoverColor: 'hover:bg-red-500',
+        color: 'bg-red-500',
+        hoverColor: 'hover:bg-red-600',
         cardTitle: '20+ Years Journey of Excellence',
         description: 'We are India\'s well-known Institute and the Best IAS Coaching in India preparing candidates for the Civil Services Examination at all three levels- Prelims, Mains & personality test.',
         icon: <Award className="w-16 h-16 text-[#d3b054]" />
@@ -34,8 +34,8 @@ const tabsData: TabData[] = [
     {
         id: 'materials',
         title: 'Best Study Materials',
-        color: 'bg-green-400',
-        hoverColor: 'hover:bg-green-500',
+        color: 'bg-purple-500',
+        hoverColor: 'hover:bg-purple-600',
         cardTitle: 'Best Study Materials',
         description: 'Our students always receive well curated study resources, which helps them stay on task and saves them time.',
         icon: <BookOpen className="w-16 h-16 text-[#d3b054]" />
@@ -102,7 +102,7 @@ export default function TabBestIasCoachingCenter() {
 
                                     {/* Icon/Image Section */}
                                     <div className="flex-shrink-0 mx-auto">
-                                        <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-6 transition-transform duration-300">
+                                        <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-slate-200 to-slate-300 rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-6 transition-transform duration-300">
                                             {activeTab === 'journey' ? (
                                                 <div className="text-center">
                                                     <div className="text-2xl md:text-3xl font-bold text-[#d3b054]">20</div>
