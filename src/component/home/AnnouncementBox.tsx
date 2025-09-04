@@ -19,21 +19,21 @@ const AnnouncementBox: React.FC = () => {
       // details: "Registration Open for 30th August -2025 (Offline/Online Live)",
       // lastDate: "Registration Last Date: 20th August-2025",
       // url:"#",
-      bgcolor: "bg-purple-200"
+      bgcolor: "bg-purple-500"
     },
     {
       title: "GS/Complete Course/Foundation Course/ Pre-Foundation Course",
       // details: "Registration Open for 10th September -2025 (Offline/Online Live)",
       // lastDate: "Registration Last Date: 20th August-2025",
       // url:"#",
-      bgcolor: "bg-yellow-200"
+      bgcolor: "bg-pink-500"
     },
     {
       title: "Advanced Test Series Program",
       // details: "Registration Open for 15th September -2025 (Online Mode)",
       // lastDate: "Registration Last Date: 25th August-2025",
       // url:"#",
-      bgcolor: "bg-red-200"
+      bgcolor: "bg-red-500"
 
     },
     {
@@ -41,7 +41,7 @@ const AnnouncementBox: React.FC = () => {
       // details: "Registration Open for 5th October -2025 (Offline/Online Live)",
       // lastDate: "Registration Last Date: 30th August-2025",
       // url:"#",
-      bgcolor: "bg-blue-200"
+      bgcolor: "bg-blue-500"
     }
   ];
 
@@ -72,7 +72,7 @@ const AnnouncementBox: React.FC = () => {
             <div key={index} className={`px-4 py-3 border-slate-50 rounded-xl my-2 ${announcement.bgcolor}`}>
               <div className="flex  items-center">
                 <span className="text-red-600 mr-2 mt-1 flex-shrink-0">📢</span>
-                <div className="text-sm font-bold text-blue-950 leading-tight">
+                <div className="text-sm font-bold text-white leading-tight">
                   {announcement.title}
                 </div>
               </div>

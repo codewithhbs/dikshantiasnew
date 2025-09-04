@@ -6,6 +6,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 interface SliderItem {
   _id: string;
@@ -20,6 +22,7 @@ interface SliderItem {
 
 export default function HomeSlider({ sliderType }: { sliderType: "Desktop" | "Mobile" }) {
   const [sliders, setSliders] = useState<SliderItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSliders = async () => {
@@ -34,11 +37,23 @@ export default function HomeSlider({ sliderType }: { sliderType: "Desktop" | "Mo
         setSliders(filtered);
       } catch (error) {
         console.error("Failed to load sliders:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchSliders();
   }, [sliderType]);
+
+  if (loading) {
+    // Show skeleton while loading
+    return (
+      <div className="space-y-2">
+        <Skeleton height={300} className="rounded-lg md:rounded-xl" />
+        <Skeleton height={20} width={1300} />
+      </div>
+    );
+  }
 
   if (sliders.length === 0) {
     return <p className="text-center text-gray-500">No {sliderType} sliders</p>;
@@ -70,7 +85,6 @@ export default function HomeSlider({ sliderType }: { sliderType: "Desktop" | "Mo
           </div>
         </SwiperSlide>
       ))}
-
     </Swiper>
   );
 }

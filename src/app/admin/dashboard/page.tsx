@@ -149,13 +149,6 @@ export default function Dashboard() {
 
       {/* Result Section */}
 
-
-
-
-
-
-
-
     </AdminLayout>
   );
 }

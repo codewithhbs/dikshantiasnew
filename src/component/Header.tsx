@@ -5,10 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SlidingButtons from './SlidingButtons';
 
-interface CurrentAffair {
+interface SubCategory {
     _id: string;
-    title: string;
+    name: string;
     slug: string;
+    category: {
+        _id: string;
+        name: string;
+        slug: string;
+    };
     active: boolean;
 }
 
@@ -32,24 +37,23 @@ const Header: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
-    const [currentAffairs, setCurrentAffairs] = useState<CurrentAffair[]>([]);
+    const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [settings, setSettings] = useState<SettingsData | null>(null);
 
 
-    // Fetch Current Affairs from API
+    // Fetch Sub-Categories
     useEffect(() => {
-        const fetchCurrentAffairs = async () => {
+        const fetchSubCategories = async () => {
             try {
-                const res = await fetch('/api/admin/current-affairs');
+                const res = await fetch('/api/admin/sub-categories');
                 const data = await res.json();
-                setCurrentAffairs(data.filter((item: CurrentAffair) => item.active));
+                setSubCategories(data.filter((item: SubCategory) => item.active));
             } catch (error) {
-                console.error('Error fetching current affairs:', error);
+                console.error('Error fetching sub-categories:', error);
             }
         };
-        fetchCurrentAffairs();
+        fetchSubCategories();
     }, []);
-
 
     // Fetch Settings
     useEffect(() => {
@@ -129,18 +133,19 @@ const Header: React.FC = () => {
                                 </button>
                                 {openDropdown === 'currentAffairs' && (
                                     <div className="absolute top-full left-0 w-72 bg-white shadow-lg rounded-md py-2 z-50">
-                                        {currentAffairs.map(item => (
+                                        {subCategories.map(item => (
                                             <Link
                                                 key={item._id}
                                                 href={`/current-affairs/${item.slug}`}
                                                 className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50"
                                             >
-                                                {item.title}
+                                                {item.name}
                                             </Link>
                                         ))}
                                     </div>
                                 )}
                             </div>
+
 
                             <Link href="/blogs" className="text-gray-900 hover:text-red-500 font-medium py-2">Blog</Link>
                         </nav>
@@ -219,13 +224,13 @@ const Header: React.FC = () => {
                                 </button>
                                 <div className={`overflow-hidden transition-all duration-300 ${openMobileDropdown === 'currentAffairs' ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="ml-4 space-y-2 pt-2">
-                                        {currentAffairs.map(item => (
+                                        {subCategories.map(item => (
                                             <Link
                                                 key={item._id}
                                                 href={`/current-affairs/${item.slug}`}
                                                 className="block py-1 text-gray-700 hover:text-red-500"
                                             >
-                                                {item.title}
+                                                {item.name}
                                             </Link>
                                         ))}
                                     </div>

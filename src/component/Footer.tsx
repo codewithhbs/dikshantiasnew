@@ -49,7 +49,7 @@ const Footer: React.FC = () => {
       links: [
         { name: "Home", href: "/" },
         { name: "About", href: "/about" },
-        { name: "Scholarship Programme", href: "/scholarship" },
+        { name: "Scholarship Programme", href: "/scholarship-programme" },
         { name: "Blog", href: "/blogs" },
         { name: "Contact Us", href: "/contact-us" },
         { name: "Gallery", href: "/gallery" }
@@ -80,9 +80,9 @@ const Footer: React.FC = () => {
     {
       title: "POLICIES",
       links: [
-        { name: "Privacy & Refund Policy", href: "/" },
-        { name: "Terms & Conditions", href: "/" },
-        { name: "Data Policy", href: "/" }
+        { name: "Privacy & Refund Policy", href: "/pages/privacy-refund-policy" },
+        { name: "Terms & Conditions", href: "/pages/terms-conditions" },
+        { name: "Data Policy", href: "/pages/data-policy" }
       ]
     }
   ];

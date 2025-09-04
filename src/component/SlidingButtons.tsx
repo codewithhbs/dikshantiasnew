@@ -21,7 +21,7 @@ export default function SlidingButtons({ className = "" }: SlidingButtonsProps):
     {
       id: 2,
       icon: Globe,
-      text: "हिंदी वेबसाइट पर जाए",
+      text: "हिंदी वेबसाइट पर जाएं",
       bgColor: "bg-yellow-200",
       textColor: "text-yellow-900",
       iconBg: "bg-yellow-400"
@@ -30,9 +30,9 @@ export default function SlidingButtons({ className = "" }: SlidingButtonsProps):
       id: 3,
       icon: Globe2,
       text: "VISIT OUR ENGLISH WEBSITE",
-      bgColor: "bg-green-200",
-      textColor: "text-green-900",
-      iconBg: "bg-green-600"
+      bgColor: "bg-pink-200",
+      textColor: "text-pink-900",
+      iconBg: "bg-pink-600"
     },
     {
       id: 1,
@@ -75,7 +75,7 @@ export default function SlidingButtons({ className = "" }: SlidingButtonsProps):
             <button
               key={button.id}
               onClick={() => handleButtonClick(button.id)}
-              className={`${button.bgColor} ${button.textColor} px-6 py-2 w-full rounded-full flex items-center gap-3 font-semibold text-[10px] md:text-sm hover:scale-101 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2`}
+              className={`${button.bgColor} ${button.textColor} px-6 py-2 w-full rounded-lg flex items-center gap-3 font-semibold text-[10px] md:text-sm hover:scale-101 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2`}
               type="button"
               aria-label={button.text}
             >
@@ -101,7 +101,7 @@ export default function SlidingButtons({ className = "" }: SlidingButtonsProps):
                 <div key={button.id} className="w-full flex-shrink-0 px-4">
                   <button
                     onClick={() => handleButtonClick(button.id)}
-                    className={`${button.bgColor} ${button.textColor} w-full px-6 py-1 rounded-full flex items-center justify-center gap-3 font-semibold text-[13px] `}
+                    className={`${button.bgColor} ${button.textColor} w-full px-6 py-1 rounded-lg flex items-center justify-center gap-3 font-semibold text-[13px] `}
                     type="button"
                     aria-label={button.text}
                   >
