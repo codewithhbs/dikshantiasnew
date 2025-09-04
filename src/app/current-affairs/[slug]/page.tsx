@@ -27,7 +27,7 @@ interface CurrentAffairItem {
   _id: string;
   title: string;
   slug: string;
-  createdAt: string;
+  affairDate: string;
   content?: string;
   subCategory?: string | { _id: string };
 }
@@ -105,11 +105,11 @@ const ReadInHindu: React.FC = () => {
               title: item.title,
               slug: item.slug,
               content: item.content || '',
-              date: new Date(item.createdAt).getDate().toString(),
-              month: new Date(item.createdAt).toLocaleString('default', {
+              date: new Date(item.affairDate).getDate().toString(),
+              month: new Date(item.affairDate).toLocaleString('default', {
                 month: 'short',
               }),
-              year: new Date(item.createdAt).getFullYear().toString(),
+              year: new Date(item.affairDate).getFullYear().toString(),
               bgColor,
               dateColor,
             };

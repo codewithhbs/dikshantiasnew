@@ -30,6 +30,7 @@ export default function AddCurrentAffairsPage() {
   const [shortContent, setShortContent] = useState("");
   const [content, setContent] = useState("");
   const [active, setActive] = useState(true);
+   const [affairDate, setAffairDate] = useState("");
 
   // 📌 Category & Sub Category
   const [categories, setCategories] = useState<Category[]>([]);
@@ -100,6 +101,7 @@ export default function AddCurrentAffairsPage() {
       formData.append("shortContent", shortContent);
       formData.append("content", content);
       formData.append("active", JSON.stringify(active));
+      formData.append("affairDate", affairDate);
 
       // 📌 Category & SubCategory
       formData.append("category", category);
@@ -200,7 +202,7 @@ export default function AddCurrentAffairsPage() {
           </div>
 
           {/* Category & Sub Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
             {/* Category */}
             <div>
               <label className="block font-medium text-gray-700 mb-1">Category</label>
@@ -240,6 +242,27 @@ export default function AddCurrentAffairsPage() {
                 ))}
               </select>
             </div>
+
+             {/* Date Picker */}
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Date</label>
+              <input
+                type="date"
+                value={affairDate}
+                onChange={(e) => setAffairDate(e.target.value)}
+                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                required
+              />
+            </div>
+          </div> 
+
+
+
+
+
+
+
           </div>
 
           {/* Short Content */}

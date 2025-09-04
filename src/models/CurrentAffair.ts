@@ -15,6 +15,7 @@ export interface ICurrentAffairs extends Document {
   };
   imageAlt?: string;
   active: boolean;
+  affairDate?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -34,6 +35,7 @@ const CurrentAffairsSchema: Schema = new Schema(
     },
     imageAlt: String,
     active: { type: Boolean, default: true },
+    affairDate: { type: Date, required: true },
   },
   { timestamps: true }
 );

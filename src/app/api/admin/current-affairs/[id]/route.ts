@@ -93,6 +93,11 @@ export async function PUT(
 
     affair.active = formData.get("active") === "true";
 
+     const affairDate = formData.get("affairDate")?.toString();
+    if (affairDate) {
+      affair.affairDate = new Date(affairDate); // store as Date in Mongo
+    }
+
     // handle image upload
     const imageFile = formData.get("image") as Blob | null;
     if (imageFile && imageFile.size > 0) {
@@ -127,6 +132,7 @@ export async function PUT(
     );
   }
 }
+
 
 // ✅ DELETE Current Affair
 export async function DELETE(

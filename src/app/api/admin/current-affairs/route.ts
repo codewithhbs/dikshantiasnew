@@ -60,6 +60,9 @@ export async function POST(req: Request) {
     const imageAlt = formData.get("imageAlt")?.toString() || "";
     const active = formData.get("active") === "true";
 
+     const affairDate = formData.get("affairDate")?.toString();
+    const parsedAffairDate = affairDate ? new Date(affairDate) : undefined;
+
     // Upload image only if provided
     const uploadedImage = imageFile ? await uploadToCloudinary(imageFile) : null;
 
@@ -70,6 +73,7 @@ export async function POST(req: Request) {
       content,
       category: categoryId,
       subCategory: subCategoryId || undefined,
+      affairDate: parsedAffairDate, 
       image: uploadedImage
         ? {
             url: uploadedImage.secure_url,

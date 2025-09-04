@@ -43,7 +43,8 @@ export default function AddCurrentAffairsPage() {
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
 
-
+  // 📌 Affair Date
+  const [affairDate, setAffairDate] = useState("");
 
   // 📌 Media
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -99,6 +100,9 @@ export default function AddCurrentAffairsPage() {
           setImageAlt(data.imageAlt || "");
           setImageFile(null); // no new file yet
           setExistingImage(data.image?.url || null);
+          setAffairDate(
+            data.affairDate ? new Date(data.affairDate).toISOString().split("T")[0] : ""
+          );
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -132,6 +136,7 @@ export default function AddCurrentAffairsPage() {
       formData.append("active", JSON.stringify(active));
       formData.append("category", category);
       formData.append("subCategory", subCategory);
+      formData.append("affairDate", affairDate);
 
       if (imageFile) formData.append("image", imageFile);
       if (imageAlt) formData.append("imageAlt", imageAlt);
@@ -231,7 +236,7 @@ export default function AddCurrentAffairsPage() {
           </div>
 
           {/* Category & Sub Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
             <div>
               <label className="block font-medium text-gray-700 mb-1">Category</label>
               <select
@@ -269,6 +274,20 @@ export default function AddCurrentAffairsPage() {
                 ))}
               </select>
             </div>
+
+            {/* Date Picker */}
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Date</label>
+              <input
+                type="date"
+                value={affairDate}
+                onChange={(e) => setAffairDate(e.target.value)}
+                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                required
+              />
+            </div>
+          </div> 
           </div>
 
           {/* Short Content */}
