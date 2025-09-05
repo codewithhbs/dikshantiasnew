@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import AdminLayout from "@/component/admin/AdminLayout";
-import { Globe, Mail, CheckCircle, Trophy } from "lucide-react";
+import { Globe, Mail, CheckCircle, Trophy, User } from "lucide-react";
 import ImageUpload from "@/component/admin/ImageUpload";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -41,6 +41,10 @@ export default function PagesPage() {
     const [resultSection, setResultSection] = useState<IResultSection | null>(null)
     const [resultForm, setResultForm] = useState<Partial<IResultSection>>({})
 
+    const [admin, setAdmin] = useState<IAdmin | null>(null);
+    const [profileForm, setProfileForm] = useState<{ name?: string; email?: string; password?: string }>({});
+
+
 
     useEffect(() => {
         fetch("/api/admin/result-section")
@@ -78,6 +82,18 @@ export default function PagesPage() {
     }
 
 
+    useEffect(() => {
+        fetch("/api/admin/profile")
+            .then((res) => res.json())
+            .then((data) => {
+                setAdmin(data);
+                setProfileForm({ name: data.name, email: data.email });
+            })
+            .catch((err) => console.error("Error fetching admin profile:", err));
+    }, []);
+
+
+
     // Fetch settings from API
     useEffect(() => {
         fetch("/api/admin/settings")
@@ -95,6 +111,12 @@ export default function PagesPage() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+
+    const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
+    };
+
 
     // Handle form submit
     const handleSubmit = async (e: React.FormEvent) => {
@@ -142,6 +164,34 @@ export default function PagesPage() {
     };
 
 
+
+    const handleProfileSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!admin?._id) {
+    toast.error("Admin ID missing, cannot update profile");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/admin/profile/${admin._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profileForm),
+    });
+
+    if (!res.ok) throw new Error("Failed to update profile");
+
+    const result = await res.json();
+    toast.success(result.message);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to update profile");
+  }
+};
+
+
+
+
     return (
         <AdminLayout>
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Manage Settings</h1>
@@ -152,6 +202,7 @@ export default function PagesPage() {
                     <ul className="flex flex-col p-4 gap-2">
                         {[
                             { name: "Web Setting", key: "web", icon: <Globe size={18} /> },
+                            { name: "Profile", key: "profile", icon: <User size={18} /> },
                             { name: "SMTP Setting", key: "smtp", icon: <Mail size={18} /> },
                             { name: "Result Setting", key: "result", icon: <Trophy size={18} /> },
                         ].map((item) => (
@@ -390,6 +441,69 @@ export default function PagesPage() {
                             </div>
                         </form>
                     )}
+
+                    {activeTab === "profile" && admin && (
+                        <form
+                            onSubmit={handleProfileSubmit}
+                            className="space-y-5 bg-white p-6 rounded-2xl shadow-md border border-gray-100"
+                        >
+                            <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300 pb-2">
+                                Profile Settings
+                            </h2>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">Name</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={profileForm.name || ""}
+                                    onChange={handleProfileChange}
+                                    className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={profileForm.email || ""}
+                                    onChange={handleProfileChange}
+                                    className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={profileForm.password || ""}
+                                    onChange={handleProfileChange}
+                                    placeholder="Enter new password if you want to change"
+                                    className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-4 mt-6">
+                                <button
+                                    type="button"
+                                    className="flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-200 transition"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="flex items-center gap-2 px-5 py-2 bg-[#E94E4E] text-white rounded-xl shadow-md hover:bg-red-600 transition"
+                                >
+                                    <CheckCircle size={18} className="text-white" />
+                                    Update
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
 
                 </div>
             </div>

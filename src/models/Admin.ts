@@ -1,4 +1,3 @@
-// src/models/Admin.ts
 import { connectToDB } from "@/lib/mongodb";
 import mongoose, { Schema, Document, Model } from "mongoose";
 import bcrypt from "bcryptjs";
@@ -18,11 +17,11 @@ const AdminSchema = new Schema<IAdmin>({
 const AdminModel: Model<IAdmin> =
   mongoose.models.Admin || mongoose.model<IAdmin>("Admin", AdminSchema);
 
-export async function createAdmin(
-  name: string,
-  email: string,
-  plainPassword: string
-) {
+// Export the model
+export const Admin = AdminModel;
+
+// Helper functions
+export async function createAdmin(name: string, email: string, plainPassword: string) {
   await connectToDB();
   const hashedPassword = await bcrypt.hash(plainPassword, 10);
   const admin = new AdminModel({ name, email, password: hashedPassword });
@@ -35,9 +34,7 @@ export async function findAdminByEmail(email: string) {
   return AdminModel.findOne({ email });
 }
 
-export async function verifyPassword(
-  plainPassword: string,
-  hashedPassword: string
-) {
+export async function verifyPassword(plainPassword: string, hashedPassword: string) {
   return bcrypt.compare(plainPassword, hashedPassword);
 }
+  
