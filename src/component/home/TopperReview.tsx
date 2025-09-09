@@ -97,7 +97,11 @@ useEffect(() => {
       <div className="max-w-7xl mx-auto rounded-3xl">
         <h2 className="text-xl md:text-3xl font-bold text-[#040c33] mb-4 md:mb-5 px-3">
           Views About <span className="text-[#f43144]"> Dikshant IAS</span>
+           <span className="block text-sm md:text-base lg:text-lg font-normal text-gray-600 mt-1">
+        India's Best Mock Interview Programme
+      </span>
         </h2>
+          
 
         <div className="relative">
           {/* Navigation Buttons */}

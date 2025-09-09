@@ -87,9 +87,19 @@ export default function OurProudAchivement() {
     <div className="py-5 px-2 md:px-4 mb-4" style={{ backgroundColor: "#fff" }}>
       <div className="max-w-7xl md:mx-auto mt-7">
         <div className="bg-[#ecf4fc] backdrop-blur-sm rounded-3xl p-6 md:p-8 lg:p-12">
-          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[#040c33] mb-4 md:mb-4">
-            {loading ? <Skeleton width={200} /> : "Our Results"}
-          </h2>
+        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[#040c33] mb-2">
+  {loading ? (
+    <Skeleton width={200} />
+  ) : (
+    <>
+      Our Results
+      <span className="block text-sm md:text-base lg:text-lg font-normal text-gray-600 mt-1">
+        India's Best Mock Interview Programme
+      </span>
+    </>
+  )}
+</h2>
+
 
           {/* Description */}
           <p className="text-blue-950 mb-4 md:mb-10">
