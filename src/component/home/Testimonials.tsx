@@ -79,6 +79,9 @@ const Testimonials = () => {
             Success Stories That <span className="text-[#f43144] mt-1 md:mt-2">Inspire Excellence</span>
           </h2>
           <p className="text-lg md:text-xl text-blue-950 leading-relaxed px-3 ">
+           India's Best Mock Interview Programme
+          </p>
+          <p className="text-lg md:text-xl text-blue-950 leading-relaxed px-3 ">
             Meet our successful candidates who cleared UPSC and are now serving the nation
           </p>
         </div>
