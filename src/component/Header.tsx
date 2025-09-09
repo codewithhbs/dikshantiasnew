@@ -163,7 +163,11 @@ const Header: React.FC = () => {
                             </div>
 
                             <button className="hidden sm:block bg-[#b10208] text-white px-6 py-2 rounded hover:bg-[#f43131] font-medium">Get Started</button>
-                            <button className="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-[#950409]">Log In</button>
+                             <Link href="/admin/login">
+                            <button className="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-[#950409]">
+                                Log In
+                            </button>
+                            </Link>
                             <button onClick={toggleMobileMenu} className="lg:hidden p-2 text-gray-700 hover:text-[#f43144]">
                                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                             </button>
@@ -256,9 +260,16 @@ const Header: React.FC = () => {
                             <button className="w-full flex items-center justify-center space-x-2 bg-red-500 text-white py-3 rounded hover:bg-red-600 animate-pulse">
                                 <Play className="w-4 h-4" />
                                 <span className="font-medium">Live Demo</span>
-                            </button>
+                            </button>           
                             <button className="w-full bg-red-500 text-white py-3 rounded hover:bg-red-600 font-medium">Get Started</button>
-                            <button className="w-full text-gray-700 hover:text-red-500 py-3 border border-gray-300 rounded">Log In</button>
+                             <Link 
+                                href="/admin/login"
+                                target="_blank"
+                                >
+                                <button className="w-full text-gray-700 hover:text-red-500 py-3 border border-gray-300 rounded">
+                                    Log In
+                                </button>
+                                </Link>
                         </div>
                     </div>
                 </div>

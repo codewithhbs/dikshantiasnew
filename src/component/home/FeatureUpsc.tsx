@@ -2,9 +2,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Clock, Users, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
+import Link from "next/link";
 
 interface Program {
   _id: string;
+  slug: string;
   badge?: string;
   badgeColor?: string;
   title: string;
@@ -35,6 +37,7 @@ const FeatureUpsc: React.FC = () => {
         const data = await res.json();
         const formatted = data.map((course) => ({
           _id: course._id,
+          slug: course.slug,
           badge: course.badge || '',
           badgeColor: course.badgeColor || 'bg-gray-500',
           title: course.title,
@@ -220,13 +223,15 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
 
         {/* Buttons */}
         <div className="mt-auto flex gap-2.5 items-center">
+          <Link href={`/online-course/${program.slug}`}>
           <button className="bg-blue-950 hover:bg-[#d12a3a] text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
             View Details
           </button>
+        </Link>
           <button className="bg-[#f43144] hover:bg-blue-950 text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
             Enroll Now
           </button>
-        </div>
+        </div>  
       </div>
     </div>
   );

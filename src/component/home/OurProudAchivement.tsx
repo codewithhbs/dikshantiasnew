@@ -151,7 +151,7 @@ export default function OurProudAchivement() {
             </div>
           </div>
 
-          <div className="flex justify-center mt-8">
+          {/* <div className="flex justify-center mt-8">
             {loading ? (
               <Skeleton width={150} height={40} />
             ) : (
@@ -159,7 +159,7 @@ export default function OurProudAchivement() {
                 {section?.buttonText || "View All Results"}
               </Link>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
