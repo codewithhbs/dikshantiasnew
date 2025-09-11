@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/_variables.scss";
+@import "../styles/_keyframe-animations.scss";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,15 +45,17 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-.swiper-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet, .swiper-pagination-horizontal.swiper-pagination-bullets .swiper-pagination-bullet{
-  border-radius: 20px!important;
+.swiper-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet,
+.swiper-pagination-horizontal.swiper-pagination-bullets
+  .swiper-pagination-bullet {
+  border-radius: 20px !important;
   width: 20px;
   height: 8px;
   background-color: #ffd401;
 }
 
 .slider-track {
-  width: 141%!important;
+  width: 141% !important;
 }
 
 :root {
@@ -132,3 +136,12 @@
   }
 }
 
+.content-ul ul {
+  list-style: disc; /* bullet points */
+  padding-left: 1.5rem; /* space for bullets */
+}
+
+.content-ul ol {
+  list-style: decimal; /* numbers */
+  padding-left: 1.5rem; /* space for numbers */
+}

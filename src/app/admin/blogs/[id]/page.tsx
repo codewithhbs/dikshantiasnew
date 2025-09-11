@@ -6,7 +6,7 @@ import AdminLayout from "@/component/admin/AdminLayout";
 import ImageUpload from "@/component/admin/ImageUpload";
 import { CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import RichTextEditor from "@/component/admin/RichTextEditor";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 interface Category {
   _id: string;
@@ -309,7 +309,7 @@ useEffect(() => {
                         <label className="block font-medium text-gray-700 mb-1">Full Content</label>
 
                         {/* Rich Text Editor (always used, both add + edit) */}
-                        <RichTextEditor value={content} onChange={setContent} />
+                        <SimpleEditor value={content} onChange={setContent} />
 
                         {/* Optional: Hidden textarea to submit raw HTML (for server compatibility) */}
                         <textarea

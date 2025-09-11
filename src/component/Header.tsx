@@ -147,7 +147,7 @@ const Header: React.FC = () => {
                             </div>
 
 
-                            <Link href="/blogs" className="text-gray-900 hover:text-red-500 font-medium py-2">Blog</Link>
+                            <Link href="/blogs" className="text-gray-900 hover:text-red-500 font-medium py-2">Blogs</Link>
                         </nav>
 
                         {/* Right Side Actions */}
@@ -243,7 +243,7 @@ const Header: React.FC = () => {
                             <div className="border-b border-gray-200">
                                 <a href="/scholarship-programme" className="block py-2 text-gray-900 hover:text-red-500 font-medium">Scholarship Programme</a>
                             </div>
-                            <Link href="/blogs" className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">Blog</Link>
+                            <Link href="/blogs" className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">Blogs</Link>
                         </nav>
 
                         {/* Mobile Actions */}

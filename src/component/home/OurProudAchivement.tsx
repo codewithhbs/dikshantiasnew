@@ -151,15 +151,15 @@ export default function OurProudAchivement() {
             </div>
           </div>
 
-          {/* <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-8">
             {loading ? (
               <Skeleton width={150} height={40} />
             ) : (
-              <Link href={section?.buttonLink || "#"} className="px-4 py-2 bg-[#a50309] text-white rounded-md">
+              <Link href={section?.buttonLink || "/"} className="px-4 py-2 bg-[#a50309] text-white rounded-md">
                 {section?.buttonText || "View All Results"}
               </Link>
             )}
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

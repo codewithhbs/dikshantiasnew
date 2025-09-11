@@ -6,7 +6,7 @@ import AdminLayout from "@/component/admin/AdminLayout";
 import ImageUpload from "@/component/admin/ImageUpload";
 import { CheckCircle, Play,Palette  } from "lucide-react";
 import toast from "react-hot-toast";
-import RichTextEditor from "@/component/admin/RichTextEditor";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 const tailwindColors = [
     "bg-red-500",
@@ -359,7 +359,7 @@ export default function AddCoursePage() {
                         <label className="block font-medium text-gray-700 mb-1 mt-4">
                             Full Content
                         </label>
-                        <RichTextEditor value={content} onChange={setContent} />
+                        <SimpleEditor value={content} onChange={setContent} />
                     </div>
 
                 </div>

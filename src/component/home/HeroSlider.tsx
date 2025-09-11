@@ -5,15 +5,16 @@ import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import AnnouncementRow from "./AnnouncementRow";
 import HomeSlider from "./HomeSlider";
+import Link from "next/link";
 
 export default function HeroSlider() {
   const courses = [
-    { id: "c1", name: "E-Learning", color: "bg-purple-200", icon: "⏰" },
-    { id: "c2", name: "What to Read in The Hindu", color: "bg-yellow-200", icon: "🎥" },
-    { id: "c3", name: "What to Read in The Indian Express", color: "bg-green-200", icon: "🏫" },
-    { id: "c4", name: "Daily Current Affairs", color: "bg-pink-200", icon: "✍️" },
-    { id: "c5", name: "Editorial Analysis", color: "bg-red-200", icon: "📚" },
-    { id: "c6", name: "Important Facts of the Day", color: "bg-blue-200", icon: "👥" },
+    { id: "c1", name: "E-Learning", color: "bg-purple-200", icon: "⏰", link: "#" },
+    { id: "c2", name: "What to Read in The Hindu", color: "bg-yellow-200", icon: "🎥", link: "current-affairs/what-to-read-in-hindu" },
+    { id: "c3", name: "What to Read in The Indian Express", color: "bg-green-200", icon: "🏫", link: "current-affairs/what-to-read-in-indian-express" },
+    { id: "c4", name: "Daily Current Affairs", color: "bg-pink-200", icon: "✍️", link: "current-affairs/daily-current-affairs-analysis" },
+    { id: "c5", name: "Editorial Analysis", color: "bg-red-200", icon: "📚", link: "current-affairs/editorial-analysis" },
+    { id: "c6", name: "Important Facts of the Day", color: "bg-blue-200", icon: "👥", link: "current-affairs/important-facts-of-the-day" },
   ];
 
   return (
@@ -52,14 +53,16 @@ export default function HeroSlider() {
         >
           {courses.map((course) => (
             <SwiperSlide key={course.id}>
-              <div
-                className={`md:w-48 w-44 md:h-32 h-26 ${course.color} rounded-lg flex flex-col text-center p-4`}
-              >
-                <span className="text-3xl mb-2">{course.icon}</span>
-                <span className="text-[13px] md:text-[15px] font-bold text-[#040c33]">
-                  {course.name}
-                </span>
-              </div>
+              <Link href={course.link}>
+                <div
+                  className={`md:w-48 w-44 md:h-32 h-26 ${course.color} rounded-lg flex flex-col text-center p-4 cursor-pointer hover:scale-105 transition-transform`}
+                >
+                  <span className="text-3xl mb-2">{course.icon}</span>
+                  <span className="text-[13px] md:text-[15px] font-bold text-[#040c33]">
+                    {course.name}
+                  </span>
+                </div>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>

@@ -6,7 +6,7 @@ import AdminLayout from "@/component/admin/AdminLayout";
 import ImageUpload from "@/component/admin/ImageUpload";
 import { CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import RichTextEditor from "@/component/admin/RichTextEditor";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 interface Category {
     _id: string;
@@ -60,7 +60,7 @@ export default function AddBlogPage() {
     }, [title]);
 
     // Fetch categories
-      // Fetch categories
+    // Fetch categories
     useEffect(() => {
         fetchCategories();
     }, []);
@@ -107,6 +107,7 @@ export default function AddBlogPage() {
         e.preventDefault();
         setSubmitting(true); // start spinner when saving
         try {
+            console.log('content',content)
             const formData = new FormData();
             formData.append("title", title);
             formData.append("slug", slug);
@@ -161,7 +162,7 @@ export default function AddBlogPage() {
     }
 
 
-        // Show submitting overlay when blog is being created
+    // Show submitting overlay when blog is being created
     if (submitting) {
         return (
             <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -282,12 +283,12 @@ export default function AddBlogPage() {
                                 required
                             />
                         </div>
-                            <div>
-                                <label className="block font-medium text-gray-700 mb-1">
-                                    Full Content
-                                </label>
-                               <RichTextEditor value={content} onChange={setContent} />
-                            </div>
+                        <div>
+                            <label className="block font-medium text-gray-700 mb-1">
+                                Full Content
+                            </label>
+                            <SimpleEditor value={content} onChange={setContent} />
+                        </div>
                     </div>
                 </div>
 
