@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 
 function decodeHtml(html?: string): string {
   if (!html) return '';
@@ -19,18 +20,18 @@ interface HinduDetailsProps {
   title: string;
   content?: string;
   onClose?: () => void;
+  imageUrl?: string;
+  imageAlt?: string;
 }
 
-const HinduDetails: React.FC<HinduDetailsProps> = ({ title, content, onClose }) => {
+const HinduDetails: React.FC<HinduDetailsProps> = ({ title, content, onClose, imageUrl, imageAlt }) => {
   const decodedContent = decodeHtml(content);
 
   return (
     <div className="bg-[#F1F5F9] shadow-lg rounded-2xl p-6 md:p-10 max-w-6xl mx-auto relative">
-      {/* Header with title + close */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-6 border-b pb-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#00072c]">
-          {title}
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-[#00072c]">{title}</h1>
         {onClose && (
           <button
             onClick={onClose}
@@ -41,6 +42,19 @@ const HinduDetails: React.FC<HinduDetailsProps> = ({ title, content, onClose }) 
           </button>
         )}
       </div>
+
+      {/* Image */}
+      {imageUrl && (
+        <div className="mb-6">
+          <Image
+            src={imageUrl}
+            alt={imageAlt || title}
+            width={1200}
+            height={200}
+            className="rounded-lg w-full h-auto object-cover"
+          />
+        </div>
+      )}
 
       {/* Body */}
       {decodedContent ? (
