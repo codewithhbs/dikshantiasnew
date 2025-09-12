@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import type { RouteContext } from "next";
 import { connectToDB } from "@/lib/mongodb";
-import cloudinary from "@/lib/cloudinary";
 import GalleryModel from "@/models/GalleryModel";
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 
-// GET single gallery
+
+// GET gallery by ID
 export async function GET(
   request: Request,
   context: RouteContext<{ id: string }>
@@ -17,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
     }
     return NextResponse.json(gallery);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -36,36 +37,27 @@ export async function PUT(
     const alt = formData.get("alt") as string;
     const imageFile = formData.get("image") as File | null;
 
-    // Fetch existing gallery
     const gallery = await GalleryModel.findById(id);
     if (!gallery) {
       return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
     }
 
     let updatedImage = gallery.image;
-
-    // If new image uploaded, delete old one and upload new
     if (imageFile && imageFile.size > 0) {
-      if (gallery.image?.public_id) {
-        await cloudinary.uploader.destroy(gallery.image.public_id);
+      if (gallery.image?.key) {
+        await deleteFromS3(gallery.image.key);
       }
-
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const uploadedImage = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: "sliders" },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-        uploadStream.end(buffer);
-      });
+      const uploadedImage = await uploadToS3(
+        buffer,
+        imageFile.name,
+        imageFile.type,
+        "gallery"
+      );
 
       updatedImage = {
-        url: uploadedImage.secure_url,
-        public_url: uploadedImage.secure_url,
-        public_id: uploadedImage.public_id,
+        key: uploadedImage.key,
+        url: uploadedImage.url,
       };
     }
 
@@ -76,10 +68,10 @@ export async function PUT(
     await gallery.save();
 
     return NextResponse.json(gallery, { status: 200 });
-  } catch (err) {
-    console.error("Error updating gallery:", err);
+  } catch (error) {
+    console.error("Error updating gallery:", error);
     return NextResponse.json(
-      { error: err.message || "Failed to update gallery" },
+      { error: error.message || "Failed to update gallery" },
       { status: 500 }
     );
   }
@@ -96,17 +88,17 @@ export async function PATCH(
 
     const { active } = await request.json();
 
-    const slider = await GalleryModel.findByIdAndUpdate(
+    const gallery = await GalleryModel.findByIdAndUpdate(
       id,
       { active },
       { new: true }
     );
 
-    if (!slider) {
+    if (!gallery) {
       return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
     }
 
-    return NextResponse.json(slider);
+    return NextResponse.json(gallery);
   } catch (error) {
     console.error("Failed to update active status:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -124,11 +116,12 @@ export async function DELETE(
 
     const gallery = await GalleryModel.findById(id);
     if (!gallery) {
-      return NextResponse.json({ error: "Slider not found" }, { status: 404 });
+      return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
     }
 
-    if (gallery.image?.public_id) {
-      await cloudinary.uploader.destroy(gallery.image.public_id);
+    // Delete image from S3
+    if (gallery.image?.key) {
+      await deleteFromS3(gallery.image.key);
     }
 
     await GalleryModel.findByIdAndDelete(id);

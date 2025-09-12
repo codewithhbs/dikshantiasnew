@@ -13,6 +13,11 @@ export interface IBlog extends Document {
     public_id: string;
     alt?: string;
   };
+  image: {
+    url: string;
+    key: string;
+  };
+   alt?: string;
   tags?: string[];
   active: boolean;
 

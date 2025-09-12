@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary"; 
 import { connectToDB } from "@/lib/mongodb";
 import CurrentAffairs from "@/models/CurrentAffair";
 import BlogCategoryModel from "@/models/BlogCategoryModel";
 import SubCategoryModel from "@/models/SubCategoryModel";
+import { uploadToS3 } from "@/lib/s3";
 
-
-
-
-// GET all Current Affairs
+// ------------------ GET ALL ------------------
 export async function GET() {
   try {
     await connectToDB();
@@ -27,23 +24,7 @@ export async function GET() {
   }
 }
 
-// Utility: Upload to Cloudinary
-async function uploadToCloudinary(file: Blob) {
-  if (!file) return null; // <-- handle null case
-  const buffer = Buffer.from(await file.arrayBuffer());
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "current_affairs" },
-      (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      }
-    );
-    uploadStream.end(buffer);
-  });
-}
-
-// POST: Create new current affair
+// ------------------ CREATE NEW ------------------
 export async function POST(req: Request) {
   try {
     await connectToDB();
@@ -56,15 +37,24 @@ export async function POST(req: Request) {
     const content = formData.get("content")?.toString();
     const categoryId = formData.get("category")?.toString();
     const subCategoryId = formData.get("subCategory")?.toString();
-    const imageFile = formData.get("image") as Blob | null;
+    const imageFile = formData.get("image") as File | null;
     const imageAlt = formData.get("imageAlt")?.toString() || "";
     const active = formData.get("active") === "true";
 
-     const affairDate = formData.get("affairDate")?.toString();
+    const affairDate = formData.get("affairDate")?.toString();
     const parsedAffairDate = affairDate ? new Date(affairDate) : undefined;
 
-    // Upload image only if provided
-    const uploadedImage = imageFile ? await uploadToCloudinary(imageFile) : null;
+    let uploadedImage = undefined;
+
+    if (imageFile && imageFile.size > 0) {
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      uploadedImage = await uploadToS3(
+        buffer,
+        imageFile.name,
+        imageFile.type,
+        "current_affairs"
+      );
+    }
 
     const newAffair = await CurrentAffairs.create({
       title,
@@ -73,19 +63,18 @@ export async function POST(req: Request) {
       content,
       category: categoryId,
       subCategory: subCategoryId || undefined,
-      affairDate: parsedAffairDate, 
+      affairDate: parsedAffairDate,
       image: uploadedImage
         ? {
-            url: uploadedImage.secure_url,
-            public_id: uploadedImage.public_id,
-            public_url: uploadedImage.secure_url,
+            key: uploadedImage.key,
+            url: uploadedImage.url,
           }
-        : undefined, // <-- no image if not uploaded
+        : undefined,
       imageAlt,
       active,
     });
 
-    // Populate category and subCategory for response
+    // Populate for response
     const populatedAffair = await newAffair.populate([
       { path: "category", select: "name" },
       { path: "subCategory", select: "name" },

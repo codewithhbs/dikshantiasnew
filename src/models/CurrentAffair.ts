@@ -1,4 +1,3 @@
-
 import mongoose, { Document, Schema, Model } from "mongoose";
 
 export interface ICurrentAffairs extends Document {
@@ -9,9 +8,8 @@ export interface ICurrentAffairs extends Document {
   category: mongoose.Schema.Types.ObjectId;
   subCategory: mongoose.Schema.Types.ObjectId;
   image?: {
-    url: string;
-    public_id: string;
-    public_url: string;
+    key: string; // S3 key for deletion
+    url: string; // Public URL
   };
   imageAlt?: string;
   active: boolean;
@@ -24,14 +22,21 @@ const CurrentAffairsSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    shortContent: { type: String},
+    shortContent: { type: String },
     content: { type: String, required: true },
-    category: { type: Schema.Types.ObjectId, ref: "BlogCategory", required: true },
-    subCategory: { type: Schema.Types.ObjectId, ref: "SubCategory", required: true },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "BlogCategory",
+      required: true,
+    },
+    subCategory: {
+      type: Schema.Types.ObjectId,
+      ref: "SubCategory",
+      required: false,
+    },
     image: {
-      url: String,
-      public_id: String,
-      public_url: String,
+      key: { type: String },
+      url: { type: String },
     },
     imageAlt: String,
     active: { type: Boolean, default: true },
@@ -40,8 +45,8 @@ const CurrentAffairsSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Prevent model recompilation error in Next.js hot reload
 const CurrentAffairs: Model<ICurrentAffairs> =
-  mongoose.models.CurrentAffairs || mongoose.model("CurrentAffairs", CurrentAffairsSchema);
+  mongoose.models.CurrentAffairs ||
+  mongoose.model("CurrentAffairs", CurrentAffairsSchema);
 
 export default CurrentAffairs;

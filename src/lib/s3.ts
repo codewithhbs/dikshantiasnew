@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { randomUUID } from "crypto";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION!,
@@ -19,7 +20,9 @@ export async function uploadToS3(
   mimetype: string,
   folder: string
 ) {
-  const key = `${folder}/${Date.now()}-${fileName}`;
+  // sanitize filename and add a UUID to avoid collisions
+  const safeFileName = fileName.replace(/\s+/g, "_");
+  const key = `${folder}/${Date.now()}-${randomUUID()}-${safeFileName}`;
 
   const command = new PutObjectCommand({
     Bucket: BUCKET_NAME,
@@ -30,16 +33,19 @@ export async function uploadToS3(
 
   await s3.send(command);
 
+  const url = `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
   return {
-    key, // keep key so we can delete later
-    url: `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
+    key,
+    url,
   };
 }
 
 /**
  * Delete a file from S3 by key
  */
-export async function deleteFromS3(key: string) {
+export async function deleteFromS3(key?: string) {
+  if (!key) return;
   try {
     const command = new DeleteObjectCommand({
       Bucket: BUCKET_NAME,

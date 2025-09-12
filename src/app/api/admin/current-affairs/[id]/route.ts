@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import type { RouteContext } from "next";
+import mongoose from "mongoose";
+
 import { connectToDB } from "@/lib/mongodb";
 import CurrentAffairs from "@/models/CurrentAffair";
-import cloudinary from "@/lib/cloudinary";
 import BlogCategoryModel from "@/models/BlogCategoryModel";
 import SubCategoryModel from "@/models/SubCategoryModel";
-import mongoose from "mongoose";
+
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 
 // ✅ GET Current Affair by ID or Slug
 export async function GET(
@@ -29,31 +31,24 @@ export async function GET(
     }
 
     if (!currentAffair) {
-      return NextResponse.json({ error: "Current Affair not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Current Affair not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(currentAffair, { status: 200 });
   } catch (error: unknown) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch current affair" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch current affair",
+      },
       { status: 500 }
     );
   }
-}
-
-// 🔹 Utility: Upload to Cloudinary
-async function uploadToCloudinary(file: Blob) {
-  const buffer = Buffer.from(await file.arrayBuffer());
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "current_affairs" },
-      (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      }
-    );
-    uploadStream.end(buffer);
-  });
 }
 
 // ✅ UPDATE Current Affair
@@ -72,7 +67,7 @@ export async function PUT(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // update fields
+    // Update fields
     const title = formData.get("title")?.toString();
     if (title) affair.title = title;
 
@@ -93,24 +88,30 @@ export async function PUT(
 
     affair.active = formData.get("active") === "true";
 
-     const affairDate = formData.get("affairDate")?.toString();
-    if (affairDate) {
-      affair.affairDate = new Date(affairDate); // store as Date in Mongo
-    }
+    const affairDate = formData.get("affairDate")?.toString();
+    if (affairDate) affair.affairDate = new Date(affairDate);
 
-    // handle image upload
-    const imageFile = formData.get("image") as Blob | null;
-    if (imageFile && imageFile.size > 0) {
-      if (affair.image?.public_id) {
-        await cloudinary.uploader.destroy(affair.image.public_id).catch(() =>
-          console.warn("⚠️ Failed to delete old image")
-        );
+    // ✅ Handle image upload with S3
+    const imageFile = formData.get("image");
+    // Type guard: ensure imageFile is a File
+    if (imageFile && typeof imageFile !== "string" && "arrayBuffer" in imageFile) {
+      // Delete old image if exists
+      if (affair.image?.key) {
+        await deleteFromS3(affair.image.key);
       }
-      const uploadedImage = (await uploadToCloudinary(imageFile))
+
+      // Upload new image
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      const uploadedImage = await uploadToS3(
+        buffer,
+        (imageFile as File).name,
+        (imageFile as File).type,
+        "current_affairs"
+      );
+
       affair.image = {
-        url: uploadedImage.secure_url,
-        public_id: uploadedImage.public_id,
-        public_url: uploadedImage.secure_url,
+        key: uploadedImage.key,
+        url: uploadedImage.url,
       };
     }
 
@@ -127,12 +128,16 @@ export async function PUT(
     return NextResponse.json(populated, { status: 200 });
   } catch (error: unknown) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update current affair" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to update current affair",
+      },
       { status: 500 }
     );
   }
 }
-
 
 // ✅ DELETE Current Affair
 export async function DELETE(
@@ -145,19 +150,31 @@ export async function DELETE(
 
     const currentAffair = await CurrentAffairs.findById(id);
     if (!currentAffair) {
-      return NextResponse.json({ error: "Current Affair not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Current Affair not found" },
+        { status: 404 }
+      );
     }
 
-    if (currentAffair.image?.public_id) {
-      await cloudinary.uploader.destroy(currentAffair.image.public_id);
+    // ✅ delete image from S3 if exists
+    if (currentAffair.image?.key) {
+      await deleteFromS3(currentAffair.image.key);
     }
 
     await CurrentAffairs.findByIdAndDelete(id);
 
-    return NextResponse.json({ message: "Current Affair deleted successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Current Affair deleted successfully" },
+      { status: 200 }
+    );
   } catch (error: unknown) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete current affair" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete current affair",
+      },
       { status: 500 }
     );
   }

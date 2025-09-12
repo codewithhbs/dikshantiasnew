@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
-import cloudinary from "@/lib/cloudinary"; 
 import Course, { ICourse } from "@/models/Course";
 import slugify from "slugify";
+import { uploadToS3 } from "@/lib/s3";
 
+// GET all courses
 export async function GET() {
   try {
     await connectToDB();
-
     const courses = await Course.find();
     return NextResponse.json(courses, { status: 200 });
   } catch (error) {
@@ -17,34 +17,15 @@ export async function GET() {
   }
 }
 
-
-// 🔹 Helper to upload image buffer to Cloudinary
-async function uploadImageToCloudinary(file: File) {
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "courses" },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      }
-    );
-    uploadStream.end(buffer);
-  });
-}
-
-
-
+// POST: Create new course
 export async function POST(req: Request) {
   try {
     await connectToDB();
-
     const formData = await req.formData();
 
     const title = formData.get("title") as string;
 
-    //Slug (generate if missing)
+    // Slug
     const rawSlug = formData.get("slug") as string | null;
     const slug =
       rawSlug && rawSlug.trim().length > 0
@@ -57,7 +38,6 @@ export async function POST(req: Request) {
       ? JSON.parse(formData.get("active") as string)
       : true;
 
-    // Basic Info
     const courseMode = formData.get("courseMode") as "online" | "offline";
     const lectures = parseInt(formData.get("lectures") as string, 10);
     const duration = formData.get("duration") as string;
@@ -92,15 +72,20 @@ export async function POST(req: Request) {
       ? parseFloat(formData.get("fourthInstallment") as string)
       : undefined;
 
-    //Handle image
+    // Handle image upload to S3
     let imageData: ICourse["image"] | undefined;
     const imageFile = formData.get("image") as File | null;
     if (imageFile) {
-      const uploadedImage = await uploadImageToCloudinary(imageFile);
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      const uploadedImage = await uploadToS3(
+        buffer,
+        imageFile.name,
+        imageFile.type,
+        "courses"
+      );
       imageData = {
-        url: uploadedImage.secure_url,
-        public_url: uploadedImage.url,
-        public_id: uploadedImage.public_id,
+        url: uploadedImage.url,
+        key: uploadedImage.key,
         alt: (formData.get("imageAlt") as string) || "",
       };
     }
@@ -111,14 +96,14 @@ export async function POST(req: Request) {
       ? JSON.parse(formData.get("videos") as string)
       : [];
 
-       //Badge & Features
+    // Badge & Features
     const badge = (formData.get("badge") as string) || undefined;
     const badgeColor = (formData.get("badgeColor") as string) || undefined;
     const features = formData.get("features")
       ? JSON.parse(formData.get("features") as string)
       : [];
 
-    //SEO fields
+    // SEO
     const metaTitle = (formData.get("metaTitle") as string) || "";
     const metaDescription = (formData.get("metaDescription") as string) || "";
     const metaKeywords = formData.get("metaKeywords")
@@ -134,7 +119,7 @@ export async function POST(req: Request) {
       ? JSON.parse(formData.get("follow") as string)
       : true;
 
-    // Create and save course
+    // Create course
     const newCourse = await Course.create({
       title,
       slug,
@@ -167,13 +152,12 @@ export async function POST(req: Request) {
       follow,
       badge,
       badgeColor,
-      features, 
+      features,
     });
 
     return NextResponse.json(newCourse, { status: 201 });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Failed to create course";
+    const message = err instanceof Error ? err.message : "Failed to create course";
     console.error("Error creating course:", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }

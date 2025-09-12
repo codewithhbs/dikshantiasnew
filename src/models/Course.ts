@@ -30,12 +30,11 @@ export interface ICourse extends Document {
   features?: string[];
 
   // Images
-  image?: {
+    image: {
     url: string;
-    public_url: string;
-    public_id: string;
-    alt: string;
+    key: string;
   };
+  alt: string;
 
   // Videos
   demoVideo?: string;
@@ -82,12 +81,12 @@ const CourseSchema: Schema = new Schema(
     badgeColor: { type: String, default: 'bg-indigo-500' },
     features: { type: [String], default: [] },     
 
-    image: {
-      url: { type: String },
-      public_url: { type: String },
-      public_id: { type: String },
-      alt: { type: String },
+      image: {
+        url: { type: String, required: true },
+        key: { type: String, required: true },
+        alt: { type: String },
     },
+
 
     demoVideo: { type: String },
     videos: { type: [String], default: [] },
