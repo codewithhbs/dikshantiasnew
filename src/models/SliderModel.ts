@@ -4,8 +4,7 @@ export interface ISlider extends Document {
   title: string;
   image: {
     url: string;
-    public_url: string;
-    public_id: string;
+    key: string;
   };
   type: "Desktop" | "Mobile";
   displayOrder: number;
@@ -19,14 +18,13 @@ const SliderSchema: Schema = new Schema(
     title: { type: String, required: true },
     image: {
       url: { type: String, required: true },
-      public_url: { type: String, required: true },
-      public_id: { type: String, required: true },
+      key: { type: String, required: true },
     },
-    type: { 
-      type: String, 
+    type: {
+      type: String,
       enum: ["Desktop", "Mobile"],
       default: "Desktop",
-      required: true
+      required: true,
     },
     displayOrder: { type: Number, default: 0 },
     active: { type: Boolean, default: true },

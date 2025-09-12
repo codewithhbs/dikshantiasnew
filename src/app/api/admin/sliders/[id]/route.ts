@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import type { RouteContext } from "next";
 import { connectToDB } from "@/lib/mongodb";
 import SliderModel from "@/models/SliderModel";
-import cloudinary from "@/lib/cloudinary";
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
+
+// ========================== ROUTES ==========================
 
 // GET single slider
 export async function GET(
@@ -61,32 +63,23 @@ export async function PUT(
       let updatedImage = slider.image;
 
       if (imageFile && imageFile.size > 0) {
-        // delete old image
-        if (slider.image?.public_id) {
-          try {
-            await cloudinary.uploader.destroy(slider.image.public_id);
-          } catch (err) {
-            console.error("Failed to delete old image from Cloudinary:", err);
-          }
+        // delete old image from S3 if exists
+        if (slider.image?.key) {
+          await deleteFromS3(slider.image.key);
         }
 
-        // upload new
+        // upload new image to S3
         const buffer = Buffer.from(await imageFile.arrayBuffer());
-        const uploadedImage = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            { folder: "sliders" },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          uploadStream.end(buffer);
-        });
+        const uploadedImage = await uploadToS3(
+          buffer,
+          imageFile.name,
+          imageFile.type,
+          "sliders"
+        );
 
         updatedImage = {
-          url: uploadedImage.secure_url,
-          public_url: uploadedImage.secure_url,
-          public_id: uploadedImage.public_id,
+          url: uploadedImage.url,
+          key: uploadedImage.key,
         };
       }
 
@@ -140,7 +133,7 @@ export async function PATCH(
 export async function DELETE(
   request: Request,
   context: RouteContext<{ id: string }>
-) {
+) { 
   try {
     const { id } = context.params;
     await connectToDB();
@@ -150,9 +143,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Slider not found" }, { status: 404 });
     }
 
-    // Delete image from Cloudinary if exists
-    if (slider.image?.public_id) {
-      await cloudinary.uploader.destroy(slider.image.public_id);
+    // delete image from S3 if exists
+    if (slider.image?.key) {
+      await deleteFromS3(slider.image.key);
     }
 
     await SliderModel.findByIdAndDelete(id);

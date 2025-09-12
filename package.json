@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.887.0",
     "@floating-ui/react": "^0.27.16",
     "@lexical/code": "^0.34.0",
     "@lexical/link": "^0.34.0",
@@ -42,6 +43,7 @@
     "@udecode/plate-common": "^41.0.13",
     "@udecode/plate-core": "^48.0.5",
     "@udecode/plate-ui": "^35.0.0",
+    "aws-sdk": "^2.1692.0",
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.8",
     "class-variance-authority": "^0.7.1",
