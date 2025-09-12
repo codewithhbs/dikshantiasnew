@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import HinduDetails from '../HinduDetails';
 
+
 interface Card {
   _id: string;
   title: string;
@@ -15,7 +16,10 @@ interface Card {
   bgColor?: string;
   dateColor?: string;
   content?: string;
+  imageUrl?: string;
+  imageAlt?: string;
 }
+
 
 interface SubCategory {
   _id: string;
@@ -95,26 +99,34 @@ const ReadInHindu: React.FC = () => {
           return subId === subCategory._id;
         });
 
-        const formattedCards: Card[] = filteredData.map(
-          (item: CurrentAffairItem, index: number): Card => {
-            const bgColor = bgColors[index % bgColors.length];
-            const dateColor = dateColors[index % dateColors.length];
+      const formattedCards: Card[] = filteredData
+        .map((item: CurrentAffairItem, index: number): Card => {
+          const bgColor = bgColors[index % bgColors.length];
+          const dateColor = dateColors[index % dateColors.length];
 
-            return {
-              _id: item._id,
-              title: item.title,
-              slug: item.slug,
-              content: item.content || '',
-              date: new Date(item.affairDate).getDate().toString(),
-              month: new Date(item.affairDate).toLocaleString('default', {
-                month: 'short',
-              }),
-              year: new Date(item.affairDate).getFullYear().toString(),
-              bgColor,
-              dateColor,
-            };
-          }
-        );
+          return {
+            _id: item._id,
+            title: item.title,
+            slug: item.slug,
+            content: item.content || '',
+            date: new Date(item.affairDate).getDate().toString(),
+            month: new Date(item.affairDate).toLocaleString('default', {
+              month: 'short',
+            }),
+            year: new Date(item.affairDate).getFullYear().toString(),
+            bgColor,
+            dateColor,
+            imageUrl: item.image?.url || '',
+            imageAlt: item.imageAlt || item.title,
+          };
+        })
+        // 🔥 Sort latest first
+        .sort((a, b) => {
+          const dateA = new Date(`${a.month} ${a.date}, ${a.year}`).getTime();
+          const dateB = new Date(`${b.month} ${b.date}, ${b.year}`).getTime();
+          return dateB - dateA; // descending
+        });
+
 
         setCards(formattedCards);
       } catch (error) {
@@ -149,8 +161,11 @@ const ReadInHindu: React.FC = () => {
         <HinduDetails
           title={activeCard.title}
           content={activeCard.content}
+          imageUrl={activeCard.imageUrl}
+          imageAlt={activeCard.imageAlt}
           onClose={() => setActiveCard(null)}
         />
+
       </div>
     );
   }
