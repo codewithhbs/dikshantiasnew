@@ -1,23 +1,37 @@
 import { NextResponse } from "next/server";
 import type { RouteContext } from "next";
 import { connectToDB } from "@/lib/mongodb";
-import cloudinary from "@/lib/cloudinary";
 import WebSettings from "@/models/WebSettingsModel";
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 
-// UPDATE slider
+interface WebSettingsUpdate {
+  name?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  address?: string;
+  googleMap?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  linkedin?: string;
+  twitter?: string;
+  telegram?: string;
+  image?: { url: string; key: string };
+}
+
 export async function PUT(
   request: Request,
   context: RouteContext<{ id: string }>
 ) {
   try {
     await connectToDB();
+    const { id } = context.params;
+    const formData = await request.formData();
 
-    const { id } = context.params; // ✅ get ID from context
-    const formData = await request.formData(); // ✅ use request, not req
-    const data: Record<string> = {};
-
-    // Append all fields from formData
-    const fields = [
+    // Prepare update data
+    const data: WebSettingsUpdate = {};
+    const fields: (keyof WebSettingsUpdate)[] = [
       "name",
       "phone",
       "whatsapp",
@@ -37,42 +51,34 @@ export async function PUT(
       if (value) data[field] = value.toString();
     });
 
-    // Handle image if uploaded
-    const imageFile = formData.get("image");
-    if (imageFile && typeof imageFile === "object") {
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const uploadedImage = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: "web" },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-        uploadStream.end(buffer);
-      });
-
-      data.image = {
-        url: uploadedImage.secure_url,
-        public_url: uploadedImage.secure_url,
-        public_id: uploadedImage.public_id,
-      };
-    }
-
-    // Update document
-    const updatedWeb = await WebSettings.findByIdAndUpdate(id, data, {
-      new: true,
-    });
-
-    if (!updatedWeb) {
+    const existing = await WebSettings.findById(id);
+    if (!existing) {
       return NextResponse.json({ error: "Web settings not found" }, { status: 404 });
     }
+
+    // Handle image upload
+    const imageFile = formData.get("image") as File | null;
+    if (imageFile && imageFile.size > 0) {
+      // Delete old image from S3 if exists
+      if (existing.image?.key) {
+        await deleteFromS3(existing.image.key);
+      }
+
+      // Upload new image to S3
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      const { url, key } = await uploadToS3(buffer, imageFile.name, imageFile.type, "web");
+
+      data.image = { url, key };
+    }
+
+    // Update WebSettings document
+    const updatedWeb = await WebSettings.findByIdAndUpdate(id, data, { new: true });
 
     return NextResponse.json(updatedWeb, { status: 200 });
   } catch (err) {
     console.error("Error updating WebSettings:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to update web settings" },
+      { error: (err as Error).message || "Failed to update web settings" },
       { status: 500 }
     );
   }

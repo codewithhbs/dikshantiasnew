@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { RouteContext } from "next";
-import cloudinary from "@/lib/cloudinary"; 
 import { connectToDB } from "@/lib/mongodb";
 import TestimonialModel from "@/models/TestimonialsModel";
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 
 // GET single Testimonial
 export async function GET(
@@ -19,11 +19,11 @@ export async function GET(
     }
     return NextResponse.json(testimonial);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
-// UPDATE Testimonial (with image upload)
+// UPDATE Testimonial (with AWS S3 image upload)
 export async function PUT(
   request: Request,
   context: RouteContext<{ id: string }>
@@ -48,33 +48,19 @@ export async function PUT(
     }
 
     let updatedImage = existing.image;
-    const imageFile = formData.get("image");
+    const imageFile = formData.get("image") as File | null;
 
-    if (imageFile && typeof imageFile === "object") {
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-
-      if (existing.image?.public_id) {
-        await cloudinary.uploader.destroy(existing.image.public_id);
+    if (imageFile && imageFile.size > 0) {
+      // Delete old image from S3
+      if (existing.image?.key) {
+        await deleteFromS3(existing.image.key);
       }
+      // Upload new image to S3
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      const { url, key } = await uploadToS3(buffer, imageFile.name, imageFile.type, "testimonials");
 
-      const uploadResult = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: "Testimonials" },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-        uploadStream.end(buffer);
-      });
-
-      updatedImage = {
-        url: uploadResult.secure_url,
-        public_url: uploadResult.secure_url,
-        public_id: uploadResult.public_id,
-      };
+      updatedImage = { url, key };
     }
-
     const updatedTestimonial = await TestimonialModel.findByIdAndUpdate(
       id,
       {
@@ -95,7 +81,7 @@ export async function PUT(
   } catch (err) {
     console.error("Error updating Testimonial:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to update Testimonial" },
+      { error: (err as Error).message || "Failed to update Testimonial" },
       { status: 500 }
     );
   }
@@ -121,11 +107,10 @@ export async function PATCH(
     if (!testimonial) {
       return NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
     }
-
     return NextResponse.json(testimonial);
   } catch (error) {
     console.error("Failed to update active status:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
@@ -143,15 +128,16 @@ export async function DELETE(
       return NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
     }
 
-    if (testimonial.image?.public_id) {
-      await cloudinary.uploader.destroy(testimonial.image.public_id);
+    // Delete image from S3
+    if (testimonial.image?.key) {
+      await deleteFromS3(testimonial.image.key);
     }
 
-    await TestimonialModel.findByIdAndDelete(id);
+    await TestimonialModel.findByIdAndDelete(id); 
 
     return NextResponse.json({ message: "Testimonial deleted successfully" });
   } catch (error) {
     console.error("Failed to delete Testimonial:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

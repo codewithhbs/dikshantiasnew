@@ -2,10 +2,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ITestimonial extends Document {
   name: string;
-  image: {
+   image: {
     url: string;
-    public_url: string;
-    public_id: string;
+    key: string;
   };
   rank: string;
   year: string;
@@ -23,8 +22,7 @@ const TestimonialSchema: Schema<ITestimonial> = new Schema(
     name: { type: String, required: true },
     image: {
       url: { type: String, required: true },
-      public_url: { type: String, required: true },
-      public_id: { type: String, required: true },
+      key: { type: String, required: true },
     },
     rank: { type: String, required: true },
     year: { type: String, required: true },

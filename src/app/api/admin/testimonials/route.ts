@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary"; 
 import { connectToDB } from "@/lib/mongodb";
 import TestimonialModel from "@/models/TestimonialsModel";
+import { uploadToS3 } from "@/lib/s3";
 
-
-
-// GET all sliders
+// GET all testimonials
 export async function GET() {
   try {
-    await connectToDB();;
+    await connectToDB();
     const testimonials = await TestimonialModel.find();
     return NextResponse.json(testimonials);
   } catch (error) {
@@ -17,38 +15,27 @@ export async function GET() {
   }
 }
 
+
 export async function POST(req: Request) {
   try {
     await connectToDB();
 
     const formData = await req.formData();
-    const name = formData.get("name") as string;
-    const rank = formData.get("rank") as string;
-    const year = formData.get("year") as string;
-    const quote = formData.get("quote") as string;
-    const attempts = formData.get("attempts") as string;
+    const name = formData.get("name")?.toString();
+    const rank = formData.get("rank")?.toString();
+    const year = formData.get("year")?.toString();
+    const quote = formData.get("quote")?.toString();
+    const attempts = formData.get("attempts")?.toString();
     const optional = (formData.get("optional") as string) || "";
     const background = (formData.get("background") as string) || "";
+    const imageFile = formData.get("image") as File | null;
 
-    const imageFile = formData.get("image");
-    if (!imageFile) {
+    if (!imageFile || imageFile.size === 0) {
       return NextResponse.json({ error: "Image is required" }, { status: 400 });
     }
-
-    // Convert file to Buffer
+    // Upload image to S3
     const buffer = Buffer.from(await imageFile.arrayBuffer());
-
-    // Upload to Cloudinary
-    const uploadedImage = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "Testimonials" },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        }
-      );
-      uploadStream.end(buffer);
-    });
+    const { url, key } = await uploadToS3(buffer, imageFile.name, imageFile.type, "testimonials");
 
     const newTestimonial = await TestimonialModel.create({
       name,
@@ -58,17 +45,18 @@ export async function POST(req: Request) {
       attempts,
       optional,
       background,
-      image: {
-        url: uploadedImage.secure_url,
-        public_url: uploadedImage.secure_url,
-        public_id: uploadedImage.public_id,
-      },
+      image: { url, key },
       active: true,
     });
 
     return NextResponse.json(newTestimonial, { status: 201 });
   } catch (err) {
-    console.error("Error creating Testimonial:", err);
-    return NextResponse.json({ error: err.message || "Failed to create Testimonial" }, { status: 500 });
+    console.error("Error creating testimonial:", err);
+    return NextResponse.json(
+      { error: (err as Error).message || "Failed to create testimonial" },
+      { status: 500 }
+    );
   }
 }
+
+

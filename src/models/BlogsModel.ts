@@ -1,6 +1,6 @@
-import mongoose, { Document, Schema, Model } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IBlog extends Document {
+interface BlogDocument extends Document {
   title: string;
   slug: string;
   shortContent: string;
@@ -9,68 +9,50 @@ export interface IBlog extends Document {
   postedBy: string;
   image: {
     url: string;
-    public_url: string;
-    public_id: string;
-    alt?: string;
-  };
-  image: {
-    url: string;
     key: string;
+    alt: string;
   };
-   alt?: string;
-  tags?: string[];
+  tags: string[];
   active: boolean;
-
-  // SEO / Meta Fields
-  metaTitle?: string;
-  metaDescription?: string;
-  metaKeywords?: string[];
-  canonicalUrl?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  index?: boolean;
-  follow?: boolean;
-
-  createdAt?: Date;
-  updatedAt?: Date;
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  index: boolean;
+  follow: boolean;
 }
 
-const BlogSchema: Schema = new Schema(
+const BlogSchema = new Schema<BlogDocument>(
   {
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    shortContent: { type: String, required: true },
-    content: { type: String, required: true },
-    category: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "BlogCategory",
-      required: true 
-    },
-    postedBy: { type: String, required: true },
+    shortContent: { type: String },
+    content: { type: String },
+    category: { type: Schema.Types.ObjectId, ref: "BlogCategory" },
+    postedBy: { type: String },
+
     image: {
       url: { type: String, required: true },
-      public_url: { type: String},
-      public_id: { type: String},
-      alt: { type: String },
+      key: { type: String, required: true },
+      alt: { type: String, default: "" },
     },
-    tags: { type: [String], default: [] },
+
+    tags: [{ type: String }],
     active: { type: Boolean, default: true },
 
-    // SEO / Meta Fields
-    metaTitle: { type: String },
-    metaDescription: { type: String },
-    metaKeywords: { type: [String], default: [] },
-    canonicalUrl: { type: String },
-    ogTitle: { type: String },
-    ogDescription: { type: String },
+    metaTitle: String,
+    metaDescription: String,
+    metaKeywords: [String],
+    canonicalUrl: String,
+    ogTitle: String,
+    ogDescription: String,
     index: { type: Boolean, default: true },
     follow: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
-const BlogsModel: Model<IBlog> =
-  mongoose.models.Blog ||
-  mongoose.model<IBlog>("Blog", BlogSchema, "blogs");
-
-export default BlogsModel;
+export default mongoose.models.Blog ||
+  mongoose.model<BlogDocument>("Blog", BlogSchema);

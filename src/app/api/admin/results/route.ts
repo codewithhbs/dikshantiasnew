@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import ResultModel from "@/models/ResultModel";
-import cloudinary from "@/lib/cloudinary"; 
+import { uploadToS3 } from "@/lib/s3";
 
 
 // GET all Results
@@ -21,52 +21,40 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     await connectToDB();
-
     const formData = await req.formData();
-    const name = formData.get("name") as string;
-    const rank = formData.get("rank") as string;
-    const service = formData.get("service") as string;
-    const year = formData.get("year") as string;
+    const name = formData.get("name")?.toString();
+    const rank = formData.get("rank")?.toString();
+    const service = formData.get("service")?.toString();
+    const year = formData.get("year")?.toString();
+    const desc = formData.get("desc")?.toString() || "";
+    const btnName = formData.get("btnName")?.toString() || "";
+    const btnLink = formData.get("btnLink")?.toString() || "";
+    const active = formData.get("active") === "true";
 
-    const imageFile = formData.get("image") as File;
-
-   
-
-    // Convert file to Buffer
+    const imageFile = formData.get("image") as File | null;
+    if (!imageFile || imageFile.size === 0) {
+      return NextResponse.json({ error: "Image is required" }, { status: 400 });
+    }
     const buffer = Buffer.from(await imageFile.arrayBuffer());
-
-    // Upload to Cloudinary
-    const uploadedImage = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "results" },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        }
-      );
-      uploadStream.end(buffer);
-    });
-
-    // Create Result in MongoDB
+    const { url, key } = await uploadToS3(buffer, imageFile.name, imageFile.type, "results");
     const newResult = await ResultModel.create({
       name,
       rank,
       service,
       year,
-      image: {
-        url: uploadedImage.secure_url,
-        public_url: uploadedImage.secure_url,
-        public_id: uploadedImage.public_id,
-      },
+      desc,
+      btnName,
+      btnLink,
+      active,
+      image: { url, key },
     });
 
     return NextResponse.json(newResult, { status: 201 });
   } catch (err) {
     console.error("Error creating Result:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to create Result" },
+      { error: (err as Error).message || "Failed to create Result" },
       { status: 500 }
     );
   }
 }
-

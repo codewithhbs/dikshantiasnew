@@ -8,11 +8,10 @@ export interface IResult extends Document {
   desc?: string;
   btnName?: string;
   btnLink?: string;   
- image: {
-    url: string;
-    public_url: string;
-    public_id: string;
-  };
+  image: {
+      url: string;
+      key: string;
+    };
   active: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,9 +27,8 @@ const ResultSchema: Schema = new Schema(
     btnName: { type: String },
     btnLink: { type: String }, 
     image: {
-      url: { type: String},
-      public_url: { type: String},
-      public_id: { type: String},
+      url: { type: String, required: true },
+      key: { type: String, required: true },
     },
     active: { type: Boolean, default: true },
   },

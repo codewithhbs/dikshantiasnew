@@ -3,135 +3,151 @@ import type { RouteContext } from "next";
 import { connectToDB } from "@/lib/mongodb";
 import BlogsModel from "@/models/BlogsModel";
 import "@/models/BlogCategoryModel";
-import cloudinary from "@/lib/cloudinary"; 
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 
-// ✅ GET blog  by ID
+
+// ✅ GET single blog
 export async function GET(
   request: Request,
   context: RouteContext<{ id: string }>
 ) {
   try {
-    await connectToDB();
-
     const { id } = context.params;
-    const blogs = await BlogsModel.findById(id).populate("category", "name");
+    await connectToDB();
+    const blog = await BlogsModel.findById(id).populate("category", "name");
 
-    if (!blogs) {
+    if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
-    return NextResponse.json(blogs, { status: 200 });
-  } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Failed to fetch blogs",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json(blog);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-
 // ✅ UPDATE blog
-export async function PUT(req: Request, context: RouteContext<{ id: string }>) {
+export async function PUT(
+  request: Request,
+  context: RouteContext<{ id: string }>
+) {
   try {
+    const { id } = context.params;
     await connectToDB();
 
-    const formData = await req.formData();
+    const blog = await BlogsModel.findById(id);
+    if (!blog) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+    }
 
-    // Extract fields
-    const title = formData.get("title") as string;
-    const slug = formData.get("slug") as string;
-    const shortContent = formData.get("shortContent") as string;
-    const content = formData.get("content") as string;
-    const category = formData.get("category") as string;
-    const postedBy = formData.get("postedBy") as string;
-    const active = JSON.parse(formData.get("active") as string);
-    const tags = JSON.parse(formData.get("tags") as string);
+    const contentType = request.headers.get("content-type") || "";
+    
+    if (
+      contentType.includes("multipart/form-data") ||
+      contentType.includes("application/x-www-form-urlencoded")
+    ) {
+      const formData = await request.formData();
 
-    const metaTitle = formData.get("metaTitle") as string;
-    const metaDescription = formData.get("metaDescription") as string;
-    const metaKeywords = JSON.parse(formData.get("metaKeywords") as string);
-    const canonicalUrl = formData.get("canonicalUrl") as string;
-    const ogTitle = formData.get("ogTitle") as string;
-    const ogDescription = formData.get("ogDescription") as string;
-    const index = JSON.parse(formData.get("index") as string);
-    const follow = JSON.parse(formData.get("follow") as string);
+      blog.title = (formData.get("title") as string) ?? blog.title;
+      blog.slug = (formData.get("slug") as string) ?? blog.slug;
+      blog.shortContent =
+        (formData.get("shortContent") as string) ?? blog.shortContent;
+      blog.content = (formData.get("content") as string) ?? blog.content;
+      blog.category = (formData.get("category") as string) ?? blog.category;
+      blog.postedBy = (formData.get("postedBy") as string) ?? blog.postedBy;
+      blog.active =
+        formData.get("active") !== null
+          ? JSON.parse(formData.get("active") as string)
+          : blog.active;
+s
+      blog.metaTitle =
+        (formData.get("metaTitle") as string) ?? blog.metaTitle;
+      blog.metaDescription =
+        (formData.get("metaDescription") as string) ?? blog.metaDescription;
+      blog.metaKeywords =
+        formData.get("metaKeywords") !== null
+          ? JSON.parse(formData.get("metaKeywords") as string)
+          : blog.metaKeywords;
+      blog.canonicalUrl =
+        (formData.get("canonicalUrl") as string) ?? blog.canonicalUrl;
+      blog.ogTitle = (formData.get("ogTitle") as string) ?? blog.ogTitle;
+      blog.ogDescription =
+        (formData.get("ogDescription") as string) ?? blog.ogDescription;
+      blog.index =
+        formData.get("index") !== null
+          ? JSON.parse(formData.get("index") as string)
+          : blog.index;
+      blog.follow =
+        formData.get("follow") !== null
+          ? JSON.parse(formData.get("follow") as string)
+          : blog.follow;
 
-    // Handle image upload
-    let imageData = undefined;
-    const imageFile = formData.get("image") as File | null;
+      blog.tags =
+        formData.get("tags") !== null
+          ? JSON.parse(formData.get("tags") as string)
+          : blog.tags;
 
-    if (imageFile && imageFile.size > 0) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      const uploadRes = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "blogs" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
+      // 🔹 Handle image upload
+      const imageFile = formData.get("image") as File | null;
+      if (imageFile && imageFile.size > 0) {
+        // delete old image from S3 if exists
+        if (blog.image?.key) {
+          await deleteFromS3(blog.image.key);
+        }
+        // upload new image
+        const buffer = Buffer.from(await imageFile.arrayBuffer());
+        const uploadedImage = await uploadToS3(
+          buffer,
+          imageFile.name,
+          imageFile.type,
+          "blogs"
         );
-        stream.end(buffer);
-      });
 
-      imageData = {
-        url: uploadRes.secure_url,
-        public_url: uploadRes.url,
-        public_id: uploadRes.public_id,
-        alt: formData.get("imageAlt") as string,
-      };
+        blog.image = {
+          url: uploadedImage.url,
+          key: uploadedImage.key,
+          alt: (formData.get("imageAlt") as string) || blog.image?.alt || "",
+        };
+      }
+
+      await blog.save();
+      return NextResponse.json(blog);
     }
+    return NextResponse.json(
+      { error: "Unsupported Content-Type" },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("Failed to update blog:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
 
-    // ✅ Build update object dynamically (avoid overwriting with null)
-    const updateData = {
-      title,
-      slug,
-      shortContent,
-      content,
-      category,
-      postedBy,
-      active,
-      tags,
-      metaTitle,
-      metaDescription,
-      metaKeywords,
-      canonicalUrl,
-      ogTitle,
-      ogDescription,
-      index,
-      follow,
-    };
-
-    if (imageData) {
-      updateData.image = imageData;
-    }
-
-    // ✅ Update blog
-    const updatedBlog = await BlogsModel.findByIdAndUpdate(
-      context.params.id,
-      updateData,
+// ✅ UPDATE blog active status only
+export async function PATCH(
+  request: Request,
+  context: RouteContext<{ id: string }>
+) {
+  try {
+    const { id } = context.params;
+    await connectToDB();
+    const { active } = await request.json();
+    const blog = await BlogsModel.findByIdAndUpdate(
+      id,
+      { active },
       { new: true }
     );
 
-    if (!updatedBlog) {
+    if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
-
-    return NextResponse.json(
-      { message: "Blog updated successfully", blog: updatedBlog },
-      { status: 200 }
-    );
+    return NextResponse.json({ blog });
   } catch (error) {
-    console.error("Error updating blog:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to update Blog" },
-      { status: 500 }
-    );
+    console.error("Failed to update active status:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
 
 // ✅ DELETE blog
 export async function DELETE(
@@ -139,24 +155,22 @@ export async function DELETE(
   context: RouteContext<{ id: string }>
 ) {
   try {
+    const { id } = context.params;
     await connectToDB();
 
-    const deletedBlog = await BlogsModel.findByIdAndDelete(context.params.id);
-
-    if (!deletedBlog) {
+    const blog = await BlogsModel.findById(id);
+    if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
+    if (blog.image?.key) {
+      await deleteFromS3(blog.image.key);
+    }
 
-    return NextResponse.json(
-      { message: "Blog deleted successfully" },
-      { status: 200 }
-    );
-  } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Failed to delete Blog",
-      },
-      { status: 500 }
-    );
+    await BlogsModel.findByIdAndDelete(id);
+
+    return NextResponse.json({ message: "Blog deleted successfully" });
+  } catch (error) {
+    console.error("Failed to delete blog:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

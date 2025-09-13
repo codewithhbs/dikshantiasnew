@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import BlogsModel from "@/models/BlogsModel";
 import "@/models/BlogCategoryModel";
-import cloudinary from "@/lib/cloudinary"; 
+import { uploadToS3 } from "@/lib/s3";
 
 export async function GET() {
   try {
@@ -16,79 +16,62 @@ export async function GET() {
   }
 }
 
-
-// POST - Add new blog
+//  POST - Add new blog with AWS S3 upload
 export async function POST(req: Request) {
   try {
     await connectToDB();
 
     const formData = await req.formData();
-
-    // Extract fields
-    const title = formData.get("title") as string;
-    const slug = formData.get("slug") as string;
-    const shortContent = formData.get("shortContent") as string;
-    const content = formData.get("content") as string;
-    const category = formData.get("category") as string;
-    const postedBy = formData.get("postedBy") as string;
-    const active = JSON.parse(formData.get("active") as string);
-    const tags = JSON.parse(formData.get("tags") as string);
-
-    const metaTitle = formData.get("metaTitle") as string;
-    const metaDescription = formData.get("metaDescription") as string;
-    const metaKeywords = JSON.parse(formData.get("metaKeywords") as string);
-    const canonicalUrl = formData.get("canonicalUrl") as string;
-    const ogTitle = formData.get("ogTitle") as string;
-    const ogDescription = formData.get("ogDescription") as string;
-    const index = JSON.parse(formData.get("index") as string);
-    const follow = JSON.parse(formData.get("follow") as string);
-
-    // Handle image upload
-    let imageData = {
-      url: "",
-      public_url: "",
-      public_id: "",
-      alt: formData.get("imageAlt") as string,
-    };
-
+    const title = formData.get("title")?.toString();
+    const slug = formData.get("slug")?.toString();
+    const shortContent = formData.get("shortContent")?.toString();
+    const content = formData.get("content")?.toString();
+    const categoryId = formData.get("category")?.toString();
+    const postedBy = formData.get("postedBy")?.toString();
     const imageFile = formData.get("image") as File | null;
-    if (imageFile) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+    const imageAlt = formData.get("imageAlt")?.toString() || "";
+    const active = formData.get("active") === "true";
 
-      const uploadRes = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "blogs" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(buffer);
-      });
+    const tags = formData.get("tags")
+      ? JSON.parse(formData.get("tags") as string)
+      : [];
 
-      const uploaded = uploadRes;
+    // SEO fields
+    const metaTitle = formData.get("metaTitle")?.toString();
+    const metaDescription = formData.get("metaDescription")?.toString();
+    const metaKeywords = formData.get("metaKeywords")
+      ? JSON.parse(formData.get("metaKeywords") as string)
+      : [];
+    const canonicalUrl = formData.get("canonicalUrl")?.toString();
+    const ogTitle = formData.get("ogTitle")?.toString();
+    const ogDescription = formData.get("ogDescription")?.toString();
+    const index = formData.get("index") === "true";
+    const follow = formData.get("follow") === "true";
 
-      imageData = {
-        url: uploaded.secure_url, // main image URL
-        public_url: uploaded.url, // http (non-ssl) url
-        public_id: uploaded.public_id, // unique cloudinary id
-        alt: formData.get("imageAlt") as string,
-      };
+    if (!imageFile || imageFile.size === 0) {
+      return NextResponse.json({ error: "Image is required" }, { status: 400 });
     }
-
-    // Save to DB
-    const newBlog = new BlogsModel({
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    const { url, key } = await uploadToS3(
+      buffer,
+      imageFile.name,
+      imageFile.type,
+      "blogs"
+    );
+    const newBlog = await BlogsModel.create({
       title,
       slug,
       shortContent,
       content,
-      category,
+      category: categoryId,
       postedBy,
       active,
       tags,
-      image: imageData,
-
+      image: {
+        url,
+        key,
+        alt: imageAlt,
+      },
       metaTitle,
       metaDescription,
       metaKeywords,
@@ -98,12 +81,16 @@ export async function POST(req: Request) {
       index,
       follow,
     });
+    const populatedBlog = await newBlog.populate([
+      { path: "category", select: "name" },
+    ]);
 
-    await newBlog.save();
-
-    return NextResponse.json({ message: "Blog created successfully" }, { status: 201 });
-  } catch (error) {
-    console.error("Error creating blog:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(populatedBlog, { status: 201 });
+  } catch (err) {
+    console.error("Error creating blog:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to create blog" },
+      { status: 500 }
+    );
   }
 }

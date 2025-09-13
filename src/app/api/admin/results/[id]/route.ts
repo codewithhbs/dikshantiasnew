@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { RouteContext } from "next";
 import { connectToDB } from "@/lib/mongodb";
-import cloudinary from "@/lib/cloudinary";
 import ResultModel from "@/models/ResultModel";
+import { uploadToS3, deleteFromS3 } from "@/lib/s3";
 
 // GET single result
 export async function GET(
@@ -18,11 +18,11 @@ export async function GET(
     }
     return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
-// UPDATE result (with image upload)
+// UPDATE result (with optional image upload)
 export async function PUT(
   request: Request,
   context: RouteContext<{ id: string }>
@@ -32,17 +32,17 @@ export async function PUT(
 
     const formData = await request.formData();
     const id = context.params.id;
-    const name = formData.get("name") as string;
-     const rank = formData.get("rank") as string;
-    const service = formData.get("service") as string;
-    const year = formData.get("year") as string;
+    const name = formData.get("name")?.toString();
+    const rank = formData.get("rank")?.toString();
+    const service = formData.get("service")?.toString();
+    const year = formData.get("year")?.toString();
+    const desc = formData.get("desc")?.toString() || "";
+    const btnName = formData.get("btnName")?.toString() || "";
+    const btnLink = formData.get("btnLink")?.toString() || "";
     const imageFile = formData.get("image") as File | null;
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Result ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Result ID is required" }, { status: 400 });
     }
 
     const existingResult = await ResultModel.findById(id);
@@ -53,33 +53,24 @@ export async function PUT(
     let updatedImage = existingResult.image;
 
     if (imageFile && imageFile.size > 0) {
-      if (existingResult.image?.public_id) {
-        await cloudinary.uploader.destroy(existingResult.image.public_id);
+      // Delete old image from S3
+      if (existingResult.image?.key) {
+        await deleteFromS3(existingResult.image.key);
       }
 
+      // Upload new image to S3
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-
-      const uploadedImage = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: "results" },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-        uploadStream.end(buffer);
-      });
+      const uploadedImage = await uploadToS3(buffer, imageFile.name, imageFile.type, "results");
 
       updatedImage = {
-        url: uploadedImage.secure_url,
-        public_url: uploadedImage.secure_url,
-        public_id: uploadedImage.public_id,
+        url: uploadedImage.url,
+        key: uploadedImage.key,
       };
     }
 
     const updatedResult = await ResultModel.findByIdAndUpdate(
       id,
-      { name, rank, service, year, image: updatedImage },
+      { name, rank, service, year, desc, btnName, btnLink, image: updatedImage },
       { new: true }
     );
 
@@ -87,7 +78,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating Result:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to update Result" },
+      { error: (error as Error).message || "Failed to update Result" },
       { status: 500 }
     );
   }
@@ -116,7 +107,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error) {
     console.error("Failed to update active Result:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
@@ -134,8 +125,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Result not found" }, { status: 404 });
     }
 
-    if (result.image?.public_id) {
-      await cloudinary.uploader.destroy(result.image.public_id);
+    // Delete image from S3
+    if (result.image?.key) {
+      await deleteFromS3(result.image.key);
     }
 
     await ResultModel.findByIdAndDelete(id);
@@ -143,6 +135,6 @@ export async function DELETE(
     return NextResponse.json({ message: "Result deleted successfully" });
   } catch (error) {
     console.error("Failed to delete result:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

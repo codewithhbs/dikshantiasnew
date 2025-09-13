@@ -8,8 +8,7 @@ export interface IWebSettings extends Document {
   address: string;
   image: {
     url: string;
-    public_url: string;
-    public_id: string;
+    key: string;
   };
   googleMap: string;
   facebook: string;
@@ -29,11 +28,10 @@ const WebSettingsSchema: Schema<IWebSettings> = new Schema(
     whatsapp: { type: String },
     email: { type: String, required: true },
     address: { type: String },
-   image: {
-      url: { type: String, required: true },
-      public_url: { type: String, required: true },
-      public_id: { type: String, required: true },
-    },
+    image: {
+        url: { type: String, required: true },
+        key: { type: String, required: true },
+      },
     googleMap: { type: String },
     facebook: { type: String },
     instagram: { type: String },
