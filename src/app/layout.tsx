@@ -24,14 +24,38 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
-      <body>
-        {/* Client-side wrapper handles conditional rendering */}
-        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
-      </body>
-    </html>
+  <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+  <head>
+    {/* Google Translate Script */}
+    <script
+      type="text/javascript"
+      src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+    ></script>
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+        function googleTranslateElementInit() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,hi',
+            autoDisplay: false
+          }, 'google_translate_element');
+        }
+      `,
+      }}
+    />
+    {/* Hide Google Translate Top Bar */}
+    <style dangerouslySetInnerHTML={{ __html: `
+      iframe.skiptranslate { display: none !important; }
+      body { top: 0 !important; }
+    `}} />
+  </head>
+  <body>
+    {/* Hidden Google Translate container */}
+    <div id="google_translate_element" className="hidden"></div>
+    <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+  </body>
+</html>
+
   );
 }

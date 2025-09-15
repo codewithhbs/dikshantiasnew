@@ -145,3 +145,13 @@
   list-style: decimal; /* numbers */
   padding-left: 1.5rem; /* space for numbers */
 }
+
+
+
+
+/* ✅ Hide Google Translate top bar */
+.VIpgJd-ZVi9od-ORHb-OEVmcd {
+    display: none;
+}
+
+

@@ -33,13 +33,44 @@ interface SettingsData {
     telegram: string;
 }
 
+
+
+
 const Header: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [settings, setSettings] = useState<SettingsData | null>(null);
+   const [selectedLang, setSelectedLang] = useState<"en" | "hi">("en");
 
+    
+
+const handleLanguageChange = (lang: "en" | "hi") => {
+  if (selectedLang === lang) return; // already selected
+  setSelectedLang(lang); // highlight button immediately
+
+  // Try changing Google Translate immediately, fallback with MutationObserver if not ready
+  const applyLang = () => {
+    const selectEl = document.querySelector<HTMLSelectElement>(".goog-te-combo");
+    if (selectEl) {
+      selectEl.value = lang;
+      selectEl.dispatchEvent(new Event("change"));
+      return true;
+    }
+    return false;
+  };
+
+  if (!applyLang()) {
+    // If dropdown not ready, watch DOM for it
+    const observer = new MutationObserver(() => {
+      if (applyLang()) {
+        observer.disconnect(); // stop watching once applied
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+};
 
     // Fetch Sub-Categories
     useEffect(() => {
@@ -161,8 +192,27 @@ const Header: React.FC = () => {
                                     <div className="font-medium">+91 7428092240</div>
                                 </div>
                             </div>
+                          <div className="flex items-center space-x-2" translate="no">
+                                <button
+                                    onClick={() => handleLanguageChange("en")}
+                                    className={`px-3 py-1 rounded text-sm hover:bg-gray-300 ${
+                                    selectedLang === "en" ? "bg-[#950409] text-white" : "bg-gray-200 text-black"
+                                    }`}
+                                >
+                                    English
+                                </button>
+                                <button
+                                    onClick={() => handleLanguageChange("hi")}
+                                    className={`px-3 py-1 rounded text-sm hover:bg-gray-300 ${
+                                    selectedLang === "hi" ? "bg-[#950409] text-white" : "bg-gray-200 text-black"
+                                    }`}
+                                >
+                                    हिंदी
+                                </button>
+                                
+                                </div>
 
-                            <button className="hidden sm:block bg-[#b10208] text-white px-6 py-2 rounded hover:bg-[#f43131] font-medium">Get Started</button>
+
                              <Link href="/admin/login">
                             <button className="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-[#950409]">
                                 Log In
