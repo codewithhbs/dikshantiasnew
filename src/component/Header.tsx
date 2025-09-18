@@ -43,10 +43,11 @@ const Header: React.FC = () => {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [settings, setSettings] = useState<SettingsData | null>(null);
+     const { t, i18n } = useTranslation("common")
   
 
     // ✅ translations
-    const { t, i18n } = useTranslation("common");
+    
     const [lang, setLang] = useState(i18n.language || "en");
 
     // Fetch Sub-Categories
