@@ -146,19 +146,31 @@ export default function OurProudAchivement() {
                       </div>
                     ))
                   : toppers.map((topper) => (
-                      <div key={topper._id} className="flex-shrink-0 px-3" style={{ width: `${100 / itemsPerView}%` }}>
-                        <div className="text-center bg-[#040c33] border border-[#000622] py-8 rounded-2xl">
-                          <div className="relative inline-block mb-4">
-                            <div className="w-25 h-25 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden border-2 md:border-3 border-orange-400">
-                              <Image src={topper.image?.url || "/placeholder.svg"} alt={topper.name} width={112} height={112} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{topper.rank}</div>
+                     <div key={topper._id} className="flex-shrink-0 px-3" style={{ width: `${100 / itemsPerView}%` }}>
+                      <div className="text-center bg-[#040c33] border border-[#000622] py-8 rounded-2xl">
+                        <div className="relative inline-block mb-4">
+                          <div className="w-25 h-25 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden border-2 md:border-3 border-orange-400">
+                            <Image
+                              src={topper.image?.url || "/placeholder.svg"}
+                              alt={topper.name?.[i18n.language] || "Result"}
+                              width={112}
+                              height={112}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <h3 className="text-lg md:text-xl font-bold text-white mb-1">{topper.name}</h3>
-                          <p className="text-white/80 font-medium mb-1">{topper.service}</p>
-                          <p className="text-orange-300 text-sm">{topper.year}</p>
+                          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            {topper.rank?.[i18n.language] || ""}
+                          </div>
                         </div>
+                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">
+                          {topper.name?.[i18n.language] || ""}
+                        </h3>
+                        <p className="text-white/80 font-medium mb-1">
+                          {topper.service?.[i18n.language] || ""}
+                        </p>
+                        <p className="text-orange-300 text-sm">{topper.year}</p>
                       </div>
+                    </div>
                     ))}
               </div>
             </div>

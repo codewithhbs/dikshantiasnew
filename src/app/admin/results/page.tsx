@@ -7,15 +7,18 @@ import { Trash2, Edit2, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmDialog from "@/component/admin/ConfirmDialog";
 
+
 interface Result {
   _id: string;
-  name: string;
-  rank: number;
-  service: string;
+  name: { en: string; hi: string };
+  rank: { en: string; hi: string };
+  service: { en: string; hi: string };
   year: string;
-  active: boolean; 
+  active: boolean;
   image?: { url: string };
+  desc?: { en: string; hi: string };
 }
+
 
 export default function ResultPage() {
   const router = useRouter();
@@ -182,13 +185,32 @@ export default function ResultPage() {
                         </div>
                       )}
                     </td>
-                    <td className="py-3 px-5 font-medium">{result.name}</td>
-                     <td className="py-3 px-5 text-center">
-                      <span className="inline-block px-2 py-0.5 text-xs font-medium text-white bg-blue-500 rounded-full">
-                        #{result.rank}
-                      </span>
+                    <td className="py-3 px-5 font-medium gap-2">
+                      <div className="flex flex-col">
+                        <span className="font-semibold">{result.name.en}</span>
+                        <span className="text-gray-500 text-sm">{result.name.hi}</span>
+                      </div>
                     </td>
-                    <td className="py-3 px-5 text-center">{result.service}</td>
+                    <td className="py-3 px-5 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          {/* English Rank */}
+                          <span className="inline-block px-3 py-1 text-sm font-semibold text-white bg-blue-600 rounded-md shadow-sm">
+                            # {result.rank.en}
+                          </span>
+
+                          {/* Hindi Rank */}
+                          <span className="inline-block px-3 py-1 text-sm font-semibold text-white bg-green-600 rounded-md shadow-sm">
+                            # {result.rank.hi}
+                          </span>
+                        </div>
+                      </td>
+
+                    <td className="py-3 px-5 text-center gap-2">
+                      <div className="flex flex-col">
+                        <span>{result.service.en}</span>
+                        <span className="text-gray-500 text-sm">{result.service.hi}</span>
+                      </div>
+                    </td>
                     <td className="py-3 px-5 text-center">{result.year}</td>
                     <td className="py-3 px-5 text-center">
                       <label className="relative inline-flex items-center cursor-pointer">

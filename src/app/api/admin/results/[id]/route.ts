@@ -22,7 +22,7 @@ export async function GET(
   }
 }
 
-// UPDATE result (with optional image upload)
+  // UPDATE result (with optional image upload)
 export async function PUT(
   request: Request,
   context: RouteContext<{ id: string }>
@@ -31,14 +31,23 @@ export async function PUT(
     await connectToDB();
 
     const formData = await request.formData();
+
+    console.log("Form Data Received for Update:", formData);
     const id = context.params.id;
-    const name = formData.get("name")?.toString();
-    const rank = formData.get("rank")?.toString();
-    const service = formData.get("service")?.toString();
+
+    // ✅ Get multilingual fields
+    const name_en = formData.get("name_en")?.toString();
+    const name_hi = formData.get("name_hi")?.toString();
+
+    const rank_en = formData.get("rank_en")?.toString();
+    const rank_hi = formData.get("rank_hi")?.toString();
+
+    const service_en = formData.get("service_en")?.toString();
+    const service_hi = formData.get("service_hi")?.toString();
+   
+
     const year = formData.get("year")?.toString();
-    const desc = formData.get("desc")?.toString() || "";
-    const btnName = formData.get("btnName")?.toString() || "";
-    const btnLink = formData.get("btnLink")?.toString() || "";
+
     const imageFile = formData.get("image") as File | null;
 
     if (!id) {
@@ -50,17 +59,20 @@ export async function PUT(
       return NextResponse.json({ error: "Result not found" }, { status: 404 });
     }
 
+    // ✅ Handle image update
     let updatedImage = existingResult.image;
-
     if (imageFile && imageFile.size > 0) {
-      // Delete old image from S3
       if (existingResult.image?.key) {
         await deleteFromS3(existingResult.image.key);
       }
 
-      // Upload new image to S3
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const uploadedImage = await uploadToS3(buffer, imageFile.name, imageFile.type, "results");
+      const uploadedImage = await uploadToS3(
+        buffer,
+        imageFile.name,
+        imageFile.type,
+        "results"
+      );
 
       updatedImage = {
         url: uploadedImage.url,
@@ -68,12 +80,27 @@ export async function PUT(
       };
     }
 
-    const updatedResult = await ResultModel.findByIdAndUpdate(
+    // ✅ Update multilingual fields properly
+     const updatedResult = await ResultModel.findByIdAndUpdate(
       id,
-      { name, rank, service, year, desc, btnName, btnLink, image: updatedImage },
+      {
+        name: {
+          en: name_en ?? existingResult.name.en,
+          hi: name_hi ?? existingResult.name.hi,
+        },
+        rank: {
+          en: rank_en ?? existingResult.rank.en,
+          hi: rank_hi ?? existingResult.rank.hi,
+        },
+        service: {
+          en: service_en ?? existingResult.service.en,
+          hi: service_hi ?? existingResult.service.hi,
+        },
+        year: year ?? existingResult.year,
+        image: updatedImage,
+      },
       { new: true }
     );
-
     return NextResponse.json(updatedResult, { status: 200 });
   } catch (error) {
     console.error("Error updating Result:", error);
@@ -83,6 +110,7 @@ export async function PUT(
     );
   }
 }
+
 
 // UPDATE Result active status
 export async function PATCH(

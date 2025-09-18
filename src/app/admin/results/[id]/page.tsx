@@ -12,10 +12,19 @@ export default function ResultFormPage() {
   const params = useParams();
   const resultId = params?.id as string | undefined;
 
-  // 📌 Form State
-  const [name, setName] = useState("");
-   const [rank, setRank] = useState("");
-  const [service, setService] = useState("");
+  // 📌 Form State - English
+  const [nameEn, setNameEn] = useState("");
+  const [rankEn, setRankEn] = useState("");
+  const [serviceEn, setServiceEn] = useState("");
+  const [descEn, setDescEn] = useState("");
+
+  // 📌 Form State - Hindi
+  const [nameHi, setNameHi] = useState("");
+  const [rankHi, setRankHi] = useState("");
+  const [serviceHi, setServiceHi] = useState("");
+  const [descHi, setDescHi] = useState("");
+
+  // Other fields
   const [year, setYear] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -26,7 +35,7 @@ export default function ResultFormPage() {
 
   // ✅ Fetch existing data if editing
   useEffect(() => {
-    if (!resultId) return; // Add mode
+    if (!resultId) return;
 
     const fetchResult = async () => {
       setLoading(true);
@@ -35,12 +44,20 @@ export default function ResultFormPage() {
         if (!res.ok) throw new Error("Failed to fetch result");
         const data = await res.json();
 
-        // Fill form with data
-        setName(data.name);
-        setRank(data.rank);
-        setService(data.service);
-        setYear(data.year);
-        setPreviewUrl(data.image?.url || null); 
+        // Fill English
+        setNameEn(data.name?.en || "");
+        setRankEn(data.rank?.en || "");
+        setServiceEn(data.service?.en || "");
+        setDescEn(data.desc?.en || "");
+
+        // Fill Hindi
+        setNameHi(data.name?.hi || "");
+        setRankHi(data.rank?.hi || "");
+        setServiceHi(data.service?.hi || "");
+        setDescHi(data.desc?.hi || "");
+
+        setYear(data.year || "");
+        setPreviewUrl(data.image?.url || null);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load result");
@@ -60,9 +77,19 @@ export default function ResultFormPage() {
     try {
       const formData = new FormData();
       formData.append("id", resultId || "");
-      formData.append("name", name);
-      formData.append("rank", rank.toString());
-      formData.append("service", service);
+
+     // English
+      formData.append("name_en", nameEn);
+      formData.append("rank_en", rankEn);
+      formData.append("service_en", serviceEn);
+      formData.append("desc_en", descEn);
+
+      // Hindi
+      formData.append("name_hi", nameHi);
+      formData.append("rank_hi", rankHi);
+      formData.append("service_hi", serviceHi);
+      formData.append("desc_hi", descHi);
+
       formData.append("year", year);
       if (imageFile) formData.append("image", imageFile);
 
@@ -86,7 +113,7 @@ export default function ResultFormPage() {
     }
   };
 
-  // ✅ Show loader while fetching existing data
+  // ✅ Loader while fetching
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -112,7 +139,7 @@ export default function ResultFormPage() {
             <div className="w-5 h-5 bg-[#facc15] rounded-full animate-bounce delay-300"></div>
           </div>
           <p className="text-gray-700 font-semibold text-lg">
-           Result is being updated...
+            Result is being updated...
           </p>
         </div>
       </div>
@@ -127,60 +154,125 @@ export default function ResultFormPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-8"
+        className="bg-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-10"
       >
-        {/* Info */}
+        {/* English Section */}
         <div>
           <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300 pb-2">
-            Result Information
+            English
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Name</label>
+              <label className="block font-medium text-gray-700 mb-1">
+                Name
+              </label>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
+                value={nameEn}
+                onChange={(e) => setNameEn(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
                 required
               />
             </div>
-
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Rank</label>
+              <label className="block font-medium text-gray-700 mb-1">
+                Rank
+              </label>
               <input
                 type="text"
-                value={rank}
-                onChange={(e) => setRank(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                
+                value={rankEn}
+                onChange={(e) => setRankEn(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
               />
             </div>
+            <div className="md:col-span-2">
+              <label className="block font-medium text-gray-700 mb-1">
+                Service
+              </label>
+              <input
+                type="text"
+                value={serviceEn}
+                onChange={(e) => setServiceEn(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
+              />
+            </div>
+            {/* <div className="md:col-span-2">
+              <label className="block font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                value={descEn}
+                onChange={(e) => setDescEn(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
+              />
+            </div> */}
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+        {/* Hindi Section */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300 pb-2">
+            हिंदी
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Service</label>
+              <label className="block font-medium text-gray-700 mb-1">
+                नाम
+              </label>
               <input
                 type="text"
-                value={service}
-                onChange={(e) => setService(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                
+                value={nameHi}
+                onChange={(e) => setNameHi(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
+                required
               />
             </div>
-
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Year</label>
+              <label className="block font-medium text-gray-700 mb-1">
+                रैंक
+              </label>
               <input
                 type="text"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] outline-none"
-                
+                value={rankHi}
+                onChange={(e) => setRankHi(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
               />
             </div>
+            <div className="md:col-span-2">
+              <label className="block font-medium text-gray-700 mb-1">
+                सेवा
+              </label>
+              <input
+                type="text"
+                value={serviceHi}
+                onChange={(e) => setServiceHi(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
+              />
+            </div>
+            {/* <div className="md:col-span-2">
+              <label className="block font-medium text-gray-700 mb-1">
+                विवरण
+              </label>
+              <textarea
+                value={descHi}
+                onChange={(e) => setDescHi(e.target.value)}
+                className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
+              />
+            </div> */}
           </div>
+        </div>
+
+        {/* Year */}
+        <div> 
+           <label className="block font-medium text-gray-700 mb-1">
+                Year
+              </label>
+          <input
+            type="text"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="w-full border px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e]"
+          />
         </div>
 
         {/* Image Upload */}

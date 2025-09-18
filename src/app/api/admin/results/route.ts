@@ -21,30 +21,46 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     await connectToDB();
-    const formData = await req.formData();
-    const name = formData.get("name")?.toString();
-    const rank = formData.get("rank")?.toString();
-    const service = formData.get("service")?.toString();
-    const year = formData.get("year")?.toString();
-    const desc = formData.get("desc")?.toString() || "";
-    const btnName = formData.get("btnName")?.toString() || "";
-    const btnLink = formData.get("btnLink")?.toString() || "";
-    const active = formData.get("active") === "true";
 
-    const imageFile = formData.get("image") as File | null;
-    if (!imageFile || imageFile.size === 0) {
+    const formData = await req.formData();
+    console.log("Form Data Received:", formData);
+
+    // English & Hindi fields
+   const name_en = formData.get("nameEn")?.toString();
+    const name_hi = formData.get("nameHi")?.toString();
+    const rank_en = formData.get("rankEn")?.toString() || "";
+    const rank_hi = formData.get("rankHi")?.toString() || "";
+    const service_en = formData.get("serviceEn")?.toString() || "";
+    const service_hi = formData.get("serviceHi")?.toString() || "";
+    const desc_en = formData.get("descEn")?.toString() || "";
+    const desc_hi = formData.get("descHi")?.toString() || "";
+    const year = formData.get("year")?.toString();
+   
+
+    // Validate required fields
+    if (!name_en || !name_hi || !year) {
+      return NextResponse.json(
+        { error: "Name (EN & HI) and Year are required" },
+        { status: 400 }
+      );
+    }
+
+    // Handle image upload
+    const imageFile = formData.get("image");
+    if (!(imageFile instanceof File) || imageFile.size === 0) {
       return NextResponse.json({ error: "Image is required" }, { status: 400 });
     }
+
     const buffer = Buffer.from(await imageFile.arrayBuffer());
     const { url, key } = await uploadToS3(buffer, imageFile.name, imageFile.type, "results");
+
+    // Create new Result
     const newResult = await ResultModel.create({
-      name,
-      rank,
-      service,
+      name: { en: name_en, hi: name_hi },
+      rank: { en: rank_en, hi: rank_hi },
+      service: { en: service_en, hi: service_hi },
+      desc: { en: desc_en, hi: desc_hi },
       year,
-      desc,
-      btnName,
-      btnLink,
       active,
       image: { url, key },
     });

@@ -1,17 +1,27 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IResult extends Document {
-  name: string;
-  rank: string;
-  service: string;
+  name: {
+    en: string;
+    hi: string;
+  };
+  rank: {
+    en?: string;
+    hi?: string;
+  };
+  service: {
+    en?: string;
+    hi?: string;
+  };
   year: string;
-  desc?: string;
-  btnName?: string;
-  btnLink?: string;   
+  desc?: {
+    en?: string;
+    hi?: string;
+  };
   image: {
-      url: string;
-      key: string;
-    };
+    url: string;
+    key: string;
+  };
   active: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -19,13 +29,23 @@ export interface IResult extends Document {
 
 const ResultSchema: Schema = new Schema(
   {
-    name: { type: String, required: true },
-    rank: { type: String},
-    service: { type: String},
-    year: { type: String},
-    desc: { type: String },
-    btnName: { type: String },
-    btnLink: { type: String }, 
+    name: {
+      en: { type: String, required: true },
+      hi: { type: String, required: true },
+    },
+    rank: {
+      en: { type: String },
+      hi: { type: String },
+    },
+    service: {
+      en: { type: String },
+      hi: { type: String },
+    },
+    year: { type: String },
+    desc: {
+      en: { type: String },
+      hi: { type: String },
+    },
     image: {
       url: { type: String, required: true },
       key: { type: String, required: true },
@@ -38,4 +58,4 @@ const ResultSchema: Schema = new Schema(
 const ResultModel: Model<IResult> =
   mongoose.models.Result || mongoose.model<IResult>("Result", ResultSchema, "results");
 
-export default ResultModel; 
+export default ResultModel;
