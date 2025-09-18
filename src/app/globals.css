@@ -145,16 +145,3 @@
   list-style: decimal; /* numbers */
   padding-left: 1.5rem; /* space for numbers */
 }
-
-menu, ol, ul {
-    list-style: initial; /* restores default list style */
-}
-
-/* OR specify explicitly */
-ul {
-    list-style-type: disc; /* default for ul */
-}
-
-ol {
-    list-style-type: decimal; /* default for ol */
-}

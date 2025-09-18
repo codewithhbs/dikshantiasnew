@@ -34,17 +34,20 @@ interface SettingsData {
     telegram: string;
 }
 
+
+
+
 const Header: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [settings, setSettings] = useState<SettingsData | null>(null);
+    const [selectedLang, setSelectedLang] = useState<"en" | "hi">("en");
 
-   // ✅ translations
-        const { t, i18n } = useTranslation("common");
-        const [lang, setLang] = useState(i18n.language || "en");
-    
+    // ✅ translations
+    const { t, i18n } = useTranslation("common");
+    const [lang, setLang] = useState(i18n.language || "en");
 
     // Fetch Sub-Categories
     useEffect(() => {
@@ -86,14 +89,14 @@ const Header: React.FC = () => {
     const handleMouseEnter = (menu: string) => setOpenDropdown(menu);
     const handleMouseLeave = () => setOpenDropdown(null);
 
- 
 
-  const changeLanguage = (lng: "en" | "hi") => {
-    i18n.changeLanguage(lng);
-    setLang(lng);
-  }     
 
-   
+    const changeLanguage = (lng: "en" | "hi") => {
+        i18n.changeLanguage(lng);
+        setLang(lng);
+    }
+
+
 
     return (
         <div className="w-full">
@@ -176,7 +179,8 @@ const Header: React.FC = () => {
                                 </div>
                             </div>
 
-                           <div className="flex space-x-2">
+
+                            <div className="flex space-x-2">
                                 <button
                                     className={`px-3 py-1 rounded font-medium ${lang === "en" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"}`}
                                     onClick={() => changeLanguage("en")}
@@ -190,17 +194,16 @@ const Header: React.FC = () => {
                                     हिंदी
                                 </button>
                             </div>
-
-                             <Link href="/admin/login">
-                            <button className="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-[#950409]">
-                                 {t("login")}
-                            </button>
+                            <Link href="/admin/login">
+                                <button className="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-[#950409]">
+                                    {t("login")}
+                                </button>
                             </Link>
                             <button onClick={toggleMobileMenu} className="lg:hidden p-2 text-gray-700 hover:text-[#f43144]">
                                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                             </button>
-                              <div>
-                          </div>
+                            <div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -290,16 +293,16 @@ const Header: React.FC = () => {
                             <button className="w-full flex items-center justify-center space-x-2 bg-red-500 text-white py-3 rounded hover:bg-red-600 animate-pulse">
                                 <Play className="w-4 h-4" />
                                 <span className="font-medium">Live Demo</span>
-                            </button>           
+                            </button>
                             <button className="w-full bg-red-500 text-white py-3 rounded hover:bg-red-600 font-medium">Get Started</button>
-                             <Link 
+                            <Link
                                 href="/admin/login"
                                 target="_blank"
-                                >
+                            >
                                 <button className="w-full text-gray-700 hover:text-red-500 py-3 border border-gray-300 rounded">
                                     {t("login")}
                                 </button>
-                                </Link>
+                            </Link>
                         </div>
                     </div>
                 </div>
