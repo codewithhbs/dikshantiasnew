@@ -5,28 +5,47 @@ import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import Image from 'next/image';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useTranslation } from 'react-i18next';
 
 interface Testimonial {
   _id: string;
-  name: string;
-  rank: string;
-  year: string;
+  name: string | { en: string; hi: string };
+  rank: string | { en: string; hi: string };
+  year: string | { en: string; hi: string };
   image: {
     url: string;
     public_url: string;
     public_id: string;
   };
-  quote: string;
-  background: string;
-  attempts: string;
-  optional: string;
+  quote: string | { en: string; hi: string };
+  background: string | { en: string; hi: string };
+  attempts: string | { en: string; hi: string };
+  optional: string | { en: string; hi: string };
 }
+
+const parseValue = (value: any, lang: string) => {
+  if (!value) return '';
+  try {
+    if (typeof value === 'object' && (value.en || value.hi)) {
+      return value[lang] || value.en || '';
+    }
+    if (typeof value === 'string' && value.startsWith('{')) {
+      const parsed = JSON.parse(value);
+      return parsed[lang] || parsed.en || value;
+    }
+    return value;
+  } catch {
+    return value;
+  }
+};
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation('common');
+  const lang = i18n.language; // "en" or "hi"
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -76,13 +95,16 @@ const Testimonials = () => {
         {/* Section Header */}
         <div className="mb-6 md:mb-10">
           <h2 className="text-xl md:text-3xl px-3 font-bold text-[#040c33] mb-1">
-            Success Stories That <span className="text-[#f43144] mt-1 md:mt-2">Inspire Excellence</span>
+            {t('successStoriesTitle')}{' '}
+            <span className="text-[#f43144] mt-1 md:mt-2">
+              {t('successStoriesHighlight')}
+            </span>
           </h2>
-          <p className="text-lg md:text-xl text-blue-950 leading-relaxed px-3 ">
-           India's Best Mock Interview Programme
+          <p className="text-lg md:text-xl text-blue-950 leading-relaxed px-3">
+            {t('mockInterview')}
           </p>
-          <p className="text-lg md:text-xl text-blue-950 leading-relaxed px-3 ">
-            Meet our successful candidates who cleared UPSC and are now serving the nation
+          <p className="text-lg md:text-xl text-blue-950 leading-relaxed px-3">
+            {t('successStoriesDesc')}
           </p>
         </div>
 
@@ -126,18 +148,20 @@ const Testimonials = () => {
                               width={400}
                               height={400}
                               src={testimonial.image?.url || '/default-avatar.jpg'}
-                              alt={testimonial.name}
+                              alt={parseValue(testimonial.name, lang)}
                               className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full mx-auto shadow-lg border-4 border-rose-100 object-cover"
                             />
                           </div>
                           <div className="space-y-2 md:space-y-3">
-                            <h3 className="text-[18px] md:text-3xl font-bold text-gray-50">{testimonial.name}</h3>
+                            <h3 className="text-[18px] md:text-3xl font-bold text-gray-50">
+                              {parseValue(testimonial.name, lang)}
+                            </h3>
                             <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
                               <span className="bg-[#f43144] text-white px-3 py-1 md:px-4 md:py-2 rounded-full font-bold text-sm md:text-lg">
-                                {testimonial.rank}
+                                {parseValue(testimonial.rank, lang)}
                               </span>
                               <span className="bg-white/15 text-white px-3 py-1 md:px-4 md:py-2 rounded-full font-bold text-sm md:text-lg">
-                                {testimonial.year}
+                                {parseValue(testimonial.year, lang)}
                               </span>
                             </div>
                           </div>
@@ -148,22 +172,28 @@ const Testimonials = () => {
                           <div>
                             <Quote className="w-8 h-8 md:w-12 md:h-12 text-orange-300 mb-3 md:mb-4" />
                             <blockquote className="text-lg md:text-xl text-gray-50 leading-relaxed italic px-9 md:px-6">
-                              &quot;{testimonial.quote}&quot;
+                              &quot;{parseValue(testimonial.quote, lang)}&quot;
                             </blockquote>
                           </div>
 
                           <div className="hidden md:grid sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                             <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
-                              <h4 className="font-semibold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">Background</h4>
-                              <p className="text-gray-600 text-xs md:text-sm">{testimonial.background}</p>
+                              <h4 className="font-semibold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">{t('background')}</h4>
+                              <p className="text-gray-600 text-xs md:text-sm">
+                                {parseValue(testimonial.background, lang)}
+                              </p>
                             </div>
                             <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
-                              <h4 className="font-semibold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">Attempts</h4>
-                              <p className="text-gray-600 text-xs md:text-sm">{testimonial.attempts}</p>
+                              <h4 className="font-semibold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">{t('attempts')}</h4>
+                              <p className="text-gray-600 text-xs md:text-sm">
+                                {parseValue(testimonial.attempts, lang)}
+                              </p>
                             </div>
                             <div className="bg-gray-50 p-3 md:p-4 rounded-xl sm:col-span-2 md:col-span-1">
-                              <h4 className="font-semibold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">Optional</h4>
-                              <p className="text-gray-600 text-xs md:text-sm">{testimonial.optional}</p>
+                              <h4 className="font-semibold text-gray-900 mb-1 md:mb-2 text-sm md:text-base">{t('optional')}</h4>
+                              <p className="text-gray-600 text-xs md:text-sm">
+                                {parseValue(testimonial.optional, lang)}
+                              </p>
                             </div>
                           </div>
                         </div>

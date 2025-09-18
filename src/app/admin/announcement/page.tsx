@@ -9,10 +9,14 @@ import ConfirmDialog from "@/component/admin/ConfirmDialog";
 
 interface Announcement {
   _id: string;
-  title: string;
+  title: {
+    en: string;
+    hi: string;
+  };
   bgcolor: string;
   active: boolean;
 }
+
 
 export default function AnnouncementPage() {
   const [authorized, setAuthorized] = useState(false);
@@ -154,7 +158,8 @@ export default function AnnouncementPage() {
           <table className="w-full border-collapse bg-white rounded-2xl shadow-lg overflow-hidden">
             <thead className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide font-semibold">
               <tr>
-                <th className="py-4 px-5 text-left border-b border-gray-200">Title</th>
+                <th className="py-4 px-5 text-left border-b border-gray-200">Title (English)</th>
+                <th className="py-4 px-5 text-left border-b border-gray-200">Title (Hindi)</th>
                 <th className="py-4 px-5 text-center border-b border-gray-200">Status</th>
                 <th className="py-4 px-5 text-center border-b border-gray-200">Actions</th>
               </tr>
@@ -163,7 +168,8 @@ export default function AnnouncementPage() {
               {paginatedData.length > 0 ? (
                 paginatedData.map((item) => (
                   <tr key={item._id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-                    <td className="py-3 px-5 font-medium">{item.title}</td>
+                    <td className="py-3 px-5 font-medium">{item.title.en}</td>
+                    <td className="py-3 px-5 font-medium">{item.title.hi}</td>
                     <td className="py-3 px-5 text-center">
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" checked={item.active} readOnly className="sr-only" />

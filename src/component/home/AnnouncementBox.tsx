@@ -1,15 +1,20 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Announcement {
   _id: string;
-  title: string;
+  title: {
+    en: string;
+    hi: string;
+  };
   bgcolor: string;
   active: boolean;
 }
 
 const AnnouncementBox: React.FC = () => {
+  const { t, i18n } = useTranslation('common');
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -51,14 +56,14 @@ const AnnouncementBox: React.FC = () => {
   return (
     <div className="w-full mx-auto rounded-xl overflow-hidden">
       {/* Mobile Title */}
-      <h3 className="text-xl md:text-3xl font-bold mb-4 text-[#040c33] md:hidden lg:hidden xl:hidden pl-2 md:pl-0">
-        New <span className="text-[#f43144]">Announcement</span>
+      <h3 className="text-xl md:text-3xl font-bold mb-4 text-[#040c33] md:hidden pl-2">
+        {t('new')} <span className="text-[#f43144]">{t('announcement')}</span>
       </h3>
 
       {/* Important Banner */}
-      <div className="bg-blue-900 text-white text-center py-3 md:px-30 hidden md:block lg:block xl:block">
+      <div className="bg-blue-900 text-white text-center py-3 hidden md:block">
         <span className="text-sm font-bold bg-white text-red-600 px-3 py-1 rounded-sm">
-          IMPORTANT ANNOUNCEMENT
+          {t('importantAnnouncement')}
         </span>
       </div>
 
@@ -84,7 +89,8 @@ const AnnouncementBox: React.FC = () => {
                 <div className="flex items-center">
                   <span className="text-red-600 mr-2 mt-1 flex-shrink-0">📢</span>
                   <div className="text-sm font-bold text-white leading-tight">
-                    {announcement.title}
+                    {/* Show title in current language */}
+                    {announcement.title[i18n.language as 'en' | 'hi'] || announcement.title.en}
                   </div>
                 </div>
               </div>

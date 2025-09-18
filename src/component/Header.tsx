@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, Menu, X, Phone, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -40,6 +41,10 @@ const Header: React.FC = () => {
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [settings, setSettings] = useState<SettingsData | null>(null);
 
+   // ✅ translations
+        const { t, i18n } = useTranslation("common");
+        const [lang, setLang] = useState(i18n.language || "en");
+    
 
     // Fetch Sub-Categories
     useEffect(() => {
@@ -81,6 +86,15 @@ const Header: React.FC = () => {
     const handleMouseEnter = (menu: string) => setOpenDropdown(menu);
     const handleMouseLeave = () => setOpenDropdown(null);
 
+ 
+
+  const changeLanguage = (lng: "en" | "hi") => {
+    i18n.changeLanguage(lng);
+    setLang(lng);
+  }     
+
+   
+
     return (
         <div className="w-full">
             {/* Main Header */}
@@ -100,8 +114,8 @@ const Header: React.FC = () => {
 
                         {/* Desktop Navigation */}
                         <nav className="hidden lg:flex items-center space-x-4">
-                            <Link href='/about-us' className="text-gray-900 hover:text-red-500 font-medium py-2">About Us</Link>
-                            <Link href='/scholarship-programme' className="text-gray-900 hover:text-red-500 font-medium py-2">Scholarship Programme</Link>
+                            <Link href='/about-us' className="text-gray-900 hover:text-red-500 font-medium py-2">{t("about")}</Link>
+                            <Link href='/scholarship-programme' className="text-gray-900 hover:text-red-500 font-medium py-2">{t("scholarship")}</Link>
 
                             {/* Courses Dropdown */}
                             <div
@@ -110,13 +124,13 @@ const Header: React.FC = () => {
                                 onMouseLeave={handleMouseLeave}
                             >
                                 <button className="flex items-center space-x-1 text-gray-900 hover:text-red-500 font-medium py-2">
-                                    <span>Courses</span>
+                                    <span>{t("courses")}</span>
                                     <ChevronDown className="w-4 h-4" />
                                 </button>
                                 {openDropdown === 'courses' && (
                                     <div className="absolute top-full left-0 w-56 bg-white shadow-lg rounded-md py-2 z-50">
-                                        <Link href="/online-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Online Mode</Link>
-                                        <Link href="/offline-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">Offline Mode</Link>
+                                        <Link href="/online-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50">{t("onlineMode")}</Link>
+                                        <Link href="/offline-course" className="block px-4 py-2 text-gray-900 hover:text-red-500 hover:bg-gray-50"> {t("offlineMode")}</Link>
                                     </div>
                                 )}
                             </div>
@@ -128,7 +142,7 @@ const Header: React.FC = () => {
                                 onMouseLeave={handleMouseLeave}
                             >
                                 <button className="flex items-center space-x-1 text-gray-900 hover:text-red-500 font-medium py-2">
-                                    <span>Current Affairs</span>
+                                    <span>{t("currentAffairs")}</span>
                                     <ChevronDown className="w-4 h-4" />
                                 </button>
                                 {openDropdown === 'currentAffairs' && (
@@ -147,7 +161,7 @@ const Header: React.FC = () => {
                             </div>
 
 
-                            <Link href="/blogs" className="text-gray-900 hover:text-red-500 font-medium py-2">Blogs</Link>
+                            <Link href="/blogs" className="text-gray-900 hover:text-red-500 font-medium py-2">{t("blogs")}</Link>
                         </nav>
 
                         {/* Right Side Actions */}
@@ -157,20 +171,36 @@ const Header: React.FC = () => {
                                     <Phone className="w-5 h-5" />
                                 </div>
                                 <div className="text-sm">
-                                    <div className="text-xs text-gray-500">Talk to our experts</div>
+                                    <div className="text-xs text-gray-500">{t("talkToExperts")}</div>
                                     <div className="font-medium">+91 7428092240</div>
                                 </div>
                             </div>
 
-                            <button className="hidden sm:block bg-[#b10208] text-white px-6 py-2 rounded hover:bg-[#f43131] font-medium">Get Started</button>
+                           <div className="flex space-x-2">
+                                <button
+                                    className={`px-3 py-1 rounded font-medium ${lang === "en" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                                    onClick={() => changeLanguage("en")}
+                                >
+                                    English
+                                </button>
+                                <button
+                                    className={`px-3 py-1 rounded font-medium ${lang === "hi" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                                    onClick={() => changeLanguage("hi")}
+                                >
+                                    हिंदी
+                                </button>
+                            </div>
+
                              <Link href="/admin/login">
                             <button className="hidden sm:flex items-center space-x-1 text-gray-700 hover:text-[#950409]">
-                                Log In
+                                 {t("login")}
                             </button>
                             </Link>
                             <button onClick={toggleMobileMenu} className="lg:hidden p-2 text-gray-700 hover:text-[#f43144]">
                                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                             </button>
+                              <div>
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -194,10 +224,10 @@ const Header: React.FC = () => {
                         {/* Mobile Navigation */}
                         <nav>
                             <div className="border-b border-gray-200">
-                                <a href="/about-us" className="block py-1 text-gray-900 hover:text-red-500 font-medium">About Dikshant IAS</a>
+                                <a href="/about-us" className="block py-1 text-gray-900 hover:text-red-500 font-medium">{t("aboutDikshant")}</a>
                             </div>
                             <div className="border-b border-gray-200">
-                                <a href="/about-upsc" className="block py-1 text-gray-900 hover:text-red-500 font-medium">About UPSC</a>
+                                <a href="/about-upsc" className="block py-1 text-gray-900 hover:text-red-500 font-medium">{t("aboutUpsc")}</a>
                             </div>
 
                             {/* Courses Dropdown */}
@@ -206,13 +236,13 @@ const Header: React.FC = () => {
                                     className="flex items-center justify-between w-full text-left py-2 text-gray-900 hover:text-red-500 font-medium"
                                     onClick={() => handleMobileDropdownToggle('courses')}
                                 >
-                                    <span>Courses</span>
+                                    <span>{t("courses")}</span>
                                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openMobileDropdown === 'courses' ? 'rotate-180' : ''}`} />
                                 </button>
                                 <div className={`overflow-hidden transition-all duration-300 ${openMobileDropdown === 'courses' ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="ml-4 space-y-2 pt-2">
-                                        <Link href="/online-course" className="block py-1 text-gray-700 hover:text-red-500">Online Mode</Link>
-                                        <Link href="#" className="block border-b border-gray-200 py-1 text-gray-700 hover:text-red-500">Offline Mode</Link>
+                                        <Link href="/online-course" className="block py-1 text-gray-700 hover:text-red-500"> {t("onlineMode")}</Link>
+                                        <Link href="#" className="block border-b border-gray-200 py-1 text-gray-700 hover:text-red-500"> {t("offlineMode")}</Link>
 
                                     </div>
                                 </div>
@@ -223,7 +253,7 @@ const Header: React.FC = () => {
                                     className="flex items-center justify-between w-full text-left py-2 text-gray-900 hover:text-red-500 font-medium"
                                     onClick={() => handleMobileDropdownToggle('currentAffairs')}
                                 >
-                                    <span>Current Affairs</span>
+                                    <span>{t("currentAffairs")}</span>
                                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openMobileDropdown === 'currentAffairs' ? 'rotate-180' : ''}`} />
                                 </button>
                                 <div className={`overflow-hidden transition-all duration-300 ${openMobileDropdown === 'currentAffairs' ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
@@ -241,9 +271,9 @@ const Header: React.FC = () => {
                                 </div>
                             </div>
                             <div className="border-b border-gray-200">
-                                <a href="/scholarship-programme" className="block py-2 text-gray-900 hover:text-red-500 font-medium">Scholarship Programme</a>
+                                <a href="/scholarship-programme" className="block py-2 text-gray-900 hover:text-red-500 font-medium"> {t("scholarship")}</a>
                             </div>
-                            <Link href="/blogs" className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">Blogs</Link>
+                            <Link href="/blogs" className="block py-2 text-gray-900 hover:text-red-500 font-medium border-b border-gray-200">{t("blogs")}</Link>
                         </nav>
 
                         {/* Mobile Actions */}
@@ -253,7 +283,7 @@ const Header: React.FC = () => {
                                     <Phone className="w-5 h-5 text-white" />
                                 </div>
                                 <div className="text-sm">
-                                    <div className="text-xs text-gray-500">Talk to our experts</div>
+                                    <div className="text-xs text-gray-500">{t("talkToExperts")}</div>
                                     <div className="font-bold text-gray-900 text-lg">{settings?.phone || '+91 7428092240'}</div>
                                 </div>
                             </div>
@@ -267,7 +297,7 @@ const Header: React.FC = () => {
                                 target="_blank"
                                 >
                                 <button className="w-full text-gray-700 hover:text-red-500 py-3 border border-gray-300 rounded">
-                                    Log In
+                                    {t("login")}
                                 </button>
                                 </Link>
                         </div>

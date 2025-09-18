@@ -9,6 +9,7 @@ export async function GET() {
   return NextResponse.json(section)
 }
 
+
 // PUT update section
 export async function PUT(req: Request) {
   await connectToDB()

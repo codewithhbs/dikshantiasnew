@@ -6,8 +6,10 @@ import "swiper/css";
 import AnnouncementRow from "./AnnouncementRow";
 import HomeSlider from "./HomeSlider";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function HeroSlider() {
+   const { t } = useTranslation("common");
   const courses = [
     { id: "c1", name: "E-Learning", color: "bg-purple-200", icon: "⏰", link: "#" },
     { id: "c2", name: "What to Read in The Hindu", color: "bg-yellow-200", icon: "🎥", link: "current-affairs/what-to-read-in-hindu" },
@@ -35,7 +37,7 @@ export default function HeroSlider() {
       {/* Popular Courses Card Slider */}
       <div className="container max-w-7xl mx-auto md:mt-0 mt-4 md:py-8">
         <h2 className="text-xl md:text-3xl font-bold mb-4 text-[#040c33] pl-2 md:pl-0">
-          Latest News and <span className="text-[#f43144]">Updates</span>
+          {t("latestNews")} <span className="text-[#f43144]">{t("updates")}</span>
         </h2>
         <Swiper
           modules={[Autoplay]}

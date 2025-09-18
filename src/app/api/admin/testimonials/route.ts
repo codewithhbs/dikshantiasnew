@@ -21,13 +21,15 @@ export async function POST(req: Request) {
     await connectToDB();
 
     const formData = await req.formData();
-    const name = formData.get("name")?.toString();
-    const rank = formData.get("rank")?.toString();
+
+    console.log("Form Data Entries:", formData);
+    const name = JSON.parse(formData.get("name")?.toString() || '{}');
+    const rank = JSON.parse(formData.get("rank")?.toString() || '{}');
+    const quote = JSON.parse(formData.get("quote")?.toString() || '{}');
+    const optional = JSON.parse(formData.get("optional")?.toString() || '{}');
+    const background = JSON.parse(formData.get("background")?.toString() || '{}');
     const year = formData.get("year")?.toString();
-    const quote = formData.get("quote")?.toString();
     const attempts = formData.get("attempts")?.toString();
-    const optional = (formData.get("optional") as string) || "";
-    const background = (formData.get("background") as string) || "";
     const imageFile = formData.get("image") as File | null;
 
     if (!imageFile || imageFile.size === 0) {

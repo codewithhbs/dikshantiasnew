@@ -25,11 +25,18 @@ interface IWebSettings {
 }
 
 interface IResultSection {
-    _id: string
-    description: string
-    buttonText: string
-    buttonLink: string
+  _id: string
+  description: {
+    en: string
+    hi: string
+  }
+  buttonText: {
+    en: string
+    hi: string
+  }
+  buttonLink: string
 }
+
 
 
 export default function PagesPage() {
@@ -58,9 +65,32 @@ export default function PagesPage() {
             .catch((err) => console.error("Error fetching result section:", err))
     }, [])
 
-    const handleResultChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setResultForm({ ...resultForm, [e.target.name]: e.target.value })
+  const handleResultChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+
+  setResultForm((prev) => {
+    const keys = name.split("."); // e.g. ["description", "en"]
+    if (keys.length === 2) {
+      const [parent, child] = keys;
+      return {
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value, // update or clear
+        },
+      };
     }
+
+    // for non-nested fields like buttonLink
+    return {
+      ...prev,
+      [name]: value,
+    };
+  });
+};
+
 
 
     const handleResultSubmit = async (e: React.FormEvent) => {
@@ -385,62 +415,100 @@ export default function PagesPage() {
                             className="space-y-5 bg-white p-6 rounded-2xl shadow-md border border-gray-100"
                         >
                             <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300 pb-2">
-                                Result Section
+                            Result Section
                             </h2>
 
+                            {/* Description EN + HI */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-2">Description</label>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">
+                                Description (English)
+                                </label>
                                 <textarea
-                                    name="description"
-                                    value={resultForm.description || ""}
-                                    onChange={handleResultChange}
-                                    className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
-                                    rows={4}
+                                name="description.en"
+                                value={resultForm.description?.en || ""}
+                                onChange={handleResultChange}
+                                className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                rows={4}
                                 ></textarea>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-2">Button Text</label>
-                                    <input
-                                        type="text"
-                                        name="buttonText"
-                                        value={resultForm.buttonText || ""}
-                                        onChange={handleResultChange}
-                                        className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
-                                    />
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">
+                                Description (Hindi)
+                                </label>
+                                <textarea
+                                name="description.hi"
+                                value={resultForm.description?.hi || ""}
+                                onChange={handleResultChange}
+                                className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                rows={4}
+                                ></textarea>
+                            </div>
+                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-2">Button Link</label>
-                                    <input
-                                        type="text"
-                                        name="buttonLink"
-                                        value={resultForm.buttonLink || ""}
-                                        onChange={handleResultChange}
-                                        className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
-                                    />
-                                </div>
+                            {/* Button Text EN + HI */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">
+                                Button Text (English)
+                                </label>
+                                <input
+                                type="text"
+                                name="buttonText.en"
+                                value={resultForm.buttonText?.en || ""}
+                                onChange={handleResultChange}
+                                className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">
+                                Button Text (Hindi)
+                                </label>
+                                <input
+                                type="text"
+                                name="buttonText.hi"
+                                value={resultForm.buttonText?.hi || ""}
+                                onChange={handleResultChange}
+                                className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                                />
+                            </div>
+                            </div>
+
+                            {/* Button Link (single) */}
+                            <div>
+                            <label className="block text-sm font-medium text-gray-600 mb-2">
+                                Button Link
+                            </label>
+                            <input
+                                type="text"
+                                name="buttonLink"
+                                value={resultForm.buttonLink || ""}
+                                onChange={handleResultChange}
+                                className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#E94E4E] transition"
+                            />
                             </div>
 
                             <div className="flex justify-end gap-4 mt-6">
-                                <button
-                                    type="button"
-                                    className="flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-200 transition"
-                                >
-                                    Cancel
-                                </button>
+                            <button
+                                type="button"
+                                className="flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
 
-                                <button
-                                    type="submit"
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#E94E4E] text-white rounded-xl shadow-md hover:bg-red-600 transition"
-                                >
-                                    <CheckCircle size={18} className="text-white" />
-                                    Update
-                                </button>
+                            <button
+                                type="submit"
+                                className="flex items-center gap-2 px-5 py-2 bg-[#E94E4E] text-white rounded-xl shadow-md hover:bg-red-600 transition"
+                            >
+                                <CheckCircle size={18} className="text-white" />
+                                Update
+                            </button>
                             </div>
                         </form>
-                    )}
+                        )}
+
 
                     {activeTab === "profile" && admin && (
                         <form

@@ -10,53 +10,84 @@ import toast from "react-hot-toast";
 export default function AddEditTestimonialPage() {
     const router = useRouter();
     const pathname = usePathname();
-    const id = pathname.split("/").pop(); // get id from URL
+    const id = pathname.split("/").pop();
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
-    // Form state
-    const [name, setName] = useState("");
-    const [rank, setRank] = useState("");
+    // Language specific fields
+    const [nameEn, setNameEn] = useState("");
+    const [nameHi, setNameHi] = useState("");
+    const [rankEn, setRankEn] = useState("");
+    const [rankHi, setRankHi] = useState("");
+    const [backgroundEn, setBackgroundEn] = useState("");
+    const [backgroundHi, setBackgroundHi] = useState("");
+    const [optionalEn, setOptionalEn] = useState("");
+    const [optionalHi, setOptionalHi] = useState("");
+    const [quoteEn, setQuoteEn] = useState("");
+    const [quoteHi, setQuoteHi] = useState("");
+
+    // Non-language fields
     const [year, setYear] = useState("");
     const [attempts, setAttempts] = useState("");
-    const [background, setBackground] = useState("");
-    const [optional, setOptional] = useState("");
-    const [quote, setQuote] = useState("");
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [existingImage, setExistingImage] = useState<string>("");
     const [active, setActive] = useState(true);
 
-    // Fetch testimonial if editing
     useEffect(() => {
         if (!id) {
             setLoading(false);
             return;
         }
 
-        const fetchTestimonial = async () => {
-            try {
-                const res = await fetch(`/api/admin/testimonials/${id}`);
-                if (!res.ok) throw new Error("Failed to fetch testimonial");
-                const data = await res.json();
+     
+        const safeParse = (field: any) => {
+  if (!field) return { en: "", hi: "" };
+  if (typeof field === "object") return field; // already object
+  try {
+    return JSON.parse(field);
+  } catch {
+    return { en: field, hi: "" };
+  }
+};
 
-                setName(data.name || "");
-                setRank(data.rank || "");
-                setYear(data.year || "");
-                setAttempts(data.attempts || "");
-                setBackground(data.background || "");
-                setOptional(data.optional || "");
-                setQuote(data.quote || "");
-                setActive(data.active ?? true);
-                setExistingImage(data.image?.url || "");
-            } catch (err) {
-                console.error(err);
-                toast.error("Failed to load testimonial");
-            } finally {
-                setLoading(false);
-            }
-        };
+const fetchTestimonial = async () => {
+  try {
+    const res = await fetch(`/api/admin/testimonials/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch testimonial");
+    const data = await res.json();
 
+    const nameObj = safeParse(data.name);
+    setNameEn(nameObj.en || "");
+    setNameHi(nameObj.hi || "");
+
+    const rankObj = safeParse(data.rank);
+    setRankEn(rankObj.en || "");
+    setRankHi(rankObj.hi || "");
+
+    const backgroundObj = safeParse(data.background);
+    setBackgroundEn(backgroundObj.en || "");
+    setBackgroundHi(backgroundObj.hi || "");
+
+    const optionalObj = safeParse(data.optional);
+    setOptionalEn(optionalObj.en || "");
+    setOptionalHi(optionalObj.hi || "");
+
+    const quoteObj = safeParse(data.quote);
+    setQuoteEn(quoteObj.en || "");
+    setQuoteHi(quoteObj.hi || "");
+
+    setYear(data.year || "");
+    setAttempts(data.attempts || "");
+    setActive(data.active ?? true);
+    setExistingImage(data.image?.url || "");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load testimonial");
+  } finally {
+    setLoading(false);
+  }
+};  
         fetchTestimonial();
     }, [id]);
 
@@ -66,13 +97,15 @@ export default function AddEditTestimonialPage() {
 
         try {
             const formData = new FormData();
-            formData.append("name", name);
-            formData.append("rank", rank);
+
+            formData.append("name", JSON.stringify({ en: nameEn, hi: nameHi }));
+            formData.append("rank", JSON.stringify({ en: rankEn, hi: rankHi }));
+            formData.append("background", JSON.stringify({ en: backgroundEn, hi: backgroundHi }));
+            formData.append("optional", JSON.stringify({ en: optionalEn, hi: optionalHi }));
+            formData.append("quote", JSON.stringify({ en: quoteEn, hi: quoteHi }));
+
             formData.append("year", year);
             formData.append("attempts", attempts);
-            formData.append("background", background);
-            formData.append("optional", optional);
-            formData.append("quote", quote);
             formData.append("active", JSON.stringify(active));
 
             if (imageFile) formData.append("image", imageFile);
@@ -113,109 +146,154 @@ export default function AddEditTestimonialPage() {
 
     return (
         <AdminLayout>
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">
-                Edit Testimonial
-            </h1>
+            <h1 className="text-3xl font-bold mb-6 text-gray-800">Edit Testimonial</h1>
 
             <form
                 onSubmit={handleSubmit}
-                className="bg-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-8"
+                className="bg-white p-8 rounded-2xl shadow-xl max-w-5xl mx-auto space-y-8"
             >
-                {/* Basic Info */}
+                {/* English Fields */}
+                <div>
+                    <h2 className="text-xl font-semibold mb-4">English</h2>
+                    <div className="border-b border-gray-300 mb-4"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-gray-700 mb-1">Name (English)</label>
+                            <input
+                                type="text"
+                                value={nameEn}
+                                onChange={(e) => setNameEn(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 mb-1">Rank (English)</label>
+                            <input
+                                type="text"
+                                value={rankEn}
+                                onChange={(e) => setRankEn(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 mb-1">Background (English)</label>
+                            <input
+                                type="text"
+                                value={backgroundEn}
+                                onChange={(e) => setBackgroundEn(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 mb-1">Optional Subject (English)</label>
+                            <input
+                                type="text"
+                                value={optionalEn}
+                                onChange={(e) => setOptionalEn(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-4">
+                        <label className="block text-gray-700 mb-1">Quote (English)</label>
+                        <textarea
+                            value={quoteEn}
+                            onChange={(e) => setQuoteEn(e.target.value)}
+                            rows={3}
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                        />
+                    </div>
+                </div>
+
+                {/* Hindi Fields */}
+                <div>
+                    <h2 className="text-xl font-semibold mb-4">हिंदी</h2>
+                    <div className="border-b border-gray-300 mb-4"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-gray-700 mb-1">नाम (हिंदी)</label>
+                            <input
+                                type="text"
+                                value={nameHi}
+                                onChange={(e) => setNameHi(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 mb-1">रैंक (हिंदी)</label>
+                            <input
+                                type="text"
+                                value={rankHi}
+                                onChange={(e) => setRankHi(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 mb-1">पृष्ठभूमि (हिंदी)</label>
+                            <input
+                                type="text"
+                                value={backgroundHi}
+                                onChange={(e) => setBackgroundHi(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 mb-1">वैकल्पिक विषय (हिंदी)</label>
+                            <input
+                                type="text"
+                                value={optionalHi}
+                                onChange={(e) => setOptionalHi(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-4">
+                        <label className="block text-gray-700 mb-1">उद्धरण (हिंदी)</label>
+                        <textarea
+                            value={quoteHi}
+                            onChange={(e) => setQuoteHi(e.target.value)}
+                            rows={3}
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                        />
+                    </div>
+                </div>
+
+                {/* Other Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block font-medium text-gray-700 mb-1">Name</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block font-medium text-gray-700 mb-1">Rank</label>
-                        <input
-                            type="text"
-                            value={rank}
-                            onChange={(e) => setRank(e.target.value)}
-                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block font-medium text-gray-700 mb-1">Year</label>
+                        <label className="block text-gray-700 mb-1">Year</label>
                         <input
                             type="text"
                             value={year}
                             onChange={(e) => setYear(e.target.value)}
-                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
                             required
                         />
                     </div>
-
                     <div>
-                        <label className="block font-medium text-gray-700 mb-1">
-                            Attempts
-                        </label>
+                        <label className="block text-gray-700 mb-1">Attempts</label>
                         <input
                             type="text"
                             value={attempts}
                             onChange={(e) => setAttempts(e.target.value)}
-                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
                         />
                     </div>
-
-                    <div>
-                        <label className="block font-medium text-gray-700 mb-1">
-                            Background
-                        </label>
-                        <input
-                            type="text"
-                            value={background}
-                            onChange={(e) => setBackground(e.target.value)}
-                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block font-medium text-gray-700 mb-1">
-                            Optional Subject
-                        </label>
-                        <input
-                            type="text"
-                            value={optional}
-                            onChange={(e) => setOptional(e.target.value)}
-                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Quote</label>
-                    <textarea
-                        value={quote}
-                        onChange={(e) => setQuote(e.target.value)}
-                        className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                        rows={5}
-                        placeholder="Write testimonial quote..."
-                    />
                 </div>
 
                 {/* Image Upload */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <ImageUpload
-                            onImageSelect={(file) => setImageFile(file)}
-                            isLoading={false}
-                            initialImage={existingImage}
-                        />
-                        <p className="mt-2 text-sm text-gray-500">
-                            Recommended size: <span className="font-medium">400×400px</span> (JPG or PNG)
-                        </p>
-                    </div>
+                <div>
+                    <label className="block text-gray-700 mb-2">Image</label>
+                    <ImageUpload
+                        onImageSelect={(file) => setImageFile(file)}
+                        isLoading={false}
+                        initialImage={existingImage}
+                    />
+                    <p className="mt-2 text-sm text-gray-500">
+                        Recommended size: <span className="font-medium">400×400px</span>
+                    </p>
                 </div>
 
                 {/* Status */}

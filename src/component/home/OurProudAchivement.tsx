@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Skeleton from "react-loading-skeleton"
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useTranslation } from "react-i18next";
 
 interface Topper {
   _id: string
@@ -19,12 +20,19 @@ interface Topper {
 }
 
 interface SectionContent {
-  description: string
-  buttonText: string
+  description: {
+    en: string
+    hi: string
+  }
+  buttonText: {
+    en: string
+    hi: string
+  }
   buttonLink: string
 }
 
 export default function OurProudAchivement() {
+   const { t, i18n } = useTranslation("common")
   const [section, setSection] = useState<SectionContent | null>(null)
   const [toppers, setToppers] = useState<Topper[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -83,28 +91,33 @@ export default function OurProudAchivement() {
     return () => clearInterval(interval)
   }, [toppers, currentIndex, itemsPerView])
 
-  return (
-    <div className="py-5 px-2 md:px-4 mb-4" style={{ backgroundColor: "#fff" }}>
-      <div className="max-w-7xl md:mx-auto mt-7">
-        <div className="bg-[#ecf4fc] backdrop-blur-sm rounded-3xl p-6 md:p-8 lg:p-12">
-        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[#040c33] mb-2">
-  {loading ? (
-    <Skeleton width={200} />
-  ) : (
-    <>
-      Our Results
-      <span className="block text-sm md:text-base lg:text-lg font-normal text-gray-600 mt-1">
-        India's Best Mock Interview Programme
-      </span>
-    </>
-  )}
-</h2>
+          return (
+            <div className="py-5 px-2 md:px-4 mb-4" style={{ backgroundColor: "#fff" }}>
+              <div className="max-w-7xl md:mx-auto mt-7">
+                <div className="bg-[#ecf4fc] backdrop-blur-sm rounded-3xl p-6 md:p-8 lg:p-12">
+                <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[#040c33] mb-2">
+          {loading ? (
+            <Skeleton width={200} />
+          ) : (
+            <>
+              {t("ourResults")}
+              <span className="block text-sm md:text-base lg:text-lg font-normal text-gray-600 mt-1">
+                {t("ourResultsSubtitle")}
+              </span>
+            </>
+          )}
+        </h2>
 
 
           {/* Description */}
-          <p className="text-blue-950 mb-4 md:mb-10">
-            {loading ? <Skeleton count={3} /> : <span dangerouslySetInnerHTML={{ __html: section?.description || "" }} />}
-          </p>
+         <p className="text-blue-950 mb-4 md:mb-10">
+  {loading ? (
+    <Skeleton count={3} />
+  ) : (
+    <span dangerouslySetInnerHTML={{ __html: section?.description?.[i18n.language] || "" }} />
+  )}
+</p>
+
 
           <div className="relative">
             {toppers.length > itemsPerView && !loading && (
@@ -155,9 +168,13 @@ export default function OurProudAchivement() {
             {loading ? (
               <Skeleton width={150} height={40} />
             ) : (
-              <Link href={section?.buttonLink || "/"} className="px-4 py-2 bg-[#a50309] text-white rounded-md">
-                {section?.buttonText || "View All Results"}
-              </Link>
+              <Link
+  href={section?.buttonLink || "/"}
+  className="px-4 py-2 bg-[#a50309] text-white rounded-md"
+>
+  {section?.buttonText?.[i18n.language] || "View All Results"}
+</Link>
+
             )}
           </div>
         </div>

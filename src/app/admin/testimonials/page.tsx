@@ -10,13 +10,13 @@ import ConfirmDialog from "@/component/admin/ConfirmDialog";
 // Testimonial interface
 interface Testimonial {
   _id: string;
-  name: string;
-  rank: string;
+  name: any;
+  rank: any;
   year: string;
-  quote: string;
-  background: string;
+  quote: any;
+  background: any;
   attempts: string;
-  optional: string;
+  optional: any;
   image: { url: string; public_url?: string; public_id?: string };
   active: boolean;
   createdAt?: string;
@@ -26,7 +26,7 @@ interface Testimonial {
 export default function TestimonialsPage() {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
-  const [mounted, setMounted] = useState(false); // Prevent SSR mismatch
+  const [mounted, setMounted] = useState(false);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -69,7 +69,9 @@ export default function TestimonialsPage() {
 
     setConfirmAction(() => async () => {
       try {
-        const res = await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+        const res = await fetch(`/api/admin/testimonials/${id}`, {
+          method: "DELETE",
+        });
         const data = await res.json();
         if (!res.ok) {
           toast.error(data.error || "Failed to delete testimonial");
@@ -89,8 +91,14 @@ export default function TestimonialsPage() {
   };
 
   const handleToggleActive = (id: string, currentStatus: boolean) => {
-    setConfirmTitle(currentStatus ? "Deactivate this testimonial?" : "Activate this testimonial?");
-    setConfirmMessage(`Are you sure you want to ${currentStatus ? "deactivate" : "activate"} this testimonial?`);
+    setConfirmTitle(
+      currentStatus
+        ? "Deactivate this testimonial?"
+        : "Activate this testimonial?"
+    );
+    setConfirmMessage(
+      `Are you sure you want to ${currentStatus ? "deactivate" : "activate"} this testimonial?`
+    );
     setConfirmBtnText(currentStatus ? "Yes, Deactivate" : "Yes, Activate");
 
     setConfirmAction(() => async () => {
@@ -104,9 +112,13 @@ export default function TestimonialsPage() {
         if (res.ok) {
           const data = await res.json();
           setTestimonials((prev) =>
-            prev.map((t) => (t._id === id ? { ...t, active: data.active ?? !currentStatus } : t))
+            prev.map((t) =>
+              t._id === id ? { ...t, active: data.active ?? !currentStatus } : t
+            )
           );
-          toast.success(`Testimonial has been ${!currentStatus ? "activated" : "deactivated"}`);
+          toast.success(
+            `Testimonial has been ${!currentStatus ? "activated" : "deactivated"}`
+          );
         } else {
           toast.error("Something went wrong.");
         }
@@ -120,10 +132,31 @@ export default function TestimonialsPage() {
     setConfirmOpen(true);
   };
 
+  // Utility: safely parse multilingual field
+  const parseField = (field: any) => {
+    if (!field) return { en: "", hi: "" };
+    if (typeof field === "object") return field;
+    try {
+      return JSON.parse(field);
+    } catch {
+      return { en: field, hi: "" };
+    }
+  };
+
+  // Filtered Testimonials
   const filteredTestimonials = testimonials.filter((t) => {
     const matchesStatus =
-      filterStatus === "true" ? t.active : filterStatus === "false" ? !t.active : true;
-    const matchesName = t.name.toLowerCase().includes(searchName.toLowerCase());
+      filterStatus === "true"
+        ? t.active
+        : filterStatus === "false"
+        ? !t.active
+        : true;
+
+    const nameObj = parseField(t.name);
+    const matchesName =
+      nameObj.en.toLowerCase().includes(searchName.toLowerCase()) ||
+      nameObj.hi.toLowerCase().includes(searchName.toLowerCase());
+
     return matchesStatus && matchesName;
   });
 
@@ -135,7 +168,7 @@ export default function TestimonialsPage() {
 
   if (!authorized || !mounted)
     return (
-     <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="flex flex-col items-center">
           <div className="relative flex space-x-3 mb-4">
             <div className="w-5 h-5 bg-[#e94e4e] rounded-full animate-bounce"></div>
@@ -202,63 +235,92 @@ export default function TestimonialsPage() {
                 <th className="py-4 px-5 text-center border-b border-gray-200 rounded-tr-2xl">Actions</th>
               </tr>
             </thead>
+
             <tbody className="text-gray-800 text-sm">
               {paginatedData.length > 0 ? (
-                paginatedData.map((t) => (
-                  <tr key={t._id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-                    <td className="py-3 px-5">
-                      {t.image?.url ? (
-                        <img src={t.image.url} alt={t.name} className="h-16 w-32 object-cover rounded" />
-                      ) : (
-                        <div className="h-16 w-32 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                          No Image
+                paginatedData.map((t) => {
+                  const nameObj = parseField(t.name);
+                  const rankObj = parseField(t.rank);
+                  const quoteObj = parseField(t.quote);
+
+                  return (
+                    <tr
+                      key={t._id}
+                      className="hover:bg-gray-50 transition-colors border-b border-gray-200"
+                    >
+                      <td className="py-3 px-5">
+                        {t.image?.url ? (
+                          <img
+                            src={t.image.url}
+                            alt={nameObj.en}
+                            className="h-16 w-32 object-cover rounded"
+                          />
+                        ) : (
+                          <div className="h-16 w-32 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                            No Image
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3 px-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-medium">{nameObj.en}</span>
+                          <span className="text-gray-500 text-sm">{nameObj.hi}</span>
                         </div>
-                      )}
-                    </td>
-                    <td className="py-3 px-5">{t.name}</td>
-                    <td className="py-3 px-5">{t.rank}</td>
-                    <td className="py-3 px-5">{t.year}</td>
-                    <td className="py-3 px-5">{t.quote}</td>
-                    <td className="py-3 px-5 text-center">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" checked={t.active ?? false} readOnly className="sr-only" />
-                        <div
-                          onClick={() => handleToggleActive(t._id, t.active)}
-                          className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 cursor-pointer ${
-                            t.active ? "bg-green-500" : "bg-gray-300"
-                          }`}
-                        >
-                          <span
-                            className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-                              t.active ? "translate-x-6" : "translate-x-0"
+                      </td>
+                      <td className="py-3 px-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-medium">{rankObj.en}</span>
+                          <span className="text-gray-500 text-sm">{rankObj.hi}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-5">{t.year}</td>
+                      <td className="py-3 px-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-medium">{quoteObj.en}</span>
+                          <span className="text-gray-500 text-sm">{quoteObj.hi}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-5 text-center">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" checked={t.active ?? false} readOnly className="sr-only" />
+                          <div
+                            onClick={() => handleToggleActive(t._id, t.active)}
+                            className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 cursor-pointer ${
+                              t.active ? "bg-green-500" : "bg-gray-300"
                             }`}
-                          ></span>
+                          >
+                            <span
+                              className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
+                                t.active ? "translate-x-6" : "translate-x-0"
+                              }`}
+                            ></span>
+                          </div>
+                        </label>
+                      </td>
+                      <td className="py-3 px-5 text-center">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => router.push(`/admin/testimonials/${t._id}`)}
+                            className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition transform hover:scale-110"
+                            title="Edit"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(t._id)}
+                            className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transition transform hover:scale-110"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
-                      </label>
-                    </td>
-                    <td className="py-3 px-5 text-center">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => router.push(`/admin/testimonials/${t._id}`)}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition transform hover:scale-110"
-                          title="Edit"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(t._id)}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transition transform hover:scale-110"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan={10} className="text-center py-8 text-gray-500 italic">
+                  <td colSpan={7} className="text-center py-8 text-gray-500 italic">
                     No testimonials found
                   </td>
                 </tr>
@@ -267,11 +329,14 @@ export default function TestimonialsPage() {
           </table>
         </div>
 
+        {/* Pagination */}
         <div className="flex justify-end items-center mt-4 space-x-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md font-medium ${currentPage === 1 ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+            className={`px-3 py-1 rounded-md font-medium ${
+              currentPage === 1 ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
           >
             Prev
           </button>
@@ -279,7 +344,9 @@ export default function TestimonialsPage() {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded-md font-medium ${currentPage === i + 1 ? "bg-[#e94e4e] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`px-3 py-1 rounded-md font-medium ${
+                currentPage === i + 1 ? "bg-[#e94e4e] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
               {i + 1}
             </button>
@@ -287,7 +354,9 @@ export default function TestimonialsPage() {
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md font-medium ${currentPage === totalPages ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+            className={`px-3 py-1 rounded-md font-medium ${
+              currentPage === totalPages ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
           >
             Next
           </button>
@@ -306,3 +375,4 @@ export default function TestimonialsPage() {
     </AdminLayout>
   );
 }
+  
