@@ -91,6 +91,7 @@ const TextColorButton = ({ editor }: { editor: Editor }) => {
       {colors.map((color) => (
         <button
           key={color}
+           type="button"
           onClick={() => editor.chain().focus().setColor(color).run()}
           className={`w-6 h-6 rounded-full border-2 transition-all duration-150 ${
             currentColor === color ? "border-black" : "border-gray-300 hover:border-gray-600"

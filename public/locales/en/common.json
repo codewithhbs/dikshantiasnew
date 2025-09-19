@@ -66,5 +66,45 @@
   "attempts": "Attempts",
   "optional": "Optional",
   "ourResults": "Our Results",
-  "ourResultsSubtitle": "India's Best Mock Interview Programme"
+  "ourResultsSubtitle": "India's Best Mock Interview Programme",
+
+
+  "about_title": "Dikshant IAS A Premier Civil Services Exam Coaching Institute",
+  "about_description": "Dikshant IAS stands as a premier coaching institute dedicated to guiding aspirants on their journey to success in the Civil Services Examination. With a team of highly experienced and dedicated educators, the institute offers comprehensive preparation for UPSC and State PSC exams. Known for its structured curriculum, personalized mentoring, and result-oriented approach, Dikshant IAS ensures that every student receives the right guidance and support to excel in one of the most competitive exams in India. The institute emphasizes conceptual clarity, current affairs integration, answer writing practice, and interview preparation. Regular test series, doubt-solving sessions, and performance assessments help students stay focused and on track. Whether you’re a beginner or a repeat aspirant, Dikshant IAS provides a nurturing and disciplined environment to bring out the best in every candidate.",
+
+  "vision_title": "Our Vision",
+  "vision_quote": "“You can’t cross the sea merely by standing and staring at the water.” – Tagore",
+  "vision_para1": "Our main objective is to guide the motivated young minds toward a fruitful professional life and a better career. As we strive for greatness, we are dedicated to each student’s success at our institute.",
+  "vision_para2": "Because Dikshant IAS prepares you for all three stages of the recruiting process—the preliminary exam, the main exam, and the interview stage—joining us for a year, we can assure you of a bright future at an affordable fee.",
+  "vision_para3": "You must comprehend that our objective is not just to prepare you for a test that will be very challenging, but also to help you find a rewarding profession. Our main objective is to guide the motivated young minds toward a fruitful professional life and a better career.",
+
+  "mission_title": "Our Mission",
+  "mission_quote": "From Intent To AIM, From Obtaining to Becoming",
+  "mission_para1": "A candidate preparing for the Civil Services Examination does not have much time at its disposal, and the number of tasks that must be completed within this short period of time is truly extensive...",
+  "mission_para2": "It will be utterly absurd to believe that one may adequately prepare for this exam in a short amount of time on their own. Therefore, the preparation strategy must be tailored to the particular requirements of this exam...",
+
+  "thoughts_title": "Thoughts",
+  "thoughts_quote": "From Ambition To Aspiration, From Acquiring To Becoming",
+  "thoughts_para": "Our experienced faculties have designed the curriculum conscientiously to directly meet the demands of the examinations...",
+
+      
+  "founders": {
+    "pandey": {
+      "name": "Dr. S.S. Pandey",
+      "title": "Educator & Director, Dikshant IAS",
+      "company": "Dikshant IAS",
+      "description": "Dr. S. S. Pandey got his Ph.D. in 2000 on “Labour: Management Relations in India,” and after getting his Ph.D., he joined as a research assistant at Indira Gandhi Rashtriya Kala Kendra, New Delhi, with famous anthropologist Dr. B. N. Saraswati. In 2002, he joined as an assistant professor at Ram Manohar Lohia Awadh University, Faizabad, Uttar Pradesh (HNB PG College, Lalgang). He worked at the college for a year and then resigned from his job to teach UPSC aspirants."
+    },
+    "ashutosh": {
+      "name": "Ashutosh Dixit",
+      "title": "Educator & CEO, Dikshant IAS",
+      "company": "Dikshant IAS",
+      "description": "From the boardrooms of global corporations to the classrooms of aspiring civil servants, Ashutosh Dixit has carved a unique path—where corporate excellence meets educational transformation. A visionary leader with a heart for public good, Ashutosh Dixit today stands as a mentor, strategist, and nation-builder, steering one of India’s most socially committed institutions—Dikshant Education Centre Private Limited."
+    }
+  },
+  "readMore": "Read More"
+
+
+
+
 }
