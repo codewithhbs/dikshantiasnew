@@ -180,7 +180,7 @@
       "blog": "Blog",
       "contact": "Contact Us",
       "gallery": "Gallery",
-       "onlineCourse": "Online Courses",
+      "onlineCourse": "Online Courses",
       "offlineCourse": "Offline Course",
       "mainsCorner": "Mains Corner",
       "mentorshipProgramme": "Mentorship Programme",
@@ -196,10 +196,101 @@
       "termsConditions": "Terms & Conditions",
       "dataPolicy": "Data Policy"
     }
+  },
+
+  "aboutupsc": {
+    "aboutTitle": "About UPSC Civil Services Examination (UPSC CSE)",
+    "aboutDesc": "The UPSC Civil Services Examination (CSE) stands as one of the most esteemed competitive exams in India, conducted annually by the Union Public Service Commission. It is designed to recruit candidates for prominent government positions, including the IAS, IPS, and IFS. The selection process is highly competitive and consists of three stages: the Preliminary Examination, the Main Examination, and the Personality Test (Interview).",
+
+    "skillsTitle": "Skills Required to Excel in UPSC CSE",
+    "skillsDesc": "The Preliminary Examination serves as an initial screening stage, designed to assess a candidate's fundamental knowledge and cognitive aptitude, helping identify serious contenders for the Mains. The Mains Examination delves deeper, testing an aspirant’s capacity for critical thinking, analytical reasoning, and effective written communication through structured and insightful answers. The final stage, the Interview (Personality Test), evaluates the candidate's intellectual depth, social awareness, and interpersonal skills — qualities essential for a successful career in the Civil Services.",
+
+    "successTitle": "Achieving Success with Dikshant IAS",
+    "successDesc1": "Dikshant IAS provides comprehensive support to civil services aspirants through a wide array of initiatives and services. Its holistic approach to preparation equips students with the essential skills and competencies needed to succeed at every stage of the UPSC CSE—be it the Prelims, Mains, or Personality Test.",
+    "successDesc2": "Dikshant IAS provides comprehensive and cutting-edge UPSC coaching through both online and offline/classroom platforms, ensuring students receive the best possible learning experience. The institute also offers its prestigious All India UPSC Mock Test Series covering GS Prelims, Mains, CSAT, Essay, and Optional Subjects, designed to facilitate regular evaluation and consistent enhancement of student performance.",
+    "successDesc3": "A dedicated and dynamic mentoring ecosystem delivers personalized guidance, helping students recognize their areas for improvement while providing targeted support to unlock their full potential and achieve success.",
+    "successDesc4": "Dikshant IAS is recognized as one of the leading IAS academies in the country, thanks to its strong presence across more than 10 cities and a robust online platform that reaches students nationwide. Known for its innovative approach to UPSC online coaching, the institute offers real-time support that empowers aspirants throughout their preparation journey. This commitment to excellence and accessibility makes Dikshant IAS a trusted destination for those aspiring to join the Civil Services and serve the nation.",
+
+    "communityTitle": "Become a part of the Dikshant IAS Community.",
+    "communityDesc": "Stay informed about crucial UPSC preparation updates. Connect with the Dikshant IAS community on social media to remain engaged with our informative and collaborative network."
+  },
+
+  "scholarships": {
+    "title": "Dikshant Scholarship Program",
+    "desc1": "At Dikshant IAS, we believe that quality education and UPSC preparation should be accessible to all, regardless of economic or social background. To support deserving and hardworking aspirants, we proudly offer need-based and category-based scholarships.",
+    "desc2": "Dikshant Scholarship Program, is a welfare program run by Dikshant IAS under which free coaching is provided to socially and economically weaker students living in India. This program is funded by the Government of India and various other NGOs.",
+    "funded": "Funded by the Government of India and NGOs.",
+    "register": "To avail the benefits of the scholarship program, click on the button below and get yourself registered.",
+
+    "notesTitle": "Important Notes",
+    "notes": [
+      "Students must present valid and up-to-date documents to claim scholarship benefits.",
+      "The final approval of scholarship rests with the Dikshant IAS Scholarship Committee.",
+      "Limited seats available under each category. Scholarships are granted on a first-come, first-served basis."
+    ],
+
+    "applyTitle": "How to Apply?",
+    "apply": [
+      "Fill the scholarship section in the scholarship form.",
+      "Wait for call from our calling team.",
+      "You can also reach on our helpline number - +91-9354994539"
+    ],
+
+    "mission": "Empower your UPSC journey with Dikshant IAS – Where talent meets opportunity."
+  },
+
+  "scholarshipDetails": {
+    "applyNow": "Apply Now",
+    "faq": [
+      {
+        "id": 1,
+        "title": "PROGRAMME - 1: 60% Scholarship Programme for BPL Students",
+        "content": [
+          "Providing coaching to BPL students with 60% fee scholarship (Online/Offline, 100 students per year). Required documents:",
+          "Aadhar Card",
+          "BPL Card",
+          "4 Passport size photographs"
+        ]
+      },
+      {
+        "id": 2,
+        "title": "PROGRAMME - 2: 50% Scholarship for SC / ST / OBC / Minorities / Girls / EWS / Defence Wards Students",
+        "content": [
+          "50% fee scholarship for SC/ST/OBC/Minorities/Girls/EWS/Defence Wards students. Required documents:",
+          "Aadhar Card",
+          "Caste/Minorities certificate + Income certificate (< 8 lakhs)",
+          "Defence ID proof",
+          "4 Passport size photographs"
+        ]
+      },
+      {
+        "id": 3,
+        "title": "PROGRAMME - 3: 40% Scholarship Programme for Meritorious Students",
+        "content": [
+          "40% fee scholarship for Meritorious Students (50 students/year). An aptitude test will be conducted. Required documents:",
+          "Aadhar Card",
+          "4 Passport size photographs"
+        ]
+      }
+    ]
+  },
+
+  "contacts": {
+    "contactAddress": "Our contact address",
+    "mainOffice": "Main Office",
+    "emailUs": "Email us",
+    "phone": "Phone",
+    "findLocation": "Find our location",
+    "haveQuestions": "Do you have any questions?",
+    "sayHi": "Have a question or just want to say hi? We'd love to hear from you.",
+    "yourName": "Your Name",
+    "yourEmail": "Your Email",
+    "yourPhone": "Your Phone",
+    "yourMessage": "Your Message",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "successMessage": "Thank you! Your message has been sent.",
+    "errorMessage": "Something went wrong. Please try again."
   }
-
-
-
-
-
+  
 }
