@@ -15,7 +15,7 @@ interface Topper {
 }
 
 export default function ResultsPage() {
-  const { i18n } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const [toppers, setToppers] = useState<Topper[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(6);
@@ -45,6 +45,8 @@ export default function ResultsPage() {
       <h1 className="text-3xl font-bold mb-6">
         {lang === "hi" ? "सभी परिणाम" : "All Results"}
       </h1>
+      <h2 className="text-2xl font-bold mb-6">{t('ourResultsSubtitle')}</h2>
+      
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading

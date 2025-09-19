@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Facebook, Instagram, Youtube, Linkedin, Twitter, Send, ChevronsRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
 
 interface FooterLink {
   name: string;
@@ -34,6 +36,7 @@ interface Settings {
 }
 
 const Footer: React.FC = () => {
+   const { t } = useTranslation('common');
   const [settings, setSettings] = useState<Settings | null>(null);
 
   useEffect(() => {
@@ -45,25 +48,25 @@ const Footer: React.FC = () => {
 
   const footerSections: FooterSection[] = [
     {
-      title: "QUICK LINKS",
+      title: t('footer.sections.quickLinks'),
       links: [
-        { name: "Home", href: "/" },
-        { name: "About", href: "/about-us" },
-        { name: "Scholarship Programme", href: "/scholarship-programme" },
-        { name: "Blog", href: "/blogs" },
-        { name: "Contact Us", href: "/contact-us" },
-        { name: "Gallery", href: "/gallery" }
+        { name: t('footer.links.home'), href: '/' },
+        { name: t('footer.links.about'), href: '/about-us' },
+        { name: t('footer.links.scholarshipProgramme'), href: '/scholarship-programme' },
+        { name: t('footer.links.blog'), href: '/blogs' },
+        { name: t('footer.links.contact'), href: '/contact-us' },
+        { name: t('footer.links.gallery'), href: '/gallery' }
       ]
     },
     {
-      title: "COURSES",
+      title:  t('footer.sections.courses'),
       links: [
-        { name: "Online Courses", href: "/online-course" },
-        { name: "Offline Course", href: "/offline-course" },
-        { name: "Mains Corner", href: "/mains-corner" },
-        { name: "Mentorship Programme", href: "/" },
-        { name: "Interview Guidancer", href: "/" },
-        { name: "Essay Answer Writing", href: "/" },
+        { name: t('footer.links.onlineCourse'), href: '/online-course' },
+        { name: t('footer.links.offlineCourse'), href: '/offline-course' },
+        { name: t('footer.links.mainsCorner'), href: '/mains-corner' },
+        { name: t('footer.links.mentorshipProgramme'), href: '/' },
+        { name: t('footer.links.interviewGuidancer'), href: '/' },
+        { name: t('footer.links.essayAnswerWriting'), href: '/' }
       ]
     },
     {
@@ -78,11 +81,11 @@ const Footer: React.FC = () => {
       ]
     },
     {
-      title: "POLICIES",
+      title: t('footer.sections.policies'),
       links: [
-        { name: "Privacy & Refund Policy", href: "/pages/privacy-refund-policy" },
-        { name: "Terms & Conditions", href: "/pages/terms-conditions" },
-        { name: "Data Policy", href: "/pages/data-policy" }
+          { name: t('footer.links.privacyRefundPolicy'), href: "/pages/privacy-refund-policy" },
+          { name: t('footer.links.termsConditions'), href: "/pages/terms-conditions" },
+          { name: t('footer.links.dataPolicy'), href: "/pages/data-policy" }
       ]
     }
   ];
@@ -115,13 +118,13 @@ const Footer: React.FC = () => {
               </div>
             </div>
             <div className="space-y-1 text-sm text-blue-950">
-              <div><span className='font-semibold'>Address:</span> {settings.address}</div>
-              <div><span className='font-semibold'>Phone:</span> {settings.phone}</div>
-              <div><span className='font-semibold'>WhatsApp:</span> {settings.whatsapp}</div>
-              <div><span className='font-semibold'>Email:</span> {settings.email}</div>
+              <div><span className='font-semibold'> {t('footer.sections.address')}:</span> {settings.address}</div>
+              <div><span className='font-semibold'> {t('footer.sections.phone')}:</span> {settings.phone}</div>
+              <div><span className='font-semibold'> {t('footer.sections.whatsapp')}:</span> {settings.whatsapp}</div>
+              <div><span className='font-semibold'> {t('footer.sections.email')} :</span> {settings.email}</div>
               <div className='mt-5'>
                 <Link className="px-4 py-2 bg-[#a50309] text-white rounded-md" href={settings.googleMap} target='_blank'>
-                  Get Direction
+                  {t('footer.sections.getDirection')}
                 </Link>
               </div>
             </div>
@@ -156,7 +159,7 @@ const Footer: React.FC = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-8">
             <div>
-              <h4 className="text-sm font-semibold text-[#8a0101] mb-3">SOCIAL MEDIA</h4>
+              <h4 className="text-sm font-semibold text-[#8a0101] mb-3">{t('footer.sections.socialMedia')}</h4>
               <div className="flex space-x-3">
                 {socialMedia.map((social, index) => (
                   <a
@@ -176,7 +179,7 @@ const Footer: React.FC = () => {
           {/* Download App */}
           <div className="text-right">
             <Link href="#" className="bg-red-700 rounded-sm text-sm px-5 py-3 font-medium text-gray-50 my-3 mx-1">
-              Download App
+               {t('footer.sections.downloadApp')}
             </Link>
           </div>
         </div>

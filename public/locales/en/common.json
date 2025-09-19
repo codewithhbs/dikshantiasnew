@@ -57,17 +57,16 @@
     }
   },
   "importantAnnouncement": "IMPORTANT ANNOUNCEMENT",
-  
+
   "successStoriesTitle": "Success Stories That",
   "successStoriesHighlight": "Inspire Excellence",
   "mockInterview": "India's Best Mock Interview Programme",
   "successStoriesDesc": "Meet our successful candidates who cleared UPSC and are now serving the nation",
-   "background": "Background",
+  "background": "Background",
   "attempts": "Attempts",
   "optional": "Optional",
   "ourResults": "Our Results",
   "ourResultsSubtitle": "India's Best Mock Interview Programme",
-
 
   "about_title": "Dikshant IAS A Premier Civil Services Exam Coaching Institute",
   "about_description": "Dikshant IAS stands as a premier coaching institute dedicated to guiding aspirants on their journey to success in the Civil Services Examination. With a team of highly experienced and dedicated educators, the institute offers comprehensive preparation for UPSC and State PSC exams. Known for its structured curriculum, personalized mentoring, and result-oriented approach, Dikshant IAS ensures that every student receives the right guidance and support to excel in one of the most competitive exams in India. The institute emphasizes conceptual clarity, current affairs integration, answer writing practice, and interview preparation. Regular test series, doubt-solving sessions, and performance assessments help students stay focused and on track. Whether you’re a beginner or a repeat aspirant, Dikshant IAS provides a nurturing and disciplined environment to bring out the best in every candidate.",
@@ -87,7 +86,6 @@
   "thoughts_quote": "From Ambition To Aspiration, From Acquiring To Becoming",
   "thoughts_para": "Our experienced faculties have designed the curriculum conscientiously to directly meet the demands of the examinations...",
 
-      
   "founders": {
     "pandey": {
       "name": "Dr. S.S. Pandey",
@@ -102,7 +100,104 @@
       "description": "From the boardrooms of global corporations to the classrooms of aspiring civil servants, Ashutosh Dixit has carved a unique path—where corporate excellence meets educational transformation. A visionary leader with a heart for public good, Ashutosh Dixit today stands as a mentor, strategist, and nation-builder, steering one of India’s most socially committed institutions—Dikshant Education Centre Private Limited."
     }
   },
-  "readMore": "Read More"
+  "readMore": "Read More",
+
+  "tabs": {
+    "journey": {
+      "title": "20+ Years Journey of Excellence",
+      "cardTitle": "20+ Years Journey of Excellence",
+      "description": "We are India's well-known Institute and the Best IAS Coaching in India preparing candidates for the Civil Services Examination at all three levels- Prelims, Mains & personality test.",
+      "achievement": "Trusted by thousands of successful candidates"
+    },
+    "faculty": {
+      "title": "Experienced Faculty Members",
+      "cardTitle": "Experienced Faculty Members",
+      "description": "Our IAS Coaching Center in Delhi is equipped with the team of top most faculties for preparation of UPSC (Prelims+Mains) who are known for producing best results year after year."
+    },
+    "materials": {
+      "title": "Best Study Materials",
+      "cardTitle": "Best Study Materials",
+      "description": "Our students always receive well curated study resources, which helps them stay on task and saves them time."
+    },
+    "interview": {
+      "title": "Best Mock Interview Programme",
+      "cardTitle": "Best Mock Interview Programme",
+      "description": "Dikshant IAS offers the Best Mock Interview Program in India with the most knowledgeable IAS interview panel, including Prof. D. P. Agarwal, former board members, top bureaucrats, and academicians."
+    },
+    "seminar": {
+      "title": "Seminar and Topper Class",
+      "cardTitle": "Seminar and Topper Class",
+      "description": "We organize seminars and topper classes where seasoned UPSC professionals assist students with their preparation and doubts."
+    }
+  },
+
+  "coursess": {
+    "sectionTitle": {
+      "part1": "Best",
+      "highlight": "IAS Coaching",
+      "part2": "Institute in India"
+    },
+    "online": {
+      "title": "Online Courses",
+      "subtitle": "Show more"
+    },
+    "distance": {
+      "title": "Distance Learning",
+      "subtitle": "Show more"
+    },
+    "test": {
+      "title": "Test Series",
+      "subtitle": "Show more"
+    },
+    "scholarship": {
+      "title": "Scholarship",
+      "subtitle": "Show more"
+    },
+    "study": {
+      "title": "Study Material",
+      "subtitle": "Notes & Resources"
+    }
+  },
+
+  "footer": {
+    "sections": {
+      "quickLinks": "QUICK LINKS",
+      "courses": "COURSES",
+      "currentAffairs": "CURRENT AFFAIRS",
+      "policies": "POLICIES",
+      "socialMedia": "SOCIAL MEDIA",
+      "downloadApp": "Download App",
+      "address": "Address",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "getDirection": "Get Direction"
+    },
+    "links": {
+      "home": "Home",
+      "about": "About",
+      "scholarshipProgramme": "Scholarship Programme",
+      "blog": "Blog",
+      "contact": "Contact Us",
+      "gallery": "Gallery",
+       "onlineCourse": "Online Courses",
+      "offlineCourse": "Offline Course",
+      "mainsCorner": "Mains Corner",
+      "mentorshipProgramme": "Mentorship Programme",
+      "interviewGuidancer": "Interview Guidancer",
+      "essayAnswerWriting": "Essay Answer Writing",
+      "whatToReadHindu": "What to Read in Hindu",
+      "whatToReadIndianExpress": "What to Read in Indian Express",
+      "editorialAnalysis": "Editorial Analysis",
+      "dailyCurrentAffairsAnalysis": "Daily Current Affairs Analysis",
+      "dailyCurrentAffairsQuiz": "Daily Current Affairs Quiz",
+      "importantFactsOfDay": "Important Facts of the Day",
+      "privacyRefundPolicy": "Privacy & Refund Policy",
+      "termsConditions": "Terms & Conditions",
+      "dataPolicy": "Data Policy"
+    }
+  }
+
 
 
 
