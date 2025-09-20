@@ -3,15 +3,22 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
+interface MultilingualString {
+  en: string;
+  hi: string;
+}
 
 interface Blog {
   _id: string;
-  title: string;
+  title: MultilingualString;
   slug: string;
   createdAt: string;
 }
 
 const DailyBlog = () => {
+  const { i18n } = useTranslation();
   const [blogs, setBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
@@ -39,12 +46,13 @@ const DailyBlog = () => {
     fetchBlogs();
   }, []);
 
+  const lang = i18n.language === 'hi' ? 'hi' : 'en';
+
   return (
     <section className="py-10 -mt-6 mb-6 md:mt-10 md:mb-10">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">        
         <div className="grid lg:grid-cols-1">
           <div>
-            {/* Keep your same design */}
             <div className="bg-red-100 rounded-2xl p-6 shadow-md">
               <h3 className="text-[18px] md:text-3xl font-bold text-[#00072c] mb-6">
                 Daily Blog
@@ -58,14 +66,13 @@ const DailyBlog = () => {
                       href={`/blogs/${blog.slug}`}
                       className="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors duration-300 cursor-pointer group"
                     >
-                      {/* Keep Trending Icon to match your design */}
                       <div className="text-red-600 mr-4 mt-1">
                         <TrendingUp className="w-5 h-5" />
                       </div>
 
                       <div className="flex-1">
                         <h4 className="font-semibold text-[#00072c] group-hover:text-pink-600 transition-colors duration-300">
-                          {blog.title}
+                          {blog.title[lang]}
                         </h4>
                         <p className="text-sm text-[#081347] mt-1">
                           Daily & Monthly Updates

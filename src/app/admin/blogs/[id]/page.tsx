@@ -23,13 +23,31 @@ const id = params ? (Array.isArray(params.id) ? params.id[0] : params.id) : null
   const [loading, setLoading] = useState(true);
 
   // Blog fields
-  const [title, setTitle] = useState("");
+
+    // Titles
+    const [titleEn, setTitleEn] = useState("");
+    const [titleHi, setTitleHi] = useState("");
+
+
+
+
   const [slug, setSlug] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
-  const [shortContent, setShortContent] = useState("");
-  const [content, setContent] = useState("");
+     // Short Content
+    const [shortContentEn, setShortContentEn] = useState("");
+    const [shortContentHi, setShortContentHi] = useState("");
+
+        // Full Content
+        const [contentEn, setContentEn] = useState("");
+        const [contentHi, setContentHi] = useState("");
+
   const [categoryId, setCategoryId] = useState("");
-  const [postedBy, setPostedBy] = useState("");
+
+    // Posted By
+    const [postedByEn, setPostedByEn] = useState("");
+    const [postedByHi, setPostedByHi] = useState("");
+
+
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [active, setActive] = useState(true);
@@ -50,19 +68,20 @@ const id = params ? (Array.isArray(params.id) ? params.id[0] : params.id) : null
 
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // ✅ Auto-generate slug ONLY if user hasn’t edited it manually
-  useEffect(() => {
-    if (title && !slugEdited) {
-      setSlug(
-        title
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-      );
-    }
-  }, [title, slugEdited]);
+// Auto-generate slug from English title only if not manually edited
+useEffect(() => {
+  if (titleEn && !slugEdited) {
+    setSlug(
+      titleEn
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+    );
+  }
+}, [titleEn, slugEdited]);
+
 
   // Fetch categories
   useEffect(() => {
@@ -88,84 +107,116 @@ useEffect(() => {
 }, [id]);
 
 
-  const fetchBlog = async () => {
-    try {
-      const res = await fetch(`/api/admin/blogs/${id}`);
-      if (!res.ok) throw new Error("Failed to fetch blog");
-      const data = await res.json();
+const fetchBlog = async () => {
+  if (!id) return;
 
-      // ✅ Handle API response shape
-      const blog = data.blog || data;
+  try {
+    const res = await fetch(`/api/admin/blogs/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch blog");
+    const data = await res.json();
+    const blog = data.blog || data;
 
-      // Prefill form
-      setTitle(blog.title || "");
-      setSlug(blog.slug || "");
-      setShortContent(blog.shortContent || "");
-      setContent(blog.content || "");
-      setCategoryId(blog.category?._id || "");
-      setPostedBy(blog.postedBy || "");
-      setTags(blog.tags || []);
-      setActive(blog.active ?? true);
-      setImageUrl(blog.image?.url || "");
-      setImageAlt(blog.image?.alt || "");
+    console.log(blog); // check API response
 
-      setMetaTitle(blog.metaTitle || "");
-      setMetaDescription(blog.metaDescription || "");
-      setMetaKeywords(blog.metaKeywords || []);
-      setCanonicalUrl(blog.canonicalUrl || "");
-      setOgTitle(blog.ogTitle || "");
-      setOgDescription(blog.ogDescription || "");
-      setIndex(blog.index ?? true);
-      setFollow(blog.follow ?? true);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load blog");
-    } finally {
-      setLoading(false);
+    setTitleEn(blog.title?.en || "");
+    setTitleHi(blog.title?.hi || "");
+    setSlug(blog.slug || "");
+    setShortContentEn(blog.shortContent?.en || "");
+    setShortContentHi(blog.shortContent?.hi || "");
+    setContentEn(blog.content?.en || "");
+    setContentHi(blog.content?.hi || "");
+    setCategoryId(blog.category?._id || "");
+    setPostedByEn(blog.postedBy?.en || "");
+    setPostedByHi(blog.postedBy?.hi || "");
+    setTags(blog.tags || []);
+    setActive(blog.active ?? true);
+    setImageUrl(blog.image?.url || "");
+    setImageAlt(blog.image?.alt || "");
+    setMetaTitle(blog.metaTitle || "");
+    setMetaDescription(blog.metaDescription || "");
+    setMetaKeywords(blog.metaKeywords || []);
+    setCanonicalUrl(blog.canonicalUrl || "");
+    setOgTitle(blog.ogTitle || "");
+    setOgDescription(blog.ogDescription || "");
+    setIndex(blog.index ?? true);
+    setFollow(blog.follow ?? true);
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load blog");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!id) {
+    toast.error("Blog ID is missing");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    // Titles
+    formData.append("titleEn", titleEn || "");
+    formData.append("titleHi", titleHi || "");
+
+    // Slug
+    formData.append("slug", slug || "");
+
+    // Content
+    formData.append("shortContentEn", shortContentEn || "");
+    formData.append("shortContentHi", shortContentHi || "");
+    formData.append("contentEn", contentEn || "");
+    formData.append("contentHi", contentHi || "");
+
+    // Category & Posted By
+    formData.append("category", categoryId || "");
+    formData.append("postedByEn", postedByEn || "");
+    formData.append("postedByHi", postedByHi || "");
+
+    // Status
+    formData.append("active", JSON.stringify(active));
+    formData.append("tags", JSON.stringify(tags));
+
+    // Image
+    if (imageFile) {
+      formData.append("image", imageFile);
+      formData.append("imageAlt", imageAlt || "");
     }
-  };
 
+    // SEO
+    formData.append("metaTitle", metaTitle || "");
+    formData.append("metaDescription", metaDescription || "");
+    formData.append("metaKeywords", JSON.stringify(metaKeywords));
+    formData.append("canonicalUrl", canonicalUrl || "");
+    formData.append("ogTitle", ogTitle || "");
+    formData.append("ogDescription", ogDescription || "");
+    formData.append("index", JSON.stringify(index));
+    formData.append("follow", JSON.stringify(follow));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("slug", slug);
-      formData.append("shortContent", shortContent);
-      formData.append("content", content);
-      formData.append("category", categoryId);
-      formData.append("postedBy", postedBy);
-      formData.append("active", JSON.stringify(active));
-      formData.append("tags", JSON.stringify(tags));
+    const res = await fetch(`/api/admin/blogs/${id}`, {
+      method: "PUT",
+      body: formData,
+    });
 
-      if (imageFile) {
-        formData.append("image", imageFile);
-        formData.append("imageAlt", imageAlt);
-      }
-
-      formData.append("metaTitle", metaTitle);
-      formData.append("metaDescription", metaDescription);
-      formData.append("metaKeywords", JSON.stringify(metaKeywords));
-      formData.append("canonicalUrl", canonicalUrl);
-      formData.append("ogTitle", ogTitle);
-      formData.append("ogDescription", ogDescription);
-      formData.append("index", JSON.stringify(index));
-      formData.append("follow", JSON.stringify(follow));
-
-      const res = await fetch(`/api/admin/blogs/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed to update blog");
-      toast.success("Blog updated successfully");
-      router.push("/admin/blogs");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update blog");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to update blog");
     }
-  };
+
+    toast.success("Blog updated successfully");
+    router.push("/admin/blogs");
+  } catch (err) {
+    console.error(err);
+    toast.error(err.message || "Failed to update blog");
+  }
+};
 
   // Tag helpers
   const addTag = () => {
@@ -214,18 +265,33 @@ useEffect(() => {
                         Basic Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                        
+
+                         {/* Title English */}
+                            <div>
                             <label className="block font-medium text-gray-700 mb-1">
-                                Title
+                                Title (English)
                             </label>
                             <input
                                 type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="w-full border border-gray-300  px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                                value={titleEn}
+                                onChange={(e) => setTitleEn(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
                                 required
                             />
-                        </div>
+                            </div>
+                            {/* Title Hindi */}
+                            <div>
+                            <label className="block font-medium text-gray-700 mb-1">
+                                Title (Hindi)
+                            </label>
+                            <input
+                                type="text"
+                                value={titleHi}
+                                onChange={(e) => setTitleHi(e.target.value)}
+                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            />
+                            </div>
 
                         <div>
                             <label className="block  font-medium text-gray-700 mb-1">
@@ -271,56 +337,67 @@ useEffect(() => {
                             </svg>
                         </div>
                         </div>
+
+                       {/* Posted By */}
                         <div>
-                            <label className="block font-medium text-gray-700 mb-1">
-                                Posted By
-                            </label>
-                            <input
-                                type="text"
-                                value={postedBy}
-                                onChange={(e) => setPostedBy(e.target.value)}
-                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                                required
-                            />
+                        <label className="block font-medium text-gray-700 mb-1">Posted By (English)</label>
+                        <input
+                            type="text"
+                            value={postedByEn}
+                            onChange={(e) => setPostedByEn(e.target.value)}
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                        />
                         </div>
-                    </div>
-                </div>
-
-                {/* Content */}
-                <div>
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b border-gray-300-b pb-2">
-                        Content
-                    </h2>
-                    <div className="space-y-4">
                         <div>
-                            <label className="block font-medium text-gray-700 mb-1">
-                                Short Content
-                            </label>
-                            <textarea
-                                value={shortContent}
-                                onChange={(e) => setShortContent(e.target.value)}
-                                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-                                rows={3}
-                                required
-                            />
-                        </div>
-                          {/* Full Content */}
-                        <div>
-                        <label className="block font-medium text-gray-700 mb-1">Full Content</label>
-
-                        {/* Rich Text Editor (always used, both add + edit) */}
-                        <SimpleEditor value={content} onChange={setContent} />
-
-                        {/* Optional: Hidden textarea to submit raw HTML (for server compatibility) */}
-                        <textarea
-                            name="content"
-                            value={content}
-                            readOnly
-                            className="hidden"
+                        <label className="block font-medium text-gray-700 mb-1">Posted By (Hindi)</label>
+                        <input
+                            type="text"
+                            value={postedByHi}
+                            onChange={(e) => setPostedByHi(e.target.value)}
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
                         />
                         </div>
                     </div>
                 </div>
+
+                {/* Content Section */}
+                    <div>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Content</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Short Content */}
+                        <div>
+                        <label className="block font-medium text-gray-700 mb-1">Short Content (English)</label>
+                        <textarea
+                            value={shortContentEn}
+                            onChange={(e) => setShortContentEn(e.target.value)}
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            rows={3}
+                        />
+                        </div>
+                        <div>
+                        <label className="block font-medium text-gray-700 mb-1">Short Content (Hindi)</label>
+                        <textarea
+                            value={shortContentHi}
+                            onChange={(e) => setShortContentHi(e.target.value)}
+                            className="w-full border border-gray-300 px-4 py-2.5 rounded-lg"
+                            rows={3}
+                        />
+                        </div>
+                    </div>
+
+                    {/* Full Content */}
+                    <div className="grid grid-cols-1 gap-6 mt-4">
+                        <div>
+                        <label className="block font-medium text-gray-700 mb-1">Full Content (English)</label>
+                        <SimpleEditor value={contentEn} onChange={setContentEn} />
+                        </div>
+                        <div>
+                        <label className="block font-medium text-gray-700 mb-1">Full Content (Hindi)</label>
+                        <SimpleEditor value={contentHi} onChange={setContentHi} />
+                        </div>
+                    </div>
+                    </div>
+
 
                 {/* Tags */}
                 <div>

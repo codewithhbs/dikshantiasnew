@@ -22,16 +22,27 @@ export async function POST(req: Request) {
     await connectToDB();
 
     const formData = await req.formData();
-    const title = formData.get("title")?.toString();
-    const slug = formData.get("slug")?.toString();
-    const shortContent = formData.get("shortContent")?.toString();
-    const content = formData.get("content")?.toString();
-    const categoryId = formData.get("category")?.toString();
-    const postedBy = formData.get("postedBy")?.toString();
-    const imageFile = formData.get("image") as File | null;
-    const imageAlt = formData.get("imageAlt")?.toString() || "";
-    const active = formData.get("active") === "true";
 
+    // Parse multilingual fields from JSON string to object
+    const title = formData.get("title")
+      ? JSON.parse(formData.get("title") as string)
+      : { en: "", hi: "" };
+
+    const shortContent = formData.get("shortContent")
+      ? JSON.parse(formData.get("shortContent") as string)
+      : { en: "", hi: "" };
+
+    const content = formData.get("content")
+      ? JSON.parse(formData.get("content") as string)
+      : { en: "", hi: "" };
+
+    const postedBy = formData.get("postedBy")
+      ? JSON.parse(formData.get("postedBy") as string)
+      : { en: "", hi: "" };
+
+    const slug = formData.get("slug")?.toString();
+    const categoryId = formData.get("category")?.toString();
+    const active = formData.get("active") === "true";
     const tags = formData.get("tags")
       ? JSON.parse(formData.get("tags") as string)
       : [];
@@ -48,9 +59,13 @@ export async function POST(req: Request) {
     const index = formData.get("index") === "true";
     const follow = formData.get("follow") === "true";
 
+    const imageFile = formData.get("image") as File | null;
+    const imageAlt = formData.get("imageAlt")?.toString() || "";
+
     if (!imageFile || imageFile.size === 0) {
       return NextResponse.json({ error: "Image is required" }, { status: 400 });
     }
+
     const buffer = Buffer.from(await imageFile.arrayBuffer());
     const { url, key } = await uploadToS3(
       buffer,
@@ -58,6 +73,7 @@ export async function POST(req: Request) {
       imageFile.type,
       "blogs"
     );
+
     const newBlog = await BlogsModel.create({
       title,
       slug,
@@ -81,9 +97,8 @@ export async function POST(req: Request) {
       index,
       follow,
     });
-    const populatedBlog = await newBlog.populate([
-      { path: "category", select: "name" },
-    ]);
+
+    const populatedBlog = await newBlog.populate([{ path: "category", select: "name" }]);
 
     return NextResponse.json(populatedBlog, { status: 201 });
   } catch (err) {

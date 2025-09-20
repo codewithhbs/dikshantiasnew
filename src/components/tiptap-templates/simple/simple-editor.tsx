@@ -253,33 +253,22 @@ export function SimpleEditor({ value = "", onChange }: SimpleEditorProps) {
   }, [isMobile, mobileView])
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
-      <EditorContext.Provider value={{ editor }}>
-        {/* Toolbar */}
-        <Toolbar ref={toolbarRef}>
-          {mobileView === "main" ? (
-            <MainToolbarContent
-              onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile}
-              editor={editor!}
-            />
-          ) : (
-            <MobileToolbarContent
-              type="link"
-              onBack={() => setMobileView("main")}
-            />
-          )}
-        </Toolbar>
+   <div className="flex flex-col w-full">
+  <EditorContext.Provider value={{ editor }}>
+    {/* Toolbar */}
+    <Toolbar className="mb-2">
+      {editor && <MainToolbarContent editor={editor} onLinkClick={() => {}} isMobile={false} />}
+    </Toolbar>
 
-        {/* Editor */}
-        <div className="flex-1 w-full border rounded bg-white overflow-hidden">
-          <EditorContent
-            editor={editor}
-            role="presentation"
-            className="simple-editor-content w-full h-full overflow-auto p-4"
-          />
-        </div>
-      </EditorContext.Provider>
+    {/* Editor */}
+    <div className="border rounded bg-white overflow-hidden min-h-[250px]">
+      <EditorContent
+        editor={editor}
+        className="simple-editor-content w-full h-full p-4 min-h-[250px] overflow-auto"
+      />
     </div>
+  </EditorContext.Provider>
+</div>
+
   )
 }

@@ -8,16 +8,22 @@ import DOMPurify from 'dompurify';
 import { useRouter } from 'next/navigation';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useTranslation } from 'react-i18next';
+
+interface MultilingualString {
+  en: string;
+  hi: string;
+}
 
 interface Blog {
   _id: string;
-  title: string;
+  title: MultilingualString;
   slug: string;
-  content: string;
+  content: MultilingualString;
   image: { url: string; alt: string };
   category: { _id: string; name: string; slug: string };
   tags: string[];
-  postedBy: string;
+  postedBy: MultilingualString;
   createdAt: string;
 }
 
@@ -32,6 +38,8 @@ interface BlogDetailsProps {
 }
 
 const BlogDetails: React.FC<BlogDetailsProps> = ({ slug }) => {
+  const { i18n } = useTranslation('common');
+
   const [blog, setBlog] = useState<Blog | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +89,9 @@ const BlogDetails: React.FC<BlogDetailsProps> = ({ slug }) => {
 
   if (!blog) return <p className="text-center py-10 text-red-600">Blog not found</p>;
 
-  const cleanHTML = DOMPurify.sanitize(blog.content, { USE_PROFILES: { html: true } });
+  // pick the current language
+  const lang = i18n.language === 'hi' ? 'hi' : 'en';
+  const cleanHTML = DOMPurify.sanitize(blog.content[lang], { USE_PROFILES: { html: true } });
 
   return (
     <div className="bg-white min-h-screen -mt-14 md:mt-3">
@@ -98,7 +108,7 @@ const BlogDetails: React.FC<BlogDetailsProps> = ({ slug }) => {
             />
           </div>
 
-          <h1 className="font-bold text-xl md:text-3xl text-[#040c33]">{blog.title}</h1>
+          <h1 className="font-bold text-xl md:text-3xl text-[#040c33]">{blog.title[lang]}</h1>
 
           <div className="flex items-center gap-4 text-sm text-blue-900 mb-4">
             <div className="flex items-center gap-1">
@@ -113,7 +123,7 @@ const BlogDetails: React.FC<BlogDetailsProps> = ({ slug }) => {
             </div>
             <div className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              <span>{blog.postedBy}</span>
+              <span>{blog.postedBy[lang]}</span>
             </div>
           </div>
 

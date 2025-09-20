@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useTranslation } from 'react-i18next';
 
 interface Blog {
   _id: string;
@@ -25,6 +26,9 @@ interface Category {
 }
 
 const BlogPage: React.FC = () => {
+   const { t, i18n } = useTranslation("common")
+    
+  
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
 
@@ -92,15 +96,21 @@ const BlogPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
             {displayedBlogs.map((blog) => (
               <div key={blog._id} className="bg-red-50 p-4 rounded-lg">
-                <Image
+                <Image  
                   src={blog.image.url}
                   alt={blog.image.alt || 'Blog Image'}
                   width={600}
                   height={300}
                   className="w-full h-48 object-cover rounded"
                 />
-                <h3 className="text-lg font-semibold mt-2 text-[#040c33]">{blog.title}</h3>
-                <p className="text-blue-950 mt-2 line-clamp-3">{blog.shortContent}</p>
+                <h3 className="text-lg font-semibold mt-2 text-[#040c33]">
+                  {i18n.language === 'hi' ? blog.title.hi : blog.title.en}
+                </h3>
+
+                <p className="text-blue-950 mt-2 line-clamp-3">
+                  {i18n.language === 'hi' ? blog.shortContent.hi : blog.shortContent.en}
+                </p>
+
                 <p className="text-blue-800 text-sm mt-2">
                   {blog.category.name} • {new Date(blog.createdAt).toLocaleDateString()}
                 </p>

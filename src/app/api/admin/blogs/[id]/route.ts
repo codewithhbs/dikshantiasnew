@@ -39,29 +39,47 @@ export async function PUT(
     if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
-
     const contentType = request.headers.get("content-type") || "";
-    
+
     if (
       contentType.includes("multipart/form-data") ||
       contentType.includes("application/x-www-form-urlencoded")
     ) {
       const formData = await request.formData();
 
-      blog.title = (formData.get("title") as string) ?? blog.title;
+      // Parse multilingual fields
+     blog.title = {
+        en: (formData.get("titleEn") as string) || blog.title?.en || "",
+        hi: (formData.get("titleHi") as string) || blog.title?.hi || ""
+      };
+      blog.shortContent = {
+        en: (formData.get("shortContentEn") as string) || blog.shortContent?.en || "",
+        hi: (formData.get("shortContentHi") as string) || blog.shortContent?.hi || ""
+      };
+      blog.content = {
+        en: (formData.get("contentEn") as string) || blog.content?.en || "",
+        hi: (formData.get("contentHi") as string) || blog.content?.hi || ""
+      };
+      blog.postedBy = {
+        en: (formData.get("postedByEn") as string) || blog.postedBy?.en || "",
+        hi: (formData.get("postedByHi") as string) || blog.postedBy?.hi || ""
+      };
+
+      //Single value fields
       blog.slug = (formData.get("slug") as string) ?? blog.slug;
-      blog.shortContent =
-        (formData.get("shortContent") as string) ?? blog.shortContent;
-      blog.content = (formData.get("content") as string) ?? blog.content;
       blog.category = (formData.get("category") as string) ?? blog.category;
-      blog.postedBy = (formData.get("postedBy") as string) ?? blog.postedBy;
       blog.active =
         formData.get("active") !== null
           ? JSON.parse(formData.get("active") as string)
           : blog.active;
-s
-      blog.metaTitle =
-        (formData.get("metaTitle") as string) ?? blog.metaTitle;
+
+      blog.tags =
+        formData.get("tags") !== null
+          ? JSON.parse(formData.get("tags") as string)
+          : blog.tags;
+
+      //SEO fields
+      blog.metaTitle = (formData.get("metaTitle") as string) ?? blog.metaTitle;
       blog.metaDescription =
         (formData.get("metaDescription") as string) ?? blog.metaDescription;
       blog.metaKeywords =
@@ -82,12 +100,7 @@ s
           ? JSON.parse(formData.get("follow") as string)
           : blog.follow;
 
-      blog.tags =
-        formData.get("tags") !== null
-          ? JSON.parse(formData.get("tags") as string)
-          : blog.tags;
-
-      // 🔹 Handle image upload
+      // Handle image upload
       const imageFile = formData.get("image") as File | null;
       if (imageFile && imageFile.size > 0) {
         // delete old image from S3 if exists
@@ -111,17 +124,21 @@ s
       }
 
       await blog.save();
-      return NextResponse.json(blog);
+
+      const populatedBlog = await blog.populate([{ path: "category", select: "name" }]);
+      return NextResponse.json(populatedBlog, { status: 200 });
     }
+
     return NextResponse.json(
       { error: "Unsupported Content-Type" },
       { status: 400 }
     );
   } catch (error) {
     console.error("Failed to update blog:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
+
 
 // ✅ UPDATE blog active status only
 export async function PATCH(

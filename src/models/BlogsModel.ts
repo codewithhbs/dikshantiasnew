@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface BlogDocument extends Document {
-  title: string;
+  title: { en: string; hi: string };
   slug: string;
-  shortContent: string;
-  content: string;
+  shortContent: { en: string; hi: string };
+  content: { en: string; hi: string };
   category: mongoose.Types.ObjectId;
-  postedBy: string;
+  postedBy: { en: string; hi: string };
   image: {
     url: string;
     key: string;
@@ -26,12 +26,28 @@ interface BlogDocument extends Document {
 
 const BlogSchema = new Schema<BlogDocument>(
   {
-    title: { type: String, required: true },
+    title: {
+      en: { type: String, required: true },
+      hi: { type: String, default: "" },
+    },
     slug: { type: String, required: true, unique: true },
-    shortContent: { type: String },
-    content: { type: String },
+
+    shortContent: {
+      en: { type: String, default: "" },
+      hi: { type: String, default: "" },
+    },
+
+    content: {
+      en: { type: String, default: "" },
+      hi: { type: String, default: "" },
+    },
+
     category: { type: Schema.Types.ObjectId, ref: "BlogCategory" },
-    postedBy: { type: String },
+
+    postedBy: {
+      en: { type: String, default: "" },
+      hi: { type: String, default: "" },
+    },
 
     image: {
       url: { type: String, required: true },

@@ -34,9 +34,9 @@ export default function BlogPage() {
   const [confirmBtnText, setConfirmBtnText] = useState("Confirm");
   const itemsPerPage = 5;
   
-  const [filterCategory, setFilterCategory] = useState<string>(""); // category filter
-  const [filterStatus, setFilterStatus] = useState<string>(""); // "active", "inactive", or ""
-  const [searchTitle, setSearchTitle] = useState<string>(""); // search by title
+  const [filterCategory, setFilterCategory] = useState<string>(""); 
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [searchTitle, setSearchTitle] = useState<string>("");
 
 
 
@@ -128,14 +128,18 @@ const handleToggleActive = (id: string, currentStatus: boolean) => {
 // Toggle blog active status
 const filteredBlogs = blogs.filter((blog) => {
   const matchesCategory = filterCategory ? blog.category?.name === filterCategory : true;
+
   const matchesStatus =
     filterStatus === "true" ? blog.active :
     filterStatus === "false" ? !blog.active : true;
 
   const searchLower = searchTitle.toLowerCase();
+
   const matchesTitleOrAuthor =
-    blog.title.toLowerCase().includes(searchLower) ||
-    (blog.postedBy?.toLowerCase().includes(searchLower));
+    (blog.title.en.toLowerCase().includes(searchLower) ||
+     blog.title.hi.toLowerCase().includes(searchLower)) ||
+    (blog.postedBy.en.toLowerCase().includes(searchLower) ||
+     blog.postedBy.hi.toLowerCase().includes(searchLower));
 
   return matchesCategory && matchesStatus && matchesTitleOrAuthor;
 });
@@ -252,70 +256,88 @@ const paginatedData = filteredBlogs.slice(
               </tr>
             </thead>
             <tbody className="text-gray-800 text-sm">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((blog) => (
-                  <tr key={blog._id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-                    <td className="py-3 px-5">
-                      {blog.image?.url ? (
-                        <img
-                          src={blog.image.url}
-                          alt={blog.image.alt || blog.title}
-                          className="h-16 w-32 object-cover rounded"
-                        />
-                      ) : (
-                        <div className="h-16 w-32 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                          No Image
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-3 px-5 font-medium">{blog.title}</td>
-                    <td className="py-3 px-5 text-center">{blog.category?.name}</td>
-                    <td className="py-3 px-5 text-center">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" checked={blog.active} readOnly className="sr-only" />
-                        <div
-                          onClick={() => handleToggleActive(blog._id, blog.active)}
-                          className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 cursor-pointer ${
-                            blog.active ? "bg-green-500" : "bg-gray-300"
-                          }`}
-                        >
-                          <span
-                            className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-                              blog.active ? "translate-x-6" : "translate-x-0"
-                            }`}
-                          ></span>
-                        </div>
-                      </label>
-                    </td>
-                    <td className="py-3 px-5 text-center">{blog.postedBy}</td>
-                    <td className="py-3 px-5 text-center">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => router.push(`/admin/blogs/${blog._id}`)}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md hover:shadow-lg transition transform hover:scale-110"
-                          title="Edit"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(blog._id)}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md hover:shadow-lg transition transform hover:scale-110"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-500 italic border-b border-gray-200">
-                    No blogs found
-                  </td>
-                </tr>
-              )}
-            </tbody>
+  {paginatedData.length > 0 ? (
+    paginatedData.map((blog) => (
+      <tr key={blog._id} className="hover:bg-gray-50 transition-colors border-b border-gray-200">
+        <td className="py-3 px-5">
+          {blog.image?.url ? (
+            <img
+              src={blog.image.url}
+              alt={blog.image.alt || blog.title.en} // fallback to English
+              className="h-16 w-32 object-cover rounded"
+            />
+          ) : (
+            <div className="h-16 w-32 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+              No Image
+            </div>
+          )}
+        </td>
+
+        {/* Title (EN + HI) */}
+        <td className="py-3 px-5 font-medium">
+          <div className="flex flex-col gap-1">
+            <span className="text-gray-800 font-semibold">{blog.title.en}</span>
+            <span className="text-gray-500 text-sm italic">{blog.title.hi || "—"}</span>
+          </div>
+        </td>
+
+        <td className="py-3 px-5 text-center">{blog.category?.name}</td>
+
+        <td className="py-3 px-5 text-center">
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={blog.active} readOnly className="sr-only" />
+            <div
+              onClick={() => handleToggleActive(blog._id, blog.active)}
+              className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 cursor-pointer ${
+                blog.active ? "bg-green-500" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
+                  blog.active ? "translate-x-6" : "translate-x-0"
+                }`}
+              ></span>
+            </div>
+          </label>
+        </td>
+
+        {/* Posted By (EN + HI) */}
+        <td className="py-3 px-5 text-center">
+          <div className="flex flex-col gap-1">
+            <span>{blog.postedBy.en}</span>
+            <span className="text-gray-500 text-sm italic">{blog.postedBy.hi || "—"}</span>
+          </div>
+        </td>
+
+        <td className="py-3 px-5 text-center">
+          <div className="flex justify-center gap-2">
+            <button
+              onClick={() => router.push(`/admin/blogs/${blog._id}`)}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md hover:shadow-lg transition transform hover:scale-110"
+              title="Edit"
+            >
+              <Edit2 size={16} />
+            </button>
+            <button
+              onClick={() => handleDelete(blog._id)}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md hover:shadow-lg transition transform hover:scale-110"
+              title="Delete"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={6} className="text-center py-8 text-gray-500 italic border-b border-gray-200">
+        No blogs found
+      </td>
+    </tr>
+  )}
+</tbody>
+
           </table>
         </div>
 
