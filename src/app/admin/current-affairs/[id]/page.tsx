@@ -31,10 +31,13 @@ export default function AddCurrentAffairsPage() {
   const [currentAffairId, setCurrentAffairId] = useState<string | null>(null);
 
   // 📌 Basic Info
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState<{ en: string; hi: string }>({ en: "", hi: "" });
+  const [shortContent, setShortContent] = useState<{ en: string; hi: string }>({ en: "", hi: "" });
+  const [content, setContent] = useState<{ en: string; hi: string }>({ en: "", hi: "" });
+
+
+
   const [slug, setSlug] = useState("");
-  const [shortContent, setShortContent] = useState("");
-  const [content, setContent] = useState("");
   const [active, setActive] = useState(true);
 
   // 📌 Category & Sub Category
@@ -57,19 +60,20 @@ export default function AddCurrentAffairsPage() {
 
   // Auto-generate slug
   useEffect(() => {
-    if (title) {
-      setSlug(
-        title
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-      );
-    } else {
-      setSlug("");
-    }
-  }, [title]);
+  if (title.en) {
+    setSlug(
+      title.en
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+    );
+  } else {
+    setSlug("");
+  }
+}, [title.en]);
+
 
   // Fetch categories, subcategories and existing data (if editing)
   useEffect(() => {
@@ -86,24 +90,23 @@ export default function AddCurrentAffairsPage() {
         setSubCategories(subs);
 
         // Fetch existing current affair if edit
-        if (editId) {
-          const res = await fetch(`/api/admin/current-affairs/${editId}`);
-          const data = await res.json();
-          setCurrentAffairId(data._id);
-          setTitle(data.title);
-          setSlug(data.slug);
-          setShortContent(data.shortContent);
-          setContent(data.content);
-          setCategory(data.category.$oid ? data.category.$oid : data.category._id?.toString());
-          setSubCategory(data.subCategory?.$oid ? data.subCategory.$oid : data.subCategory?._id?.toString() || "");
-          setActive(data.active);
-          setImageAlt(data.imageAlt || "");
-          setImageFile(null); // no new file yet
-          setExistingImage(data.image?.url || null);
-          setAffairDate(
-            data.affairDate ? new Date(data.affairDate).toISOString().split("T")[0] : ""
-          );
-        }
+       if (editId) {
+        const res = await fetch(`/api/admin/current-affairs/${editId}`);
+        const data = await res.json();
+
+        setCurrentAffairId(data._id);
+        setTitle({ en: data.title.en, hi: data.title.hi });
+        setShortContent({ en: data.shortContent.en, hi: data.shortContent.hi });
+        setContent({ en: data.content.en, hi: data.content.hi });
+        setCategory(data.category._id?.toString());
+        setSubCategory(data.subCategory?._id?.toString() || "");
+        setActive(data.active);
+        setImageAlt(data.imageAlt || "");
+        setImageFile(null);
+        setExistingImage(data.image?.url || null);
+        setAffairDate(data.affairDate ? new Date(data.affairDate).toISOString().split("T")[0] : "");
+      }
+
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -120,49 +123,53 @@ export default function AddCurrentAffairsPage() {
     );
 
   // Submit
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
+ // Submit
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setSubmitting(true);
 
-    try {
-      const formData = new FormData();
+  try {
+    const formData = new FormData();
 
-      if (currentAffairId) formData.append("_id", currentAffairId);
+    if (currentAffairId) formData.append("_id", currentAffairId);
 
-      formData.append("title", title);
-      formData.append("slug", slug);
-      formData.append("shortContent", shortContent);
-      formData.append("content", content);
-      formData.append("active", JSON.stringify(active));
-      formData.append("category", category);
-      formData.append("subCategory", subCategory);
-      formData.append("affairDate", affairDate);
+    // ✅ Send bilingual fields as JSON strings
+    formData.append("title", JSON.stringify(title));
+    formData.append("shortContent", JSON.stringify(shortContent));
+    formData.append("content", JSON.stringify(content));
 
-      if (imageFile) formData.append("image", imageFile);
-      if (imageAlt) formData.append("imageAlt", imageAlt);
+    formData.append("slug", slug);
+    formData.append("active", active ? "true" : "false");
+    formData.append("category", category);
+    if (subCategory) formData.append("subCategory", subCategory);
+
+    if (affairDate) formData.append("affairDate", new Date(affairDate).toISOString());
+
+    if (imageFile) formData.append("image", imageFile);
+    if (imageAlt) formData.append("imageAlt", imageAlt);
 
     const res = await fetch(
-        currentAffairId
-          ? `/api/admin/current-affairs/${currentAffairId}`
-          : "/api/admin/current-affairs",                   
-        {
-          method: currentAffairId ? "PUT" : "POST",
-          body: formData,
-        }
-      );
+      currentAffairId
+        ? `/api/admin/current-affairs/${currentAffairId}`
+        : "/api/admin/current-affairs",
+      {
+        method: currentAffairId ? "PUT" : "POST",
+        body: formData,
+      }
+    );
 
+    if (!res.ok) throw new Error("Failed to save current affair");
 
-      if (!res.ok) throw new Error("Failed to save current affair");
+    toast.success(`Current Affair ${currentAffairId ? "updated" : "added"} successfully`);
+    router.push("/admin/current-affairs");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to save current affair");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
-      toast.success(`Current Affair ${editId ? "updated" : "added"} successfully`);
-      router.push("/admin/current-affairs");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save current affair");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -212,18 +219,31 @@ export default function AddCurrentAffairsPage() {
             Basic Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             {/* Title EN */}
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Title</label>
+              <label className="block font-medium text-gray-700 mb-1">Title (English)</label>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={title.en}
+                onChange={(e) => setTitle({ ...title, en: e.target.value })}
                 className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
                 required
               />
             </div>
 
+            {/* Title HI */}
             <div>
+              <label className="block font-medium text-gray-700 mb-1">Title (Hindi)</label>
+              <input
+                type="text"
+                value={title.hi}
+                onChange={(e) => setTitle({ ...title, hi: e.target.value })}
+                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                required
+              />
+            </div>
+
+           <div className="col-span-full">
               <label className="block font-medium text-gray-700 mb-1">Slug</label>
               <input
                 type="text"
@@ -233,6 +253,7 @@ export default function AddCurrentAffairsPage() {
                 required
               />
             </div>
+
           </div>
 
           {/* Category & Sub Category */}
@@ -290,25 +311,38 @@ export default function AddCurrentAffairsPage() {
           </div> 
           </div>
 
-          {/* Short Content */}
-          <div>
-            <label className="block font-medium text-gray-700 mb-1 mt-4">
-              Short Content
-            </label>
-            <textarea
-              value={shortContent}
-              onChange={(e) => setShortContent(e.target.value)}
-              className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
-              rows={3}
-            />
+          {/* Short Content EN / HI */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Short Content (English)</label>
+              <textarea
+                value={shortContent.en}
+                onChange={(e) => setShortContent({ ...shortContent, en: e.target.value })}
+                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Short Content (Hindi)</label>
+              <textarea
+                value={shortContent.hi}
+                onChange={(e) => setShortContent({ ...shortContent, hi: e.target.value })}
+                className="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-1 focus:ring-[#e94e4e] transition outline-none"
+                rows={3}
+              />
+            </div>
           </div>
 
-          {/* Full Content */}
-          <div>
-            <label className="block font-medium text-gray-700 mb-1 mt-4">
-              Full Content
-            </label>
-            <SimpleEditor  value={content} onChange={setContent} />
+          {/* Full Content EN / HI */}
+          <div className="mt-4 grid grid-cols-1  gap-6">
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Full Content (English)</label>
+              <SimpleEditor value={content.en} onChange={(val) => setContent({ ...content, en: val })} />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Full Content (Hindi)</label>
+              <SimpleEditor value={content.hi} onChange={(val) => setContent({ ...content, hi: val })} />
+            </div>
           </div>
         </div>
 

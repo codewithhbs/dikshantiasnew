@@ -1,10 +1,10 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 
 export interface ICurrentAffairs extends Document {
-  title: string;
+  title: { en: string; hi: string };
   slug: string;
-  shortContent: string;
-  content: string;
+  shortContent: { en: string; hi: string };
+  content: { en: string; hi: string };
   category: mongoose.Schema.Types.ObjectId;
   subCategory: mongoose.Schema.Types.ObjectId;
   image?: {
@@ -20,10 +20,19 @@ export interface ICurrentAffairs extends Document {
 
 const CurrentAffairsSchema: Schema = new Schema(
   {
-    title: { type: String, required: true },
+    title: {
+      en: { type: String, required: true },
+      hi: { type: String, required: true },
+    },
     slug: { type: String, required: true, unique: true },
-    shortContent: { type: String },
-    content: { type: String, required: true },
+    shortContent: {
+      en: { type: String },
+      hi: { type: String },
+    },
+    content: {
+      en: { type: String, required: true },
+      hi: { type: String, required: true },
+    },
     category: {
       type: Schema.Types.ObjectId,
       ref: "BlogCategory",

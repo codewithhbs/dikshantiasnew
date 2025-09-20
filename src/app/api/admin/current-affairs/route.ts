@@ -25,27 +25,96 @@ export async function GET() {
 }
 
 // ------------------ CREATE NEW ------------------
+// export async function POST(req: Request) {
+//   try {
+//     await connectToDB();
+
+//     const formData = await req.formData();
+
+//     const title = formData.get("title")?.toString();
+//     const slug = formData.get("slug")?.toString();
+//     const shortContent = formData.get("shortContent")?.toString();
+//     const content = formData.get("content")?.toString();
+//     const categoryId = formData.get("category")?.toString();
+//     const subCategoryId = formData.get("subCategory")?.toString();
+//     const imageFile = formData.get("image") as File | null;
+//     const imageAlt = formData.get("imageAlt")?.toString() || "";
+//     const active = formData.get("active") === "true";
+
+//     const affairDate = formData.get("affairDate")?.toString();
+//     const parsedAffairDate = affairDate ? new Date(affairDate) : undefined;
+
+//     let uploadedImage = undefined;
+
+//     if (imageFile && imageFile.size > 0) {
+//       const buffer = Buffer.from(await imageFile.arrayBuffer());
+//       uploadedImage = await uploadToS3(
+//         buffer,
+//         imageFile.name,
+//         imageFile.type,
+//         "current_affairs"
+//       );
+//     }
+
+//     const newAffair = await CurrentAffairs.create({
+//       title,
+//       slug,
+//       shortContent,
+//       content,
+//       category: categoryId,
+//       subCategory: subCategoryId || undefined,
+//       affairDate: parsedAffairDate,
+//       image: uploadedImage
+//         ? {
+//             key: uploadedImage.key,
+//             url: uploadedImage.url,
+//           }
+//         : undefined,
+//       imageAlt,
+//       active,
+//     });
+
+//     // Populate for response
+//     const populatedAffair = await newAffair.populate([
+//       { path: "category", select: "name" },
+//       { path: "subCategory", select: "name" },
+//     ]);
+
+//     return NextResponse.json(populatedAffair, { status: 201 });
+//   } catch (err) {
+//     console.error("Error creating current affair:", err);
+//     return NextResponse.json(
+//       { error: err.message || "Failed to create current affair" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+
 export async function POST(req: Request) {
   try {
     await connectToDB();
 
     const formData = await req.formData();
 
-    const title = formData.get("title")?.toString();
-    const slug = formData.get("slug")?.toString();
-    const shortContent = formData.get("shortContent")?.toString();
-    const content = formData.get("content")?.toString();
-    const categoryId = formData.get("category")?.toString();
-    const subCategoryId = formData.get("subCategory")?.toString();
-    const imageFile = formData.get("image") as File | null;
-    const imageAlt = formData.get("imageAlt")?.toString() || "";
+    // Parse bilingual fields
+    const title = JSON.parse(formData.get("title")?.toString() || '{}');
+    const shortContent = JSON.parse(formData.get("shortContent")?.toString() || '{}');
+    const content = JSON.parse(formData.get("content")?.toString() || '{}');
+
+    // Parse other fields
+    const slug = formData.get("slug")?.toString() || '';
+    const category = formData.get("category")?.toString();
+    const subCategory = formData.get("subCategory")?.toString() || undefined;
     const active = formData.get("active") === "true";
+    const affairDateStr = formData.get("affairDate")?.toString();
+    const affairDate = affairDateStr ? new Date(affairDateStr) : undefined;
+    const imageAlt = formData.get("imageAlt")?.toString() || "";
 
-    const affairDate = formData.get("affairDate")?.toString();
-    const parsedAffairDate = affairDate ? new Date(affairDate) : undefined;
-
-    let uploadedImage = undefined;
-
+    // Handle image upload (if any)
+    const imageFile = formData.get("image") as File | null;
+    let uploadedImage;
     if (imageFile && imageFile.size > 0) {
       const buffer = Buffer.from(await imageFile.arrayBuffer());
       uploadedImage = await uploadToS3(
@@ -61,20 +130,14 @@ export async function POST(req: Request) {
       slug,
       shortContent,
       content,
-      category: categoryId,
-      subCategory: subCategoryId || undefined,
-      affairDate: parsedAffairDate,
-      image: uploadedImage
-        ? {
-            key: uploadedImage.key,
-            url: uploadedImage.url,
-          }
-        : undefined,
-      imageAlt,
+      category,
+      subCategory,
       active,
+      affairDate,
+      image: uploadedImage ? { key: uploadedImage.key, url: uploadedImage.url } : undefined,
+      imageAlt,
     });
 
-    // Populate for response
     const populatedAffair = await newAffair.populate([
       { path: "category", select: "name" },
       { path: "subCategory", select: "name" },

@@ -67,18 +67,19 @@ export async function PUT(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Update fields
-    const title = formData.get("title")?.toString();
-    if (title) affair.title = title;
+    // ✅ Parse bilingual fields
+    const titleRaw = formData.get("title")?.toString();
+    if (titleRaw) affair.title = JSON.parse(titleRaw);
 
+    const shortContentRaw = formData.get("shortContent")?.toString();
+    if (shortContentRaw) affair.shortContent = JSON.parse(shortContentRaw);
+
+    const contentRaw = formData.get("content")?.toString();
+    if (contentRaw) affair.content = JSON.parse(contentRaw);
+
+    // ✅ Other fields
     const slug = formData.get("slug")?.toString();
     if (slug) affair.slug = slug;
-
-    const shortContent = formData.get("shortContent")?.toString();
-    if (shortContent !== undefined) affair.shortContent = shortContent;
-
-    const content = formData.get("content")?.toString();
-    if (content !== undefined) affair.content = content;
 
     const categoryId = formData.get("category")?.toString();
     if (categoryId) affair.category = categoryId;
@@ -93,14 +94,11 @@ export async function PUT(
 
     // ✅ Handle image upload with S3
     const imageFile = formData.get("image");
-    // Type guard: ensure imageFile is a File
     if (imageFile && typeof imageFile !== "string" && "arrayBuffer" in imageFile) {
-      // Delete old image if exists
       if (affair.image?.key) {
         await deleteFromS3(affair.image.key);
       }
 
-      // Upload new image
       const buffer = Buffer.from(await imageFile.arrayBuffer());
       const uploadedImage = await uploadToS3(
         buffer,
@@ -138,6 +136,7 @@ export async function PUT(
     );
   }
 }
+
 
 // ✅ DELETE Current Affair
 export async function DELETE(

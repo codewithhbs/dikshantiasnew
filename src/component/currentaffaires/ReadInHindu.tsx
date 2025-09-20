@@ -161,4 +161,4 @@ const ReadInHindu: React.FC = () => {
   );
 };
 
-export default ReadInHindu;
+export default ReadInHindu; 

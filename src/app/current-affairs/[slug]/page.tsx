@@ -1,25 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import HinduDetails from '../HinduDetails';
-
-
-interface Card {
-  _id: string;
-  title: string;
-  slug: string;
-  date: string;
-  month: string;
-  year: string;
-  bgColor?: string;
-  dateColor?: string;
-  content?: string;
-  imageUrl?: string;
-  imageAlt?: string;
-}
-
+import { useTranslation } from 'react-i18next';
+import HinduDetails from '@/app/current-affairs/HinduDetails';
 
 interface SubCategory {
   _id: string;
@@ -29,14 +14,30 @@ interface SubCategory {
 
 interface CurrentAffairItem {
   _id: string;
-  title: string;
+  title: { en: string; hi: string };
   slug: string;
   affairDate: string;
-  content?: string;
+  content?: { en: string; hi: string };
   subCategory?: string | { _id: string };
+  image?: { url: string };
+  imageAlt?: string;
 }
 
-// Skeleton Card
+// Card interface stores both languages
+interface Card {
+  _id: string;
+  title: { en: string; hi: string };
+  slug: string;
+  content: { en: string; hi: string };
+  date: string;
+  month: string;
+  year: string;
+  bgColor: string;
+  dateColor: string;
+  imageUrl: string;
+  imageAlt: string;
+}
+
 const SkeletonCard = () => (
   <div className="animate-pulse bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
     <div className="p-4 md:p-6 flex gap-4">
@@ -51,6 +52,9 @@ const SkeletonCard = () => (
 );
 
 const ReadInHindu: React.FC = () => {
+  const { i18n } = useTranslation('common');
+  const lang = i18n.language as 'en' | 'hi';
+
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
@@ -58,75 +62,57 @@ const ReadInHindu: React.FC = () => {
   const params = useParams();
   const subCategorySlug = params?.slug as string | undefined;
 
-  // 🎨 Color palettes
-  const bgColors = [
-    'bg-[#DBEAFE]', // light blue
-    'bg-[#CEFAFE]', // cyan
-    'bg-[#D0FAE5]', // mint
-    'bg-[#FEF9C2]', // yellow 
-    'bg-[#FFEDD4]', // peach
-    'bg-[#FFE2E2]', // pink
-  ];
-
-  const dateColors = [
-    'bg-[#BFDBFE]',
-    'bg-[#A5F3FC]',
-    'bg-[#A7F3D0]',
-    'bg-[#FEF08A]',
-    'bg-[#FED7AA]',
-    'bg-[#FCA5A5]',
-  ];
+  const bgColors = ['bg-[#DBEAFE]', 'bg-[#CEFAFE]', 'bg-[#D0FAE5]', 'bg-[#FEF9C2]', 'bg-[#FFEDD4]', 'bg-[#FFE2E2]'];
+  const dateColors = ['bg-[#BFDBFE]', 'bg-[#A5F3FC]', 'bg-[#A7F3D0]', 'bg-[#FEF08A]', 'bg-[#FED7AA]', 'bg-[#FCA5A5]'];
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
+        setLoading(true);
+
+        // Fetch sub-categories
         const subRes = await fetch('/api/admin/sub-categories');
         const subcategories: SubCategory[] = await subRes.json();
+        const subCategory = subcategories.find((sub) => sub.slug === subCategorySlug);
+        if (!subCategory) {
+          setCards([]);
+          return;
+        }
 
-        const subCategory = subcategories.find(
-          (sub) => sub.slug === subCategorySlug
-        );
-        if (!subCategory) return setLoading(false);
-
+        // Fetch current affairs
         const res = await fetch('/api/admin/current-affairs');
-        const data = await res.json();
+        const data: CurrentAffairItem[] = await res.json();
 
-        const filteredData = data.filter((item: CurrentAffairItem) => {
-          const subId =
-            typeof item.subCategory === 'string'
-              ? item.subCategory
-              : item.subCategory?._id;
+        const filteredData = data.filter((item) => {
+          const subId = typeof item.subCategory === 'string' ? item.subCategory : item.subCategory?._id;
           return subId === subCategory._id;
         });
 
-      const formattedCards: Card[] = filteredData
-        .map((item: CurrentAffairItem, index: number): Card => {
+        const formattedCards: Card[] = filteredData.map((item, index) => {
           const bgColor = bgColors[index % bgColors.length];
           const dateColor = dateColors[index % dateColors.length];
+          const affairDate = new Date(item.affairDate);
 
           return {
             _id: item._id,
             title: item.title,
             slug: item.slug,
-            content: item.content || '',
-            date: new Date(item.affairDate).getDate().toString(),
-            month: new Date(item.affairDate).toLocaleString('default', {
-              month: 'short',
-            }),
-            year: new Date(item.affairDate).getFullYear().toString(),
+            content: item.content || { en: '', hi: '' },
+            date: affairDate.getDate().toString(),
+            month: affairDate.toLocaleString('default', { month: 'short' }),
+            year: affairDate.getFullYear().toString(),
             bgColor,
             dateColor,
             imageUrl: item.image?.url || '',
-            imageAlt: item.imageAlt || item.title,
+            imageAlt: item.imageAlt || item.title?.en || '',
           };
-        })
-        // 🔥 Sort latest first
-        .sort((a, b) => {
-          const dateA = new Date(`${a.month} ${a.date}, ${a.year}`).getTime();
-          const dateB = new Date(`${b.month} ${b.date}, ${b.year}`).getTime();
-          return dateB - dateA; // descending
         });
 
+        formattedCards.sort((a, b) => {
+          const dateA = new Date(`${a.month} ${a.date}, ${a.year}`).getTime();
+          const dateB = new Date(`${b.month} ${b.date}, ${b.year}`).getTime();
+          return dateB - dateA;
+        });
 
         setCards(formattedCards);
       } catch (error) {
@@ -159,13 +145,12 @@ const ReadInHindu: React.FC = () => {
     return (
       <div className="container max-w-7xl mx-auto px-4 py-6">
         <HinduDetails
-          title={activeCard.title}
-          content={activeCard.content}
+          title={activeCard.title[lang]}
+          content={activeCard.content[lang]}
           imageUrl={activeCard.imageUrl}
           imageAlt={activeCard.imageAlt}
           onClose={() => setActiveCard(null)}
         />
-
       </div>
     );
   }
@@ -186,47 +171,26 @@ const ReadInHindu: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {cards.map((card) => (
-              <div
-                key={card._id}
-                className={`${card.bgColor} rounded-lg border border-gray-200 overflow-hidden`}
-              >
+              <div key={card._id} className={`${card.bgColor} rounded-lg border border-gray-200 overflow-hidden`}>
                 <div className="p-4 md:p-6">
                   <div className="flex items-start gap-4">
-                    <div
-                      className={`${card.dateColor} rounded-md px-3 py-2 flex-shrink-0 text-center min-w-[60px]`}
-                    >
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                        {card.month}
-                      </div>
-                      <div className="text-2xl md:text-3xl font-bold text-[#00072c] leading-none">
-                        {card.date}
-                      </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        {card.year}
-                      </div>
+                    <div className={`${card.dateColor} rounded-md px-3 py-2 flex-shrink-0 text-center min-w-[60px]`}>
+                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">{card.month}</div>
+                      <div className="text-2xl md:text-3xl font-bold text-[#00072c] leading-none">{card.date}</div>
+                      <div className="text-xs text-gray-600 mt-1">{card.year}</div>
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm md:text-base font-semibold text-[#00072c] leading-tight mb-3 line-clamp-2">
-                        {card.title}
+                        {card.title[lang]}
                       </h3>
                       <button
                         onClick={() => setActiveCard(card)}
                         className="text-red-600 hover:text-red-700 text-xs md:text-sm font-medium uppercase tracking-wide transition-colors duration-200 flex items-center gap-1"
                       >
                         VIEW DETAILS
-                        <svg
-                          className="w-3 h-3 md:w-4 md:h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
+                        <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
                     </div>
