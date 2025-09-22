@@ -8,7 +8,8 @@ import { uploadToS3 } from "@/lib/s3";
 export async function GET() {
   try {
     await connectToDB();
-    const courses = await Course.find();
+    const courses = await Course.find()
+      .sort({ createdAt: -1 }); //  Latest first
     return NextResponse.json(courses, { status: 200 });
   } catch (error) {
     const errMessage = error instanceof Error ? error.message : "Unknown error";

@@ -7,7 +7,8 @@ import { uploadToS3 } from "@/lib/s3";
 export async function GET() {
   try {
     await connectToDB();
-    const galleries = await GalleryModel.find();
+    const galleries = await GalleryModel.find()
+      .sort({ createdAt: -1 }); // Latest first
     return NextResponse.json(galleries, { status: 200 });
   } catch (error) {
     console.error("Error fetching gallery:", error);

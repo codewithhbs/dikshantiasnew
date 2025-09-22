@@ -8,7 +8,10 @@ export async function GET() {
   try {
     await connectToDB();
 
-    const blogs = await BlogsModel.find().populate("category").lean();
+    const blogs = await BlogsModel.find()
+      .populate("category")
+      .sort({ createdAt: -1 }) // Latest first
+
     return NextResponse.json(blogs, { status: 200 });
   } catch (error) {
     console.error("Error fetching blogs:", error);

@@ -8,7 +8,9 @@ import { uploadToS3 } from "@/lib/s3";
 export async function GET() {
   try {
     await connectToDB();
-    const Results = await ResultModel.find();
+    const Results = await ResultModel.find()
+      .sort({ createdAt: -1 }); // Latest first
+
     return NextResponse.json(Results);
   } catch (error) {
     console.error("Error fetching Results:", error);

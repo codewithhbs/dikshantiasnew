@@ -7,7 +7,8 @@ import { uploadToS3 } from "@/lib/s3";
 export async function GET() {
   try {
     await connectToDB();
-    const testimonials = await TestimonialModel.find();
+    const testimonials = await TestimonialModel.find()
+      .sort({ createdAt: -1 }); // Latest first
     return NextResponse.json(testimonials);
   } catch (error) {
     console.error("Error fetching testimonials:", error);
