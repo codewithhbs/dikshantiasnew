@@ -222,16 +222,23 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
         </div>
 
         {/* Buttons */}
-        <div className="mt-auto flex gap-2.5 items-center">
+        {/* <div className="mt-auto flex gap-2.5 items-center">
           <Link href={`/online-course/${program.slug}`}>
-          <button className="bg-blue-950 hover:bg-[#d12a3a] text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
+          <button className="bg-blue-950 hover:bg-[#d12a3a] w-full text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
             View Details
           </button>
         </Link>
           <button className="bg-[#f43144] hover:bg-blue-950 text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
             Enroll Now
           </button>
-        </div>  
+        </div>   */}
+        <div className="mt-auto flex justify-center w-full">
+          <Link href={`/online-course/${program.slug}`} className="w-full">
+            <button className="bg-blue-950 hover:bg-[#d12a3a] w-full text-white py-2 px-5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1">
+              View Details
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );

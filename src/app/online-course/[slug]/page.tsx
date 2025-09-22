@@ -290,27 +290,28 @@ const CoursePage = () => {
                                     </button>
                                     <div className="border-t pt-6">
                                         <div className="flex items-start gap-4">
-                                            <Image
+                                            {/* <Image
                                                 width={1920}
                                                 height={500}
                                                 src="/api/placeholder/50/50"
                                                 alt="Keith Son"
                                                 className="w-12 h-12 rounded-full"
-                                            />
+                                            /> */}
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <h4 className="font-semibold text-[#040c33]">Keith Son</h4>
-                                                    <div className="flex text-yellow-400">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} className="w-4 h-4 fill-current" />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div className="text-sm text-blue-950 mb-2">Course Review</div>
-                                                <p className="text-blue-950 text-sm">
-                                                    Lorem ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.
-                                                </p>
-                                            </div>
+                                                                                            <div className="flex items-center gap-2 mb-1">
+                                                                                                <h4 className="font-semibold text-[#040c33]">Vijay Verma</h4>
+                                                                                                <div className="flex text-yellow-400">
+                                                                                                    {[...Array(5)].map((_, i) => (
+                                                                                                        <Star key={i} className="w-4 h-4 fill-current" />
+                                                                                                    ))}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div className="text-sm text-blue-950 mb-2">Course Review</div>
+                                                                                           <p className="text-blue-950 text-sm">
+                                                                                            "This course exceeded my expectations! The instructor explained complex topics in a clear and engaging way, with practical examples that I could immediately apply. The content was well-structured, and the exercises helped reinforce my learning. I feel much more confident in my skills now and would highly recommend this course to anyone looking to level up."
+                                                                                            </p>
+                                            
+                                                                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -387,7 +388,7 @@ const CoursePage = () => {
                                         <Image
                                             width={500}
                                             height={500}
-                                            src="/api/placeholder/280/160"
+                                            src="/img/offer.png"
                                             alt="Thumbnails preview"
                                             className="w-full rounded-lg"
                                         />

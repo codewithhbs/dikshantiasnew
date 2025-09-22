@@ -89,24 +89,36 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
 
                 {/* Buttons */}
                 <div className="space-y-3 text-center">
-                    <button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
-                        Enroll Now
+                    <Link href={`/offline-course/${course.slug}`} className="w-full">
+                        <button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+                        View Details
                         <svg
                             className="w-4 h-4 ml-2"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                         >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                            />
                         </svg>
-                    </button>
-                    <Link
+                        </button>
+                    </Link>
+
+                    {/* Hidden old View Details link */}
+                    <span className="hidden">
+                        <Link
                         href={`/offline-course/${course.slug}`}
                         className="w-full text-blue-800 hover:text-blue-950 font-medium py-2 transition-colors duration-200"
-                    >
+                        >
                         View Details
-                    </Link>
-                </div>
+                        </Link>
+                    </span>
+                    </div>
+
             </div>
         </div>
     );
