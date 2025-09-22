@@ -1,26 +1,31 @@
-'use client'
-import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+"use client";
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface FaqItem {
-  id: number
-  title: string
-  content: string[]
+  id: number;
+  title: string;
+  content: string[];
 }
 
 export default function ScholershipFaq() {
-  const { t } = useTranslation('common')
-  const [active, setActive] = useState<number | null>(1)
+  const { t } = useTranslation("common");
+  const [active, setActive] = useState<number | null>(1);
+  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ modal state
 
   // ✅ Define faqs inside the component
-  const faqs: FaqItem[] = (t('scholarshipDetails.faq', { returnObjects: true }) as FaqItem[]) || []
+  const faqs: FaqItem[] =
+    (t("scholarshipDetails.faq", { returnObjects: true }) as FaqItem[]) || [];
 
-  const applyNowText = t('scholarshipDetails.applyNow')
+  const applyNowText = t("scholarshipDetails.applyNow");
 
   const toggleAccordion = (id: number) => {
-    setActive(active === id ? null : id)
-  }
+    setActive(active === id ? null : id);
+  };
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <div className="max-w-7xl mx-auto px-2 md:p-0">
@@ -32,12 +37,16 @@ export default function ScholershipFaq() {
               className="w-full text-md flex justify-between items-center text-left px-4 py-3 font-semibold text-slate-900"
             >
               {faq.title}
-              {active === faq.id ? <ChevronUp size={30} /> : <ChevronDown size={30} />}
+              {active === faq.id ? (
+                <ChevronUp size={30} />
+              ) : (
+                <ChevronDown size={30} />
+              )}
             </button>
 
             <div
               className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                active === faq.id ? 'max-h-screen' : 'max-h-0'
+                active === faq.id ? "max-h-screen" : "max-h-0"
               }`}
             >
               {active === faq.id && (
@@ -56,7 +65,10 @@ export default function ScholershipFaq() {
                     </ul>
                   )}
 
-                  <button className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                  <button
+                    onClick={openModal}
+                    className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  >
                     {applyNowText}
                   </button>
                 </div>
@@ -64,6 +76,89 @@ export default function ScholershipFaq() {
             </div>
           </div>
         ))}
+
+      {/* ✅ Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center border-2">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full relative animate-fadeIn overflow-hidden">
+            {/* Header with red background */}
+            <div className="bg-[#E7000B] text-white p-6 relative">
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white text-red-600 hover:bg-gray-200 hover:text-red-700 shadow-md transition"
+              >
+                ✕
+              </button>
+
+              {/* Title */}
+              <h2 className="text-2xl font-bold mb-1">{applyNowText}</h2>
+              <p className="text-white text-opacity-90">
+                Fill in the details below to apply for the scholarship.
+              </p>
+            </div>
+
+            {/* Form Section */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert("Form submitted!");
+                closeModal();
+              }}
+              className="space-y-5 p-6"
+            >
+              <input
+                type="text"
+                placeholder="Full Name"
+                required
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                required
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+              />
+              <input
+                type="email"
+                placeholder="Email Address"
+                required
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+              />
+              <input
+                type="text"
+                placeholder="Course"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+              />
+              <textarea
+                placeholder="Message"
+                rows={4}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+              />
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 mt-4">
+                {/* Cancel */}
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-all shadow-sm"
+                >
+                  Cancel
+                </button>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded bg-[#E7000B] text-white font-semibold hover:bg-[#c6000a] transition-all shadow-md"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
