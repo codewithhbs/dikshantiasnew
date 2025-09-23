@@ -222,7 +222,23 @@ const CoursePage = () => {
                         {activeTab === 'description' && (
                             <div>
                                 {/* Course Description */}
-                                {parse(course.content)}
+                                {/* {parse(course.content)} */}
+                                <div
+                                    className="
+                                        max-w-none text-gray-800 leading-relaxed space-y-8
+                                        [&>h1]:text-3xl [&>h1]:mt-10 [&>h1]:mb-6
+                                        [&>h2]:text-2xl [&>h2]:mt-8 [&>h2]:mb-5
+                                        [&>h3]:text-xl [&>h3]:mt-6 [&>h3]:mb-4
+                                        [&>p]:mb-6
+                                        [&>ul]:list-disc [&>ul]:pl-8 [&>ul]:mb-6
+                                        [&>ol]:list-decimal [&>ol]:pl-8 [&>ol]:mb-6
+                                        [&>li]:mb-3
+                                        [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 [&>blockquote]:pl-6 [&>blockquote]:italic [&>blockquote]:text-gray-600 [&>blockquote]:my-6
+                                        [&>img]:rounded-lg [&>img]:my-8
+                                    "
+                                    dangerouslySetInnerHTML={{ __html: course.content }}
+                                />
+
 
                                 {/* Course Videos */}
                                 <div className="w-full mb-8 mt-8">
