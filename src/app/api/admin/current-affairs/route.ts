@@ -5,6 +5,15 @@ import BlogCategoryModel from "@/models/BlogCategoryModel";
 import SubCategoryModel from "@/models/SubCategoryModel";
 import { uploadToS3 } from "@/lib/s3";
 
+
+export const config = {
+  api: {
+    bodyParser: false, // we're using formData, not JSON body
+    sizeLimit: "20mb", // increase to 20MB (adjust as needed)
+  },
+};
+
+
 // ------------------ GET ALL ------------------
 export async function GET() {
   try {

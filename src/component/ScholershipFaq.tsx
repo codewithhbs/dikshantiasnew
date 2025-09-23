@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 interface FaqItem {
   id: number;
@@ -12,9 +13,9 @@ interface FaqItem {
 export default function ScholershipFaq() {
   const { t } = useTranslation("common");
   const [active, setActive] = useState<number | null>(1);
-  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // ✅ loading state
 
-  // ✅ Define faqs inside the component
   const faqs: FaqItem[] =
     (t("scholarshipDetails.faq", { returnObjects: true }) as FaqItem[]) || [];
 
@@ -26,6 +27,43 @@ export default function ScholershipFaq() {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  // ✅ Form Submit
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const form = e.currentTarget;
+    const formData = {
+      name: (form[0] as HTMLInputElement).value,
+      phone: (form[1] as HTMLInputElement).value,
+      email: (form[2] as HTMLInputElement).value,
+      course: (form[3] as HTMLInputElement).value,
+      message: (form[4] as HTMLTextAreaElement).value,
+    };
+
+    try {
+      const res = await fetch("/api/admin/scholarship", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success(data.message || "Application submitted successfully!");
+        form.reset();
+        closeModal();
+      } else {
+        toast.error(data.message || "Failed to submit");
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-2 md:p-0">
@@ -51,10 +89,8 @@ export default function ScholershipFaq() {
             >
               {active === faq.id && (
                 <div className="text-md text-[#040c33] px-4 pb-4 text-left">
-                  {/* First item as paragraph */}
                   <p className="text-blue-950">{faq.content[0]}</p>
 
-                  {/* Rest as list */}
                   {faq.content.length > 1 && (
                     <ul className="list-disc pl-6 mt-2 text-blue-950">
                       {faq.content.slice(1).map((item, idx) => (
@@ -81,9 +117,7 @@ export default function ScholershipFaq() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center border-2">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full relative animate-fadeIn overflow-hidden">
-            {/* Header with red background */}
             <div className="bg-[#E7000B] text-white p-6 relative">
-              {/* Close Button */}
               <button
                 onClick={closeModal}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white text-red-600 hover:bg-gray-200 hover:text-red-700 shadow-md transition"
@@ -91,22 +125,14 @@ export default function ScholershipFaq() {
                 ✕
               </button>
 
-              {/* Title */}
               <h2 className="text-2xl font-bold mb-1">{applyNowText}</h2>
               <p className="text-white text-opacity-90">
                 Fill in the details below to apply for the scholarship.
               </p>
             </div>
 
-            {/* Form Section */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                alert("Form submitted!");
-                closeModal();
-              }}
-              className="space-y-5 p-6"
-            >
+            {/* ✅ Use handleSubmit here */}
+            <form onSubmit={handleSubmit} className="space-y-5 p-6">
               <input
                 type="text"
                 placeholder="Full Name"
@@ -136,23 +162,26 @@ export default function ScholershipFaq() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
               />
 
-              {/* Buttons */}
               <div className="flex justify-end gap-3 mt-4">
-                {/* Cancel */}
                 <button
                   type="button"
                   onClick={closeModal}
                   className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-all shadow-sm"
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
 
-                {/* Submit */}
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded bg-[#E7000B] text-white font-semibold hover:bg-[#c6000a] transition-all shadow-md"
+                  disabled={isLoading}
+                  className={`px-5 py-2 rounded text-white font-semibold transition-all shadow-md ${
+                    isLoading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-[#E7000B] hover:bg-[#c6000a]"
+                  }`}
                 >
-                  Submit
+                  {isLoading ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </form>
