@@ -1,3 +1,4 @@
+export const runtime = 'nodejs'; // Use Node.js runtime
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import CurrentAffairs from "@/models/CurrentAffair";
@@ -36,18 +37,18 @@ export async function GET() {
 
 // ------------------ CREATE NEW ------------------
 
+
+
 export async function POST(req: Request) {
   try {
     await connectToDB();
 
     const formData = await req.formData();
 
-    // Parse bilingual fields
     const title = JSON.parse(formData.get("title")?.toString() || '{}');
     const shortContent = JSON.parse(formData.get("shortContent")?.toString() || '{}');
     const content = JSON.parse(formData.get("content")?.toString() || '{}');
 
-    // Parse other fields
     const slug = formData.get("slug")?.toString() || '';
     const category = formData.get("category")?.toString();
     const subCategory = formData.get("subCategory")?.toString() || undefined;
@@ -56,7 +57,6 @@ export async function POST(req: Request) {
     const affairDate = affairDateStr ? new Date(affairDateStr) : undefined;
     const imageAlt = formData.get("imageAlt")?.toString() || "";
 
-    // Handle image upload (if any)
     const imageFile = formData.get("image") as File | null;
     let uploadedImage;
     if (imageFile && imageFile.size > 0) {
