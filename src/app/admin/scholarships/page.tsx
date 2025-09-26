@@ -137,24 +137,22 @@ export default function ScholarshipPage() {
               <table className="w-full border-collapse bg-white rounded-2xl shadow-lg overflow-hidden">
                 <thead className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide font-semibold">
                   <tr>
+                    <th className="py-4 px-5 text-left border-b border-gray-200">Scholarship </th>
                     <th className="py-4 px-5 text-left border-b border-gray-200">Name</th>
                     <th className="py-4 px-5 text-left border-b border-gray-200">Phone</th>
                     <th className="py-4 px-5 text-left border-b border-gray-200">Email</th>
                     <th className="py-4 px-5 text-left border-b border-gray-200">Course</th>
-                    <th className="py-4 px-5 text-left border-b border-gray-200">Message</th>
                     <th className="py-4 px-5 text-center border-b border-gray-200">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-800 text-sm">
                   {paginatedData.map((s) => (
                     <tr key={s._id} className="hover:bg-gray-50 border-b border-gray-200">
+                      <td className="py-3 px-5">{s.scholarship}</td>
                       <td className="py-3 px-5">{s.name}</td>
                       <td className="py-3 px-5">{s.phone}</td>
                       <td className="py-3 px-5">{s.email}</td>
                       <td className="py-3 px-5">{s.course}</td>
-                      <td className="py-3 px-5">
-                        {s.message.length > 30 ? s.message.slice(0, 30) + "..." : s.message}
-                      </td>
                       <td className="py-3 px-5 text-center">
                         <div className="flex justify-center gap-2">
                           <button

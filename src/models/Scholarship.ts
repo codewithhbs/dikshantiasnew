@@ -6,6 +6,7 @@ export interface IScholarship extends Document {
   email: string;
   course?: string;
   message?: string;
+  scholarship?: string;
   createdAt: Date;
 }
 
@@ -15,6 +16,7 @@ const ScholarshipSchema: Schema = new Schema({
   email: { type: String, required: true },
   course: { type: String },
   message: { type: String },
+  scholarship: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

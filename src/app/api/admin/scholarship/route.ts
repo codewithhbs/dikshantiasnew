@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import Scholarship from "@/models/Scholarship";
 
+
 export async function POST(req: Request) {
   try {
-    const { name, phone, email, course, message } = await req.json();
+    const { name, phone, email, course, message, scholarship } =
+      await req.json();
 
     await connectToDB();
 
@@ -14,16 +16,24 @@ export async function POST(req: Request) {
       email,
       course,
       message,
+      scholarship,
     });
 
     await newScholarship.save();
 
-    return NextResponse.json({ success: true, message: "Application submitted successfully!" });
+    return NextResponse.json({
+      success: true,
+      message: "Application submitted successfully!",
+    });
   } catch (error) {
     console.error("Error saving scholarship:", error);
-    return NextResponse.json({ success: false, message: "Something went wrong!" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Something went wrong!" },
+      { status: 500 }
+    );
   }
 }
+
 
 
 

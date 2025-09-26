@@ -10,36 +10,44 @@ interface FaqItem {
   content: string[];
 }
 
-export default function ScholershipFaq() {
+export default function ScholarshipFaq() {
   const { t } = useTranslation("common");
   const [active, setActive] = useState<number | null>(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // ✅ loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedScholarship, setSelectedScholarship] = useState<string | null>(null);
 
-  const faqs: FaqItem[] =
-    (t("scholarshipDetails.faq", { returnObjects: true }) as FaqItem[]) || [];
-
+  const faqsRaw = t("scholarshipDetails.faq", { returnObjects: true });
+  const faqs: FaqItem[] = Array.isArray(faqsRaw) ? (faqsRaw as FaqItem[]) : [];
   const applyNowText = t("scholarshipDetails.applyNow");
 
-  const toggleAccordion = (id: number) => {
-    setActive(active === id ? null : id);
+  const toggleAccordion = (id: number) => setActive(active === id ? null : id);
+  const openModal = (scholarship: string) => {
+    setSelectedScholarship(scholarship);
+    setIsModalOpen(true);
   };
-
-  const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // ✅ Form Submit
+  const scholarshipShortMap: Record<string, string> = {
+    "PROGRAMME - 1: 60% Scholarship Programme for BPL Students": "PROGRAMME - 1: 60% Scholarship",
+    "PROGRAMME - 2: 50% Scholarship for SC / ST / OBC / Minorities / Girls / EWS / Defence Wards Students": "PROGRAMME - 2: 50% Scholarship",
+    "PROGRAMME - 3: 40% Scholarship Programme for Meritorious Students": "PROGRAMME - 3: 40% Scholarship",
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     const form = e.currentTarget;
+    const shortScholarship = scholarshipShortMap[selectedScholarship || ""] || selectedScholarship;
+
     const formData = {
-      name: (form[0] as HTMLInputElement).value,
-      phone: (form[1] as HTMLInputElement).value,
-      email: (form[2] as HTMLInputElement).value,
-      course: (form[3] as HTMLInputElement).value,
-      message: (form[4] as HTMLTextAreaElement).value,
+      name: (form["name"] as HTMLInputElement).value,
+      phone: (form["phone"] as HTMLInputElement).value,
+      email: (form["email"] as HTMLInputElement).value,
+      course: (form["course"] as HTMLInputElement).value,
+      message: (form["message"] as HTMLTextAreaElement).value,
+      scholarship: shortScholarship,
     };
 
     try {
@@ -66,119 +74,114 @@ export default function ScholershipFaq() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-2 md:p-0">
-      {Array.isArray(faqs) &&
-        faqs.map((faq) => (
-          <div key={faq.id} className="mb-2 bg-[#ecf4fc] rounded-lg">
-            <button
-              onClick={() => toggleAccordion(faq.id)}
-              className="w-full text-md flex justify-between items-center text-left px-4 py-3 font-semibold text-slate-900"
-            >
-              {faq.title}
-              {active === faq.id ? (
-                <ChevronUp size={30} />
-              ) : (
-                <ChevronDown size={30} />
-              )}
-            </button>
+    <div className="max-w-7xl mx-auto px-4 md:px-0">
+      {/* FAQ Accordion */}
+      {faqs.map((faq) => (
+        <div key={faq.id} className="mb-3 bg-[#f0f4f8] rounded-lg shadow-sm">
+          <button
+            onClick={() => toggleAccordion(faq.id)}
+            className="w-full flex justify-between items-center text-left px-5 py-3 font-semibold text-gray-900 hover:bg-gray-100 rounded-t-lg"
+          >
+            {faq.title}
+            {active === faq.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+          </button>
 
-            <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                active === faq.id ? "max-h-screen" : "max-h-0"
-              }`}
-            >
-              {active === faq.id && (
-                <div className="text-md text-[#040c33] px-4 pb-4 text-left">
-                  <p className="text-blue-950">{faq.content[0]}</p>
-
-                  {faq.content.length > 1 && (
-                    <ul className="list-disc pl-6 mt-2 text-blue-950">
-                      {faq.content.slice(1).map((item, idx) => (
-                        <li key={idx}>
-                          <em>{item}</em>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <button
-                    onClick={openModal}
-                    className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                  >
-                    {applyNowText}
-                  </button>
-                </div>
-              )}
-            </div>
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              active === faq.id ? "max-h-screen" : "max-h-0"
+            }`}
+          >
+            {active === faq.id && (
+              <div className="px-5 pb-4 text-gray-700">
+                <p>{faq.content[0]}</p>
+                {faq.content.length > 1 && (
+                  <ul className="list-disc pl-6 mt-2">
+                    {faq.content.slice(1).map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+                <button
+                  onClick={() => openModal(faq.title)}
+                  className="mt-4 bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition"
+                >
+                  {applyNowText}
+                </button>
+              </div>
+            )}
           </div>
-        ))}
+        </div>
+      ))}
 
-      {/* ✅ Modal */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center border-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full relative animate-fadeIn overflow-hidden">
-            <div className="bg-[#E7000B] text-white p-6 relative">
+            <div className="bg-red-600 text-white p-6 relative">
               <button
                 onClick={closeModal}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white text-red-600 hover:bg-gray-200 hover:text-red-700 shadow-md transition"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white text-red-600 hover:bg-gray-200 hover:text-red-700 shadow transition"
               >
                 ✕
               </button>
-
               <h2 className="text-2xl font-bold mb-1">{applyNowText}</h2>
-              <p className="text-white text-opacity-90">
-                Fill in the details below to apply for the scholarship.
-              </p>
+              <p className="text-white text-opacity-90">Fill in the details below to apply for the scholarship.</p>
             </div>
 
-            {/* ✅ Use handleSubmit here */}
-            <form onSubmit={handleSubmit} className="space-y-5 p-6">
+            <form onSubmit={handleSubmit} className="space-y-4 p-6">
+              <div className="inline-block rounded-md px-3 py-1 bg-red-100 text-red-600 font-medium text-sm border border-red-600 shadow-sm">
+                {scholarshipShortMap[selectedScholarship || ""]}
+              </div>
+              <input type="hidden" name="scholarship" value={scholarshipShortMap[selectedScholarship || ""]} />
+
               <input
+                name="name"
                 type="text"
                 placeholder="Full Name"
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-600"
               />
               <input
+                name="phone"
                 type="tel"
                 placeholder="Phone Number"
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-600"
               />
               <input
+                name="email"
                 type="email"
                 placeholder="Email Address"
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-600"
               />
               <input
+                name="course"
                 type="text"
                 placeholder="Course"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-600"
               />
               <textarea
+                name="message"
                 placeholder="Message"
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#E7000B] focus:border-transparent shadow-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-600"
               />
 
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex justify-end gap-3 mt-2">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-all shadow-sm"
+                  className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition"
                   disabled={isLoading}
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`px-5 py-2 rounded text-white font-semibold transition-all shadow-md ${
-                    isLoading
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#E7000B] hover:bg-[#c6000a]"
+                  className={`px-5 py-2 rounded text-white font-semibold transition-shadow shadow-md ${
+                    isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
                   }`}
                 >
                   {isLoading ? "Submitting..." : "Submit"}
