@@ -247,25 +247,35 @@ const CoursePage = () => {
                                     </h2>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                        {course.videos?.map((videoUrl, index) => (
-                                            <div key={index} className="text-center">
-                                                <iframe
-                                                    width="100%"
-                                                    height="200"
-                                                    className="rounded-xl"
-                                                    src={videoUrl.replace("watch?v=", "embed/")}
-                                                    title={`Video Class ${index + 1}`}
-                                                    frameBorder="0"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                    referrerPolicy="strict-origin-when-cross-origin"
-                                                    allowFullScreen
-                                                ></iframe>
+                                       {course.videos?.map((videoUrl, index) => {
+  let embedUrl = videoUrl;
 
-                                                <h3 className="font-bold mt-2 text-blue-500">
-                                                    Video Class {index + 1}
-                                                </h3>
-                                            </div>
-                                        ))}
+  if (videoUrl.includes("watch?v=")) {
+    embedUrl = videoUrl.replace("watch?v=", "embed/");
+  } else if (videoUrl.includes("youtu.be/")) {
+    embedUrl = videoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+  }
+
+  return (
+    <div key={index} className="text-center">
+      <iframe
+        width="100%"
+        height="200"
+        className="rounded-xl"
+        src={embedUrl}
+        title={`Video Class ${index + 1}`}
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
+      ></iframe>
+
+      <h3 className="font-bold mt-2 text-blue-500">
+        Video Class {index + 1}
+      </h3>
+    </div>
+  );
+})}
                                     </div>
                                 </div>
 
