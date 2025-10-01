@@ -246,8 +246,7 @@ const Header: React.FC = () => {
                                 <div className={`overflow-hidden transition-all duration-300 ${openMobileDropdown === 'courses' ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="ml-4 space-y-2 pt-2">
                                         <Link href="/online-course" className="block py-1 text-gray-700 hover:text-red-500"> {t("onlineMode")}</Link>
-                                        <Link href="#" className="block border-b border-gray-200 py-1 text-gray-700 hover:text-red-500"> {t("offlineMode")}</Link>
-
+                                        <Link href="/offline-course" className="block border-b border-gray-200 py-1 text-gray-700 hover:text-red-500"> {t("offlineMode")}</Link>
                                     </div>
                                 </div>
                             </div>
