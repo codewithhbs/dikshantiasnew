@@ -22,17 +22,15 @@ export default function ScholarshipFaq() {
   const applyNowText = t("scholarshipDetails.applyNow");
 
   const toggleAccordion = (id: number) => setActive(active === id ? null : id);
-  const openModal = (scholarship: string) => {
-    setSelectedScholarship(scholarship);
-    setIsModalOpen(true);
-  };
+const openModal = (scholarshipKey: string) => {
+  setSelectedScholarship(scholarshipKey);
+  setIsModalOpen(true);
+};
   const closeModal = () => setIsModalOpen(false);
 
-  const scholarshipShortMap: Record<string, string> = {
-    "PROGRAMME - 1: 60% Scholarship Programme for BPL Students": "PROGRAMME - 1: 60% Scholarship",
-    "PROGRAMME - 2: 50% Scholarship for SC / ST / OBC / Minorities / Girls / EWS / Defence Wards Students": "PROGRAMME - 2: 50% Scholarship",
-    "PROGRAMME - 3: 40% Scholarship Programme for Meritorious Students": "PROGRAMME - 3: 40% Scholarship",
-  };
+const scholarshipShortMap = t("scholarshipShortMap", { returnObjects: true }) as Record<string, string>;
+
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,12 +99,12 @@ export default function ScholarshipFaq() {
                     ))}
                   </ul>
                 )}
-                <button
-                  onClick={() => openModal(faq.title)}
-                  className="mt-4 bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition"
-                >
-                  {applyNowText}
-                </button>
+              <button
+                onClick={() => openModal(faq.key)}   // use key, not title
+                className="mt-4 bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition"
+              >
+                {applyNowText}
+              </button>
               </div>
             )}
           </div>
@@ -129,11 +127,14 @@ export default function ScholarshipFaq() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 p-6">
-              <div className="inline-block rounded-md px-3 py-1 bg-red-100 text-red-600 font-medium text-sm border border-red-600 shadow-sm">
-                {scholarshipShortMap[selectedScholarship || ""]}
-              </div>
-              <input type="hidden" name="scholarship" value={scholarshipShortMap[selectedScholarship || ""]} />
-
+            <div className="inline-block rounded-md px-3 py-1 bg-red-100 text-red-600 font-medium text-sm border border-red-600 shadow-sm">
+  {scholarshipShortMap[selectedScholarship || ""]}
+</div>
+<input
+  type="hidden"
+  name="scholarship"
+  value={scholarshipShortMap[selectedScholarship || ""]}
+/>
               <input
                 name="name"
                 type="text"

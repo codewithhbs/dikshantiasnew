@@ -239,42 +239,6 @@
     "mission": "Empower your UPSC journey with Dikshant IAS – Where talent meets opportunity."
   },
 
-  "scholarshipDetails": {
-    "applyNow": "Apply Now",
-    "faq": [
-      {
-        "id": 1,
-        "title": "PROGRAMME - 1: 60% Scholarship Programme for BPL Students",
-        "content": [
-          "Providing coaching to BPL students with 60% fee scholarship (Online/Offline, 100 students per year). Required documents:",
-          "Aadhar Card",
-          "BPL Card",
-          "4 Passport size photographs"
-        ]
-      },
-      {
-        "id": 2,
-        "title": "PROGRAMME - 2: 50% Scholarship for SC / ST / OBC / Minorities / Girls / EWS / Defence Wards Students",
-        "content": [
-          "50% fee scholarship for SC/ST/OBC/Minorities/Girls/EWS/Defence Wards students. Required documents:",
-          "Aadhar Card",
-          "Caste/Minorities certificate + Income certificate (< 8 lakhs)",
-          "Defence ID proof",
-          "4 Passport size photographs"
-        ]
-      },
-      {
-        "id": 3,
-        "title": "PROGRAMME - 3: 40% Scholarship Programme for Meritorious Students",
-        "content": [
-          "40% fee scholarship for Meritorious Students (50 students/year). An aptitude test will be conducted. Required documents:",
-          "Aadhar Card",
-          "4 Passport size photographs"
-        ]
-      }
-    ]
-  },
-
   "contacts": {
     "contactAddress": "Our contact address",
     "mainOffice": "Main Office",
@@ -291,6 +255,51 @@
     "submitting": "Submitting...",
     "successMessage": "Thank you! Your message has been sent.",
     "errorMessage": "Something went wrong. Please try again."
-  }
+  },
   
+  "scholarshipShortMap": {
+    "p1": "PROGRAMME - 1: 60% Scholarship",
+    "p2": "PROGRAMME - 2: 50% Scholarship",
+    "p3": "PROGRAMME - 3: 40% Scholarship"
+  },
+  "scholarshipDetails": {
+    "applyNow": "Apply Now",
+    "faq": [
+      {
+        "id": 1,
+        "key": "p1",
+        "title": "PROGRAMME - 1: 60% Scholarship Programme for BPL Students",
+        "content": [
+          "Providing coaching to BPL students with 60% fee scholarship (Online/Offline, 100 students per year). Required documents:",
+          "Aadhar Card",
+          "BPL Card",
+          "4 Passport size photographs"
+        ]
+      },
+      {
+        "id": 2,
+        "key": "p2",
+        "title": "PROGRAMME - 2: 50% Scholarship for SC / ST / OBC / Minorities / Girls / EWS / Defence Wards Students",
+        "content": [
+          "50% fee scholarship for SC/ST/OBC/Minorities/Girls/EWS/Defence Wards students. Required documents:",
+          "Aadhar Card",
+          "Caste/Minorities certificate + Income certificate (< 8 lakhs)",
+          "Defence ID proof",
+          "4 Passport size photographs"
+        ]
+      },
+      {
+        "id": 3,
+        "key": "p3",
+        "title": "PROGRAMME - 3: 40% Scholarship Programme for Meritorious Students",
+        "content": [
+          "40% fee scholarship for Meritorious Students (50 students/year). An aptitude test will be conducted. Required documents:",
+          "Aadhar Card",
+          "4 Passport size photographs"
+        ]
+      }
+    ]
+  }
+
+
 }
