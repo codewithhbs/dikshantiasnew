@@ -39,6 +39,16 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
                         alt={course.image?.alt || course.title}
                         className="object-cover h-full w-full"
                     />
+
+                    {/* <div className="relative w-[600px] h-[200px] overflow-hidden">
+                        <Image
+                            src={course.image?.url || "/img/Prelims-Foundation-Course.webp"}
+                            alt={course.image?.alt || course.title}
+                            fill
+                            className="object-cover"
+                        />
+                        </div> */}
+
                 </div>
 
                 {/* Badge */}
