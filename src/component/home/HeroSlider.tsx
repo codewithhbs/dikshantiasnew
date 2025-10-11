@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 export default function HeroSlider() {
    const { t } = useTranslation("common");
   const courses = [
-    { id: "c1", name: "E-Learning", color: "bg-purple-200", icon: "⏰", link: "#" },
+    { id: "c1", name: "E-Learning", color: "bg-purple-200", icon: "⏰", link: "/e-learning" },
     { id: "c2", name: "What to Read in The Hindu", color: "bg-yellow-200", icon: "🎥", link: "current-affairs/what-to-read-in-hindu" },
     { id: "c3", name: "What to Read in The Indian Express", color: "bg-green-200", icon: "🏫", link: "current-affairs/what-to-read-in-indian-express" },
     { id: "c4", name: "Daily Current Affairs", color: "bg-pink-200", icon: "✍️", link: "current-affairs/daily-current-affairs-analysis" },

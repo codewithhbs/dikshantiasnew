@@ -49,6 +49,7 @@
       label: "Settings",
       icon: Settings,
       children: [
+        { href: "/admin/e-learning", label: "E-Learning", icon: BookOpen },
         { href: "/admin/settings/pages", label: "Pages" },
         { href: "/admin/settings/web", label: "Web" },
       ],

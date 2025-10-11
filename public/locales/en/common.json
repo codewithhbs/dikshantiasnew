@@ -16,6 +16,18 @@
   "latestNews": "Latest News and",
   "updates": "Updates",
 
+  "ELearning": "E-Learning Materials",
+  "Browse": "Download IAS-related study materials (English & Hindi).",
+  "EName": "Name",
+  "MonthYear": "Month & Year",
+  "Download": "Download",
+  "English": "English",
+  "Hindi": "Hindi",
+  "Prev": "Prev",
+  "Next": "Next",
+
+
+
   "quickLinks": "QUICK LINKS",
   "contact": "Contact Us",
   "gallery": "Gallery",
@@ -300,6 +312,7 @@
       }
     ]
   }
+
 
 
 }
